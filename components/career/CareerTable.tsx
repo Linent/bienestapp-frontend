@@ -16,6 +16,7 @@ import {
 import { fetchCareers } from "@/services/careerService";
 import { EyeIcon, EditIcon, DeleteIcon } from "@/components/icons/ActionIcons";
 import AddCareerModal from "@/components/career/AddCareerModal";
+import ViewCareerModal from "@/components/career/ViewCareerModal";
 
 interface Career {
   _id: string;
@@ -37,6 +38,10 @@ const CareerTable = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Estado y funciones para visualizar carrera
+  const [selectedCareer, setSelectedCareer] = useState<Career | null>(null);
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
+
   useEffect(() => {
     const getCareers = async () => {
       try {
@@ -56,6 +61,11 @@ const CareerTable = () => {
 
     getCareers();
   }, []);
+
+  const handleViewCareer = (career: Career) => {
+    setSelectedCareer(career);
+    onViewOpen();
+  };
 
   const filteredCareers = careers.filter((career) => {
     const matchesStatus = filterStatus
@@ -130,6 +140,7 @@ const CareerTable = () => {
                       <button
                         aria-label="Ver detalles"
                         className="cursor-pointer text-default-400 hover:text-primary"
+                        onClick={() => handleViewCareer(career)}
                       >
                         <EyeIcon />
                       </button>
@@ -158,8 +169,9 @@ const CareerTable = () => {
         </TableBody>
       </Table>
 
-      {/* Modal de agregar carrera */}
+      {/* Modales */}
       <AddCareerModal isOpen={isOpen} onClose={onClose} />
+      <ViewCareerModal isOpen={isViewOpen} onClose={onViewClose} career={selectedCareer} />
     </div>
   );
 };

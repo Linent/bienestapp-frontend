@@ -2,7 +2,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 
 interface Career {
   name: string;
-  description: string;
+  code: string;
   enable: boolean;
 }
 
@@ -26,8 +26,8 @@ const ViewCareerModal: React.FC<ViewCareerModalProps> = ({ isOpen, onClose, care
               <p>{career.name}</p>
             </div>
             <div>
-              <p className="font-semibold">Descripción:</p>
-              <p>{career.description}</p>
+              <p className="font-semibold">código:</p>
+              <p>{career.code}</p>
             </div>
             <div>
               <p className="font-semibold">Estado:</p>

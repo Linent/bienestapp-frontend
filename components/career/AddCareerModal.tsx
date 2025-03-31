@@ -8,6 +8,7 @@ import {
   Button,
   Input,
   Alert,
+  Skeleton,
   addToast,
 } from "@heroui/react";
 import { createCareer } from "@/services/careerService";
@@ -47,8 +48,9 @@ const AddCareerModal = ({ isOpen, onClose, onSuccess }) => {
         color: "success",
       });
     } catch (err) {
-      setLoading(false);
       setError("Error al registrar la carrera. Intente nuevamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,22 +59,31 @@ const AddCareerModal = ({ isOpen, onClose, onSuccess }) => {
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Agregar Carrera</ModalHeader>
         <ModalBody>
-          <Input
-            label="Código"
-            placeholder="Ingrese el código de la carrera"
-            variant="bordered"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            isRequired
-          />
-          <Input
-            label="Nombre"
-            placeholder="Ingrese el nombre de la carrera"
-            variant="bordered"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            isRequired
-          />
+          {loading ? (
+            <>
+              <Skeleton className="h-10 w-full mb-4" />
+              <Skeleton className="h-10 w-full" />
+            </>
+          ) : (
+            <>
+              <Input
+                label="Código"
+                placeholder="Ingrese el código de la carrera"
+                variant="bordered"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                isRequired
+              />
+              <Input
+                label="Nombre"
+                placeholder="Ingrese el nombre de la carrera"
+                variant="bordered"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                isRequired
+              />
+            </>
+          )}
           {error && (
             <Alert color="warning" variant="filled" className="mt-4">
               {error}
