@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "Bienestapp",
+  description: "Solicita en tus estudios con tutores especializados.",
   navItems: [
     {
       label: "Home",
@@ -13,6 +13,7 @@ export const siteConfig = {
       label: "Agenda",
       href: "/schedules",
       roles: ["admin", "academic_friend"], // Solo admin y amigos académicos pueden acceder
+      subItems: []
     },
     {
       label: "Usuarios",
@@ -23,6 +24,7 @@ export const siteConfig = {
       label: "Dashboard",
       href: "/dashboard",
       roles: ["admin"], // Admin y estudiantes pueden ver el dashboard
+      
     },
     {
       label: "Carreras",
