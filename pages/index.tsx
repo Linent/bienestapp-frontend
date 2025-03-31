@@ -15,7 +15,7 @@ export default function IndexPage() {
     },
     {
       title: "Bienestar Universitario",
-      subtitle: "Salud mental",
+      subtitle: "Siempre a tu lado",
       description: "Fortalecimiento de los servicios de Bienestar Universitario UFPS",
       imageUrl: "https://scontent.fbga2-1.fna.fbcdn.net/v/t39.30808-6/442477187_939805018151184_3692111653218029846_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeE4IDfH_n-34jDbZoreU7GUnpaKs8wa46-eloqzzBrjr6U6jgRjTJ90iOCKfEoaOoc&_nc_ohc=MbQcSx7qnMIQ7kNvgG9ET60&_nc_oc=AdkHXEEE-fsSUXPyVgNl4L7F1s9FvYP1xxaKsox6cLd4KLKqSUl4ne_1OmZZaoeMyqqRNSI7cJGbxwpB2pwcKsat&_nc_zt=23&_nc_ht=scontent.fbga2-1.fna&_nc_gid=fRAgs22SOVG0HHLL3ckTqw&oh=00_AYEnIge35x9bTnekWxQV72fs_3lEIMCFyLUClRDtEvVg5Q&oe=67EFCB39",
       href:"https://docs.google.com/forms/d/e/1FAIpQLSd_SwnIMoj6Luro4hj2ep4BpJlDXhQDg_F75I4akxslR-TKZw/viewform"
