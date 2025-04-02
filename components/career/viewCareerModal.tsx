@@ -1,10 +1,8 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
 
-interface Career {
-  name: string;
-  code: string;
-  enable: boolean;
-}
+import { Career } from '@/types'
+
+
 
 interface ViewCareerModalProps {
   isOpen: boolean;
