@@ -62,3 +62,30 @@ export const fetchAdvisoriesLast7Days = async (): Promise<AdvisoryReport[]> => {
     const response = await axios.get<MostActiveAdvisor[]>(`${BACKEND_URL}/${Advisory}/report/mostActiveAdvisor`, { headers: getAuthHeaders() });
     return response.data;
   };
+
+  
+  const reportPath = "schedules";
+  
+  // Obtener cantidad de asesorías por asesor
+  export const fetchSchedulesByAdvisor = async (): Promise<{ advisorName: string; count: number }[]> => {
+    const response = await axios.get(`${BACKEND_URL}/${reportPath}/schedules-by-advisor`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  };
+  
+  // Obtener cantidad de asesorías por tema
+export const fetchSchedulesByTopic = async (): Promise<{ topic: string; count: number }[]> => {
+  const response = await axios.get(`${BACKEND_URL}/${reportPath}/schedules-by-topic`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data;
+};
+
+// Obtener promedio de asistencia por asesoría
+export const fetchAttendancePerSchedule = async (): Promise<{ advisoryId: string; attendanceRate: number }[]> => {
+  const response = await axios.get(`${BACKEND_URL}/${reportPath}/attendance-per-schedule`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data;
+};

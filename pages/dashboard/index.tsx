@@ -6,8 +6,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line
 
 import  TopCareersChart  from "@/components/TopCareers";
 import DefaultLayout from "@/layouts/default";
-import AdvisoriesOverTime from "@/components/AdvisoriesOverTime";
-import MostActiveAdvisorChart from "@/components/MostActiveAdvisor";
+import AdvisoriesByTopic from "@/components/AdvisoriesByTopic";
+import AdvisoriesByAdvisor from "@/components/AdvisoriesByAdvisor";
+import AttendancePerSchedule from "@/components/AttendancePerSchedule";
 
 
 const Dashboard = () => {
@@ -68,9 +69,10 @@ const Dashboard = () => {
       <h1 className="text-3xl font-bold mb-6">Estadísticas de Asesorías</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AdvisoriesOverTime />
-        <MostActiveAdvisorChart />
+        <AdvisoriesByAdvisor />
+        <AdvisoriesByTopic />
         <TopCareersChart />
+        <AttendancePerSchedule/>
       </div>
     </div>
     </DefaultLayout>
