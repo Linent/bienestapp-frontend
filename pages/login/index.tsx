@@ -94,7 +94,7 @@ const LoginPage = () => {
             <Tabs>
               <Tab key="login" title="Inicia sesión">
                 {error && (
-                  <Alert color="warning" title="Error" description={error} />
+                  <Alert color="danger" title="Error" description={error} />
                 )}
                 <Form
                   onSubmit={handleSubmit}

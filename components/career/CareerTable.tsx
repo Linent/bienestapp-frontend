@@ -16,7 +16,7 @@ import {
 import { fetchCareers } from "@/services/careerService";
 import { EyeIcon, EditIcon, DeleteIcon } from "@/components/icons/ActionIcons";
 import AddCareerModal from "@/components/career/AddCareerModal";
-import ViewCareerModal from "@/components/career/ViewCareerModal";
+import ViewCareerModal from "@/components/career/viewCareerModal";
 import { Career } from "@/types";
 
 const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
