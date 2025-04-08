@@ -5,54 +5,50 @@ export const siteConfig = {
   description: "Solicita en tus estudios con tutores especializados.",
   navItems: [
     {
-      label: "Home",
+      label: "Inicio",
       href: "/",
-      roles: ["admin", "student", "academic_friend", ''], // Todos los roles pueden ver esta página
+      roles: ["admin", "student", "academic_friend"],
     },
     {
-      label: "Agenda",
+      label: "Asesorías",
       href: "/schedules",
-      roles: ["admin", "academic_friend"], // Solo admin y amigos académicos pueden acceder
-      subItems: []
+      roles: ["admin", "academic_friend"],
+      subItems: [
+        { label: "Mis asesorías", href: "/schedules/view" },
+        { label: "Crear asesoría", href: "/schedules/new" },
+      ]
+    },
+    {
+      label: "Asesores",
+      href: "/advisors",
+      roles: ["admin"],
     },
     {
       label: "Usuarios",
       href: "/user",
-      roles: ["admin"], // Solo administradores pueden acceder
+      roles: ["admin"],
     },
     {
       label: "Dashboard",
       href: "/dashboard",
-      roles: ["admin"], // Admin y estudiantes pueden ver el dashboard
-      
+      roles: ["admin"],
     },
     {
       label: "Carreras",
       href: "/career",
-      roles: ["admin", "academic_friend"],
+      roles: ["admin"],
     }
   ],
   navMenuItems: [
     {
-      label: "Profile",
+      label: "Perfil",
       href: "/profile",
       roles: ["admin", "student", "academic_friend"],
     },
     {
-      label: "Projects",
-      href: "/projects",
-      roles: ["admin"],
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-      roles: ["admin"],
-    },
-    {
-      label: "Logout",
+      label: "Cerrar sesión",
       href: "/logout",
       roles: ["admin", "student", "academic_friend"],
-    },
+    }
   ],
-  links: {},
 };
