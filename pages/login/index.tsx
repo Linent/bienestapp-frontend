@@ -10,6 +10,7 @@ import {
   Tabs,
   Tab,
   Alert,
+  CardHeader,
 } from "@heroui/react";
 import DefaultLayout from "@/layouts/default";
 import { BACKEND_URL } from "@/config";
@@ -34,7 +35,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  setError(null); 
+    setError(null);
 
     try {
       const response = await axios.post(`${BACKEND_URL}/user/login`, {
@@ -49,16 +50,13 @@ const LoginPage = () => {
         setIsAuthenticated(true);
         router.push("/");
       }
-    } 
-    catch (err: any) {
+    } catch (err: any) {
       console.error("Error en el login:", err.toJSON ? err.toJSON() : err);
-    
-      if (axios.isAxiosError(err) && err.response) {
 
-    
+      if (axios.isAxiosError(err) && err.response) {
         const status = err.response.status;
-        const message =  "usuario o contraseña incorrectos";
-    
+        const message = "usuario o contraseña incorrectos";
+
         if (status === 400 || status === 401) {
           setError(message);
         } else if (status === 500) {
@@ -69,7 +67,7 @@ const LoginPage = () => {
       } else {
         setError("No se pudo conectar con el servidor.");
       }
-    
+
       // Ocultar la alerta después de 5 segundos
       setTimeout(() => setError(null), 5000);
     }
@@ -88,45 +86,57 @@ const LoginPage = () => {
   return (
     <DefaultLayout>
       <div className=" flex flex-col w-full items-center">
-        <h1 className={title()}>Bienvenido de nuevo</h1>
-        <Card className="m-4 max-w-full w-96 h-[400px]">
-          <CardBody className="overflow-hidden">
-            <Tabs>
-              <Tab key="login" title="Inicia sesión">
-                {error && (
-                  <Alert color="warning" title="Error" description={error} />
-                )}
-                <Form
-                  onSubmit={handleSubmit}
-                  className="w-full flex flex-col gap-4"
-                >
-                  <Input
-                    isRequired
-                    label="Email"
-                    name="email"
-                    placeholder="Enter your email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                  <Input
-                    isRequired
-                    label="Password"
-                    name="password"
-                    placeholder="Enter your password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
 
-                  <div className="flex gap-2 justify-end">
-                    <Button fullWidth color="primary" type="submit">
-                      Iniciar sesión
-                    </Button>
-                  </div>
-                </Form>
-              </Tab>
-            </Tabs>
+        <Card className="m-4 max-w-full pt-4 w-96 shadow-lg rounded-lg">
+          <CardHeader className="text-center py-4">
+            <h2 className="text-2xl font-bold text-gray-800">Iniciar sesión</h2>
+          </CardHeader>
+
+          <CardBody className="px-6 py-4">
+            {error && (
+              <Alert
+                color="warning"
+                title="Error"
+                description={error}
+                className="mb-4"
+              />
+            )}
+
+            <Form
+              onSubmit={handleSubmit}
+              className="w-full flex flex-col gap-5"
+            >
+              <Input
+                isRequired
+                label="Correo electrónico"
+                name="email"
+                placeholder="Ingresa tu correo"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+
+              <Input
+                isRequired
+                label="Contraseña"
+                name="password"
+                placeholder="Ingresa tu contraseña"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+
+              <div className="flex justify-center">
+                <Button
+                  fullWidth
+                  color="primary"
+                  type="submit"
+                  className="py-3 text-lg"
+                >
+                  Iniciar sesión
+                </Button>
+              </div>
+            </Form>
           </CardBody>
         </Card>
       </div>

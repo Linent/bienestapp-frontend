@@ -10,7 +10,7 @@ const AdvisoriesByAdvisor = () => {
     const getData = async () => {
       try {
         const result = await fetchSchedulesByAdvisor();
-        setData(result.map(item => ({
+        setData(result.slice(0, 10).map(item => ({ // Tomar solo los primeros 10 registros
           advisorName: item.advisorName || "Desconocido", // Asegura que siempre haya un valor
           count: item.count
         })));

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import DefaultLayout from "@/layouts/default";
+import AdvisoryCalendar from "@/components/schedule/AdvisoryCalendar";
 
 export default function SchedulePage() {
   const router = useRouter();
@@ -21,12 +22,11 @@ export default function SchedulePage() {
   }
 
   return (
-    <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <div className="inline-block max-w-lg text-center justify-center">
+    <DefaultLayout>   
+        <div className=" flex flex-col w-full items-center p-6">
           <h1 className="text-3xl font-bold">Todas las asesorías</h1>
+          <AdvisoryCalendar />
         </div>
-      </section>
     </DefaultLayout>
   );
 }
