@@ -49,7 +49,7 @@ export default function IndexPage() {
         <div className="flex flex-wrap items-center justify-center gap-1">
           {cardsData.map((card, index) => (
             <a
-              key={card.id || index}
+              key={index}
               href={card.href}
               target="_blank"
               rel="noopener noreferrer"
