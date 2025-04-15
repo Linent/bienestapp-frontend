@@ -115,7 +115,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   }
 >
   {roleOptions.map((role) => (
-    <SelectItem key={role.value} value={role.value}>
+    <SelectItem key={role.value} id={role.value}>
       {role.label}
     </SelectItem>
   ))}
@@ -129,7 +129,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   }
 >
   {careers.map((career) => (
-    <SelectItem key={career._id} value={career._id}>
+    <SelectItem key={career._id} id={career._id}> 
       {career.name}
     </SelectItem>
   ))}

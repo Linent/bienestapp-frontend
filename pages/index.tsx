@@ -17,14 +17,14 @@ export default function IndexPage() {
       title: "Bienestar Universitario",
       subtitle: "Siempre a tu lado",
       description: "Fortalecimiento de los servicios de Bienestar Universitario UFPS",
-      imageUrl: "https://scontent.fbga2-1.fna.fbcdn.net/v/t39.30808-6/442477187_939805018151184_3692111653218029846_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeE4IDfH_n-34jDbZoreU7GUnpaKs8wa46-eloqzzBrjr6U6jgRjTJ90iOCKfEoaOoc&_nc_ohc=MbQcSx7qnMIQ7kNvgG9ET60&_nc_oc=AdkHXEEE-fsSUXPyVgNl4L7F1s9FvYP1xxaKsox6cLd4KLKqSUl4ne_1OmZZaoeMyqqRNSI7cJGbxwpB2pwcKsat&_nc_zt=23&_nc_ht=scontent.fbga2-1.fna&_nc_gid=fRAgs22SOVG0HHLL3ckTqw&oh=00_AYEnIge35x9bTnekWxQV72fs_3lEIMCFyLUClRDtEvVg5Q&oe=67EFCB39",
+      imageUrl: "https://ww2.ufps.edu.co/public/imagenes/noticia/045d3494baa3138730f82cb3c4a29b94.jpg",
       href:"https://docs.google.com/forms/d/e/1FAIpQLSd_SwnIMoj6Luro4hj2ep4BpJlDXhQDg_F75I4akxslR-TKZw/viewform"
     },
     {
       title: "La oficina virtual reiniciara",
       subtitle: "Estamos contigo en casa",
       description: "Vuelve la Oficina Virtual de Bienestar Universitario UFPS",
-      imageUrl: "https://scontent.fbga2-1.fna.fbcdn.net/v/t39.30808-6/469897119_8588105951315674_8473951230566303519_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEsgd0MjjszMhTLowgJrUsK2hQwSoZGRGfaFDBKhkZEZ-ZogTvldQ4vYxbvmroU2ng&_nc_ohc=IP8KKiUibtMQ7kNvgHbkfIY&_nc_oc=AdlKMk58cQX5uJ_XRu68YVLU8JUTYA61g2JaRL8Yf03oIqbIH2fgYD7OPIEIhcEAkFzmdPME0h-oha3ys8cTNJ6X&_nc_zt=23&_nc_ht=scontent.fbga2-1.fna&_nc_gid=AB6LcIXRBUBMUX-I07FjRA&oh=00_AYGhw3Q4GjadLKP6n9_NbuZuTwviSMm_8n4lLOl_EM2e5Q&oe=67EFD197",
+      imageUrl: "https://scontent.fbga2-1.fna.fbcdn.net/v/t1.6435-9/174627494_3709278305865154_4523148945106296178_n.jpg?stp=dst-jpg_p526x296_tt6&_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGWGS_v5Xe4qpB2Jp8yVJs_7TreAsdix6btOt4Cx2LHphuFQKUBWsW247CAjhV2A5o&_nc_ohc=0j7UldvLRZgQ7kNvwHl_MWa&_nc_oc=AdkTmXQKn8AgvIjgU0Ys-RjQZCLmN1rUkZseoFK-S7DeBsFIiIxfxqscJGxiOxr4H9kTR1jHHQTxO9essTlWCSxC&_nc_zt=23&_nc_ht=scontent.fbga2-1.fna&_nc_gid=kyjJlVD8DjXExE_xjltxXw&oh=00_AfF_i_5JqxoTGpOwFzXRoTBN-TwyQr5b8kx_WKtgGmLOtw&oe=681F9C65",
       href:"https://docs.google.com/forms/d/e/1FAIpQLSdKak7SIRrRkJpY6qGZifM4N3M4MQZDxvsUfAB7NFqqo6EMhA/viewform?fbclid=IwY2xjawJWx2xleHRuA2FlbQIxMAABHaQGDS6nXnCB52cbwJco3mp9WBmooacWSIKq-BN3GjMLzN1VTz2mLLllzg_aem__WChdfqJofJEOc1QqaYIsQ"
     },
   ];

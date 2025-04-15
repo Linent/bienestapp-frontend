@@ -17,7 +17,12 @@ import { fetchCareers } from "@/services/careerService";
 import { registerUser } from "@/services/userService"; // Importa la función de registro
 import axios from "axios"; // Importar axios para manejar las respuestas de error
 
-const AddUserModal = ({ isOpen, onClose }) => {
+interface AddUserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
   const [careers, setCareers] = useState<{ _id: string; name: string }[]>([]);
   const [selectedCareer, setSelectedCareer] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -89,7 +94,7 @@ const AddUserModal = ({ isOpen, onClose }) => {
           color: "success",
         });
       }, 1000); // Añadido un pequeño retraso para asegurarse de que el modal ya está cerrado
-    } catch (err) {
+    } catch (err:any) {
       setLoading(false); // Desactivar el Skeleton
 
       // Manejo de errores
@@ -216,7 +221,7 @@ const AddUserModal = ({ isOpen, onClose }) => {
               </div>
             )}
             {error && (
-              <Alert color="danger" variant="filled" className="mt-4">
+              <Alert color="danger" variant="solid" className="mt-4">
                 {error}
               </Alert>
             )}

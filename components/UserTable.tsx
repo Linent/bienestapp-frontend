@@ -132,13 +132,13 @@ const UserTable = () => {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
-            <SelectItem key="" value="">
+            <SelectItem key="" data-value="">
               Todos
             </SelectItem>
-            <SelectItem key="Activo" value="Activo">
+            <SelectItem key="Activo" data-value="Activo">
               Activo
             </SelectItem>
-            <SelectItem key="Inactivo" value="Inactivo">
+            <SelectItem key="Inactivo" data-value="Inactivo">
               Inactivo
             </SelectItem>
           </Select>
