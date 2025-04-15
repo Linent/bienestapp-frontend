@@ -7,14 +7,12 @@ export interface User {
   role: "admin" | "student" | "academic_friend";
   enable: boolean;
   password?: string; // Solo para el registro
+  availableHours: number;
 }
+
 
 export interface Career {
   _id: string;
-  name: string;
-}
-
-export interface Career {
   name: string;
   code: string;
   enable: boolean;
@@ -26,6 +24,7 @@ export interface AdvisoryData {
   dateStart: string; // Formato ISO (datetime-local)
   dateEnd: string;   // Formato ISO
   status?: "pending" | "approved" | "canceled";
+  recurring?: boolean;
 }
 export interface Advisory {
           _id: string;

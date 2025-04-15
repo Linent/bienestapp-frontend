@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
+
+
 import { fetchUsers } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
 import { createAdvisory } from "@/services/advisoryService";
-
+import { User } from "@/types";
 const MAX_HOURS = 20;
 const allowedTimes = [8, 9, 10, 11, 14, 15, 16, 17]; // Horarios permitidos
 const daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
 const AdvisoryForm = () => {
-  const [advisors, setAdvisors] = useState([]);
+  const [advisors, setAdvisors] = useState<User[]>([]);
   const [selectedAdvisor, setSelectedAdvisor] = useState("");
   const [selectedCareer, setSelectedCareer] = useState("");
   const [selectedSchedule, setSelectedSchedule] = useState<{ day: string; hour: number } | null>(null);
@@ -17,7 +19,7 @@ const AdvisoryForm = () => {
     const loadData = async () => {
       const users = await fetchUsers();
       // Filtramos solo los asesores disponibles con menos de 20 horas asignadas
-      const academicFriends = users.filter(user => user.role === "academic_friend" && user.enable && user.availableHours < MAX_HOURS);
+      const academicFriends = users.filter((user: User) => user.role === "academic_friend" && user.enable && user.availableHours < MAX_HOURS);
       setAdvisors(academicFriends);
     };
     loadData();
@@ -25,7 +27,7 @@ const AdvisoryForm = () => {
 
   const handleAdvisorChange = (advisorId: string) => {
     setSelectedAdvisor(advisorId);
-    const advisor = advisors.find(a => a._id === advisorId);
+    const advisor = advisors.find((a: User) => a._id === advisorId);
     if (advisor) {
       setSelectedCareer(advisor.career);
     }
@@ -54,9 +56,8 @@ const AdvisoryForm = () => {
     await createAdvisory({
       advisorId: selectedAdvisor,
       careerId: selectedCareer,
-      day: selectedSchedule.day.toLowerCase(),
-      dateStart,
-      dateEnd,
+      dateStart: dateStart.toISOString(),
+      dateEnd: dateEnd.toISOString(),
       status: "pending",
       recurring: true,
     });

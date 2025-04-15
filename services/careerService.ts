@@ -13,7 +13,6 @@ export const fetchCareers = async (): Promise<Career[]> => {
 };
 
 
-
 // Obtener una carrera por ID
 export const fetchCareerById = async (id: string): Promise<Career> => {
   const response = await axios.get(`${BACKEND_URL}/${carreraPath}/${id}`, {

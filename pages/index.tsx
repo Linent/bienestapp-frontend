@@ -44,7 +44,7 @@ export default function IndexPage() {
         {/* Contenedor de las tarjetas con separación */}
         <div className="flex flex-wrap items-center justify-center gap-1">
           {cardsData.map((card, index) => (
-            <a href={card.href} target="_blank" no-follow>
+            <a href={card.href} target="_blank" rel="noreferrer nofollow">
             <Card 
             key={index} className="py-4 w-5/6 h-85 mt-2">
               <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">

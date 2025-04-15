@@ -16,7 +16,7 @@ import {
 import { fetchCareers } from "@/services/careerService";
 import { EyeIcon, EditIcon, DeleteIcon } from "@/components/icons/ActionIcons";
 import AddCareerModal from "@/components/career/AddCareerModal";
-import ViewCareerModal from "@/components/career/ViewCareerModal";
+import ViewCareerModal from "@/components/career/viewCareerModal";
 import { Career } from "@/types";
 
 const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
@@ -91,13 +91,13 @@ const CareerTable = () => {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <SelectItem key="" value="">
+          <SelectItem key="" data-value="">
             Todas
           </SelectItem>
-          <SelectItem key="Activo" value="Activo">
+          <SelectItem key="Activo" data-value="Activo">
             Activo
           </SelectItem>
-          <SelectItem key="Inactivo" value="Inactivo">
+          <SelectItem key="Inactivo" data-value="Inactivo">
             Inactivo
           </SelectItem>
         </Select>
@@ -164,7 +164,19 @@ const CareerTable = () => {
       </Table>
 
       {/* Modales */}
-      <AddCareerModal isOpen={isOpen} onClose={onClose} />
+      <AddCareerModal isOpen={isOpen} onClose={onClose} onSuccess={() => {
+        // Refresh the careers list or handle success logic
+        setLoading(true);
+        fetchCareers().then((data) => {
+          if (Array.isArray(data)) {
+            setCareers(data as Career[]);
+          }
+          setLoading(false);
+        }).catch(() => {
+          setError("No se pudo actualizar la lista de carreras.");
+          setLoading(false);
+        });
+      }} />
       <ViewCareerModal isOpen={isViewOpen} onClose={onViewClose} career={selectedCareer} />
     </div>
   );

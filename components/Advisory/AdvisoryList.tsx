@@ -17,7 +17,7 @@ import {
 import { fetchUsers } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
 import { createAdvisory } from "@/services/advisoryService";
-import { User, Career } from "@/types";
+import { User, Career, AdvisoryData } from "@/types";
 import { PlusIcon } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/AddUserModal";
 
@@ -60,11 +60,16 @@ const AdvisoryList = () => {
     }
 
     try {
+      const dateStart = new Date().toISOString(); // Example: current date as start
+      const dateEnd = new Date(new Date().setHours(new Date().getHours() + 1)).toISOString(); // Example: 1 hour later as end
+
       await createAdvisory({
         advisorId,
         careerId: advisor.career,
         status: "pending",
         recurring: true,
+        dateStart,
+        dateEnd,
       });
       alert("Asesoría creada exitosamente.");
     } catch (error) {
@@ -95,13 +100,13 @@ const AdvisoryList = () => {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <SelectItem key="" value="">
+          <SelectItem key="" data-value="">
             Todos
           </SelectItem>
-          <SelectItem key="Activo" value="Activo">
+          <SelectItem key="Activo" data-value="Activo">
             Activo
           </SelectItem>
-          <SelectItem key="Inactivo" value="Inactivo">
+          <SelectItem key="Inactivo" data-value="Inactivo">
             Inactivo
           </SelectItem>
         </Select>
@@ -110,14 +115,16 @@ const AdvisoryList = () => {
           value={filterCareer}
           onChange={(e) => setFilterCareer(e.target.value)}
         >
-          <SelectItem key="" value="">
+          <SelectItem key="" data-value="">
             Todas
           </SelectItem>
-          {Object.entries(careers).map(([id, name]) => (
-            <SelectItem key={id} value={id}>
-              {name}
-            </SelectItem>
-          ))}
+          <>
+            {Object.entries(careers).map(([id, name]) => (
+              <SelectItem key={id} data-value={id}>
+                {name}
+              </SelectItem>
+            ))}
+          </>
         </Select>
         <Button color="primary" startContent={<PlusIcon />} onPress={onOpen}>
           Agregar
