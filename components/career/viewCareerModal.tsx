@@ -1,8 +1,13 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from "@heroui/react";
 
-import { Career } from '@/types'
-
-
+import { Career } from "@/types";
 
 interface ViewCareerModalProps {
   isOpen: boolean;
@@ -10,11 +15,15 @@ interface ViewCareerModalProps {
   career: Career | null;
 }
 
-const ViewCareerModal: React.FC<ViewCareerModalProps> = ({ isOpen, onClose, career }) => {
+const ViewCareerModal: React.FC<ViewCareerModalProps> = ({
+  isOpen,
+  onClose,
+  career,
+}) => {
   if (!career) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="w-full max-w-lg">
+    <Modal className="w-full max-w-lg" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>Detalles de la Carrera</ModalHeader>
         <ModalBody>
@@ -36,7 +45,9 @@ const ViewCareerModal: React.FC<ViewCareerModalProps> = ({ isOpen, onClose, care
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onPress={onClose} color="primary">Cerrar</Button>
+          <Button color="primary" onPress={onClose}>
+            Cerrar
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

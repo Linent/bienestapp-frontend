@@ -11,9 +11,10 @@ import {
   SelectItem,
   Skeleton,
 } from "@heroui/react";
+import toast from "react-hot-toast";
+
 import { fetchUserById, updateUser } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
-import toast from "react-hot-toast";
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -41,13 +42,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-
       const fetchData = async () => {
         setLoading(true);
         try {
           const userData = await fetchUserById(userId);
 
           const careerData = await fetchCareers();
+
           setUser(userData);
           setCareers(careerData);
         } catch (error) {
@@ -57,6 +58,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           setLoading(false);
         }
       };
+
       fetchData();
     }
   }, [isOpen, userId]);
@@ -67,6 +69,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     try {
       const updatedUser = Object.keys(user).reduce((acc, key) => {
         if (user[key] !== "") acc[key] = user[key];
+
         return acc;
       }, {} as any);
 
@@ -83,7 +86,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="w-full max-w-lg">
+    <Modal className="w-full max-w-lg" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>Editar Usuario</ModalHeader>
         <ModalBody>
@@ -107,41 +110,41 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 value={user?.codigo || ""}
                 onChange={(e) => setUser({ ...user, codigo: e.target.value })}
               />
-<Select
-  label="Rol"
-  selectedKeys={new Set([user?.role || "student"])}
-  onSelectionChange={(value) =>
-    setUser({ ...user, role: Array.from(value)[0] })
-  }
->
-  {roleOptions.map((role) => (
-    <SelectItem key={role.value} id={role.value}>
-      {role.label}
-    </SelectItem>
-  ))}
-</Select>
+              <Select
+                label="Rol"
+                selectedKeys={new Set([user?.role || "student"])}
+                onSelectionChange={(value) =>
+                  setUser({ ...user, role: Array.from(value)[0] })
+                }
+              >
+                {roleOptions.map((role) => (
+                  <SelectItem key={role.value} id={role.value}>
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </Select>
 
-<Select
-  label="Carrera"
-  selectedKeys={new Set([user?.career || ""])}
-  onSelectionChange={(value) =>
-    setUser({ ...user, career: Array.from(value)[0] })
-  }
->
-  {careers.map((career) => (
-    <SelectItem key={career._id} id={career._id}> 
-      {career.name}
-    </SelectItem>
-  ))}
-</Select>
+              <Select
+                label="Carrera"
+                selectedKeys={new Set([user?.career || ""])}
+                onSelectionChange={(value) =>
+                  setUser({ ...user, career: Array.from(value)[0] })
+                }
+              >
+                {careers.map((career) => (
+                  <SelectItem key={career._id} id={career._id}>
+                    {career.name}
+                  </SelectItem>
+                ))}
+              </Select>
             </>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button onPress={onClose} variant="flat">
+          <Button variant="flat" onPress={onClose}>
             Cancelar
           </Button>
-          <Button color="primary" onPress={handleUpdate} isLoading={updating}>
+          <Button color="primary" isLoading={updating} onPress={handleUpdate}>
             Guardar Cambios
           </Button>
         </ModalFooter>

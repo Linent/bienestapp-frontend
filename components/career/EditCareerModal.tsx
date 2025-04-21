@@ -9,8 +9,9 @@ import {
   Button,
   Skeleton,
 } from "@heroui/react";
-import { fetchCareerById, updateCareer } from "@/services/careerService";
 import toast from "react-hot-toast";
+
+import { fetchCareerById, updateCareer } from "@/services/careerService";
 
 interface EditCareerModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
         setLoading(true);
         try {
           const careerData = await fetchCareerById(careerId);
+
           setCareer(careerData);
         } catch (error) {
           console.error("Error al obtener datos de la carrera:", error);
@@ -43,6 +45,7 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
           setLoading(false);
         }
       };
+
       fetchData();
     }
   }, [isOpen, careerId]);
@@ -53,6 +56,7 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
     try {
       const updatedCareer = Object.keys(career).reduce((acc, key) => {
         if (career[key] !== "") acc[key] = career[key];
+
         return acc;
       }, {} as any);
 
@@ -69,7 +73,7 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="w-full max-w-lg">
+    <Modal className="w-full max-w-lg" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>Editar Carrera</ModalHeader>
         <ModalBody>
@@ -86,10 +90,10 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button onPress={onClose} variant="flat">
+          <Button variant="flat" onPress={onClose}>
             Cancelar
           </Button>
-          <Button color="primary" onPress={handleUpdate} isLoading={updating}>
+          <Button color="primary" isLoading={updating} onPress={handleUpdate}>
             Guardar Cambios
           </Button>
         </ModalFooter>

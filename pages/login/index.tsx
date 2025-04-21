@@ -7,22 +7,22 @@ import {
   Button,
   Card,
   CardBody,
-  Tabs,
-  Tab,
   Alert,
   CardHeader,
 } from "@heroui/react";
+
 import DefaultLayout from "@/layouts/default";
 import { BACKEND_URL } from "@/config";
-import { title } from "@/components/primitives";
 
 const LoginPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token) {
       setIsAuthenticated(true);
       router.push("/");
@@ -45,6 +45,7 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         const { token, user } = response.data; // Suponiendo que el backend devuelve el rol del usuario
+
         localStorage.setItem("token", token);
         localStorage.setItem("role", user.role); // Guardar el rol en localStorage
         setIsAuthenticated(true);
@@ -94,16 +95,16 @@ const LoginPage = () => {
           <CardBody className="px-6 py-4">
             {error && (
               <Alert
-                color="warning"
-                title="Error"
-                description={error}
                 className="mb-4"
+                color="warning"
+                description={error}
+                title="Error"
               />
             )}
 
             <Form
-              onSubmit={handleSubmit}
               className="w-full flex flex-col gap-5"
+              onSubmit={handleSubmit}
             >
               <Input
                 isRequired
@@ -133,9 +134,9 @@ const LoginPage = () => {
               <div className="flex justify-center">
                 <Button
                   fullWidth
+                  className="py-3 text-lg"
                   color="primary"
                   type="submit"
-                  className="py-3 text-lg"
                 >
                   Iniciar sesión
                 </Button>

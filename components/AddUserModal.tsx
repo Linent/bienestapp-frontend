@@ -13,9 +13,10 @@ import {
   Alert,
   addToast,
 } from "@heroui/react";
+import axios from "axios"; // Importar axios para manejar las respuestas de error
+
 import { fetchCareers } from "@/services/careerService";
 import { registerUser } from "@/services/userService"; // Importa la función de registro
-import axios from "axios"; // Importar axios para manejar las respuestas de error
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
     const getCareers = async () => {
       try {
         const data = await fetchCareers();
+
         if (Array.isArray(data)) {
           setCareers(data);
         } else {
@@ -56,6 +58,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
     // Verificar si todos los campos obligatorios están completos
     if (!name || !email || !codigo || !role || !password || !selectedCareer) {
       setError("Por favor, complete todos los campos.");
+
       return;
     }
 
@@ -72,8 +75,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
     };
 
     try {
-      const result = await registerUser(userData);
-
+      await registerUser(userData);
 
       // Limpiar los campos del formulario después de guardar
       setName("");
@@ -94,17 +96,17 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
           color: "success",
         });
       }, 1000); // Añadido un pequeño retraso para asegurarse de que el modal ya está cerrado
-    } catch (err:any) {
+    } catch (err: any) {
       setLoading(false); // Desactivar el Skeleton
 
       // Manejo de errores
-      console.error("Error al registrar el usuario:", err.toJSON ? err.toJSON() : err);
-      
+      console.error(
+        "Error al registrar el usuario:",
+        err.toJSON ? err.toJSON() : err,
+      );
+
       if (axios.isAxiosError(err) && err.response) {
-
-
         const status = err.response.status;
-        const message = "Error al registrar el usuario";
 
         if (status === 400 || status === 401) {
           setError("Datos inválidos. Verifique el formulario.");
@@ -130,7 +132,9 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
     <>
       <Modal isOpen={isOpen} placement="top-center" onOpenChange={onClose}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Agregar Usuario</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Agregar Usuario
+          </ModalHeader>
           <ModalBody>
             {loading ? (
               // Mostrar Skeleton mientras carga los datos
@@ -146,42 +150,44 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
               // Mostrar el formulario cuando no está cargando
               <div className="space-y-4">
                 <Input
-                  label="Nombre"
-                  placeholder="Ingrese el nombre"
-                  variant="bordered"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  minLength={10} // Mínimo 3 caracteres
-                  errorMessage="El nombre debe tener al menos 10 caracteres"
                   isRequired
+                  errorMessage="El nombre debe tener al menos 10 caracteres"
+                  label="Nombre"
+                  minLength={10} // Mínimo 3 caracteres
+                  placeholder="Ingrese el nombre"
+                  value={name}
+                  variant="bordered"
+                  onChange={(e) => setName(e.target.value)}
                 />
                 <Input
-                  label="Correo"
-                  placeholder="Ingrese el correo"
-                  variant="bordered"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   isRequired
                   errorMessage="Por favor, ingrese un correo válido"
+                  label="Correo"
+                  placeholder="Ingrese el correo"
+                  type="email"
+                  value={email}
+                  variant="bordered"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
-                  label="Código"
-                  placeholder="Ingrese el código"
-                  variant="bordered"
-                  value={codigo}
-                  onChange={(e) => setCode(e.target.value)}
                   isRequired
                   errorMessage="Por favor, ingrese un código"
+                  label="Código"
+                  placeholder="Ingrese el código"
+                  value={codigo}
+                  variant="bordered"
+                  onChange={(e) => setCode(e.target.value)}
                 />
                 <Select
-                  label="Rol"
                   isRequired
                   errorMessage="Por favor, seleccione un rol"
+                  label="Rol"
                   placeholder="Seleccione un rol"
-                  variant="bordered"
                   value={role}
-                  onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
+                  variant="bordered"
+                  onSelectionChange={(keys) =>
+                    setRole(Array.from(keys)[0] as string)
+                  }
                 >
                   <SelectItem key="admin" textValue="admin">
                     Administrador
@@ -194,23 +200,25 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                   </SelectItem>
                 </Select>
                 <Input
-                  label="Contraseña"
-                  placeholder="Ingrese la contraseña"
-                  variant="bordered"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   isRequired
                   errorMessage="Por favor, ingrese una contraseña"
+                  label="Contraseña"
+                  placeholder="Ingrese la contraseña"
+                  type="password"
+                  value={password}
+                  variant="bordered"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-                <Select 
-                    isRequired
-                    errorMessage="Por favor, seleccione una carrera"
+                <Select
+                  isRequired
+                  errorMessage="Por favor, seleccione una carrera"
                   label="Carrera"
                   placeholder="Seleccione una carrera"
                   selectedKeys={new Set([selectedCareer])}
-                  onSelectionChange={(keys) => setSelectedCareer(Array.from(keys)[0] as string)}
                   variant="bordered"
+                  onSelectionChange={(keys) =>
+                    setSelectedCareer(Array.from(keys)[0] as string)
+                  }
                 >
                   {careers.map((career) => (
                     <SelectItem key={career._id} textValue={career._id}>
@@ -221,7 +229,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
               </div>
             )}
             {error && (
-              <Alert color="danger" variant="solid" className="mt-4">
+              <Alert className="mt-4" color="danger" variant="solid">
                 {error}
               </Alert>
             )}
@@ -241,4 +249,3 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default AddUserModal;
-

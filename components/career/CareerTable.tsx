@@ -13,6 +13,7 @@ import {
   Chip,
   useDisclosure,
 } from "@heroui/react";
+
 import { fetchCareers } from "@/services/careerService";
 import { EyeIcon, EditIcon, DeleteIcon } from "@/components/icons/ActionIcons";
 import AddCareerModal from "@/components/career/AddCareerModal";
@@ -34,12 +35,17 @@ const CareerTable = () => {
 
   // Estado y funciones para visualizar carrera
   const [selectedCareer, setSelectedCareer] = useState<Career | null>(null);
-  const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
+  const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
+  } = useDisclosure();
 
   useEffect(() => {
     const getCareers = async () => {
       try {
         const data = await fetchCareers();
+
         if (Array.isArray(data)) {
           setCareers(data as Career[]);
         } else {
@@ -69,6 +75,7 @@ const CareerTable = () => {
       ? career.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         career.code.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
+
     return matchesStatus && matchesSearch;
   });
 
@@ -79,9 +86,9 @@ const CareerTable = () => {
     <div className="m-4">
       <div className="flex justify-between items-center mb-4">
         <input
-          type="text"
-          placeholder="Buscar carrera..."
           className="border p-2 rounded"
+          placeholder="Buscar carrera..."
+          type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -118,13 +125,18 @@ const CareerTable = () => {
             const statusText: "Activo" | "Inactivo" = career.enable
               ? "Activo"
               : "Inactivo";
+
             return (
               <TableRow key={career._id || index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{career.code}</TableCell>
                 <TableCell>{career.name}</TableCell>
                 <TableCell>
-                  <Chip color={statusColorMap[statusText]} size="sm" variant="flat">
+                  <Chip
+                    color={statusColorMap[statusText]}
+                    size="sm"
+                    variant="flat"
+                  >
                     {statusText}
                   </Chip>
                 </TableCell>
@@ -164,20 +176,30 @@ const CareerTable = () => {
       </Table>
 
       {/* Modales */}
-      <AddCareerModal isOpen={isOpen} onClose={onClose} onSuccess={() => {
-        // Refresh the careers list or handle success logic
-        setLoading(true);
-        fetchCareers().then((data) => {
-          if (Array.isArray(data)) {
-            setCareers(data as Career[]);
-          }
-          setLoading(false);
-        }).catch(() => {
-          setError("No se pudo actualizar la lista de carreras.");
-          setLoading(false);
-        });
-      }} />
-      <ViewCareerModal isOpen={isViewOpen} onClose={onViewClose} career={selectedCareer} />
+      <AddCareerModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSuccess={() => {
+          // Refresh the careers list or handle success logic
+          setLoading(true);
+          fetchCareers()
+            .then((data) => {
+              if (Array.isArray(data)) {
+                setCareers(data as Career[]);
+              }
+              setLoading(false);
+            })
+            .catch(() => {
+              setError("No se pudo actualizar la lista de carreras.");
+              setLoading(false);
+            });
+        }}
+      />
+      <ViewCareerModal
+        career={selectedCareer}
+        isOpen={isViewOpen}
+        onClose={onViewClose}
+      />
     </div>
   );
 };

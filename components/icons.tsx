@@ -7,15 +7,7 @@ export const Logo: React.FC<{ size?: number; src: string; alt?: string }> = ({
   src,
   alt = "Logo",
   ...props
-}) => (
-  <img
-    src={src}
-    alt={alt}
-    width={size}
-    height={size}
-    {...props}
-  />
-);
+}) => <img alt={alt} height={size} src={src} width={size} {...props} />;
 
 export const DiscordIcon: React.FC<IconSvgProps> = ({
   size = 24,

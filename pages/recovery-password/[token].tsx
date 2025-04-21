@@ -10,6 +10,7 @@ import {
   Spacer,
   Skeleton,
 } from "@heroui/react";
+
 import { recoveryPassword } from "@/services/userService";
 
 export default function RecoveryPasswordPage() {
@@ -28,6 +29,7 @@ export default function RecoveryPasswordPage() {
     if (!password || password.length < 8) {
       setAlertType("warning");
       setAlertMessage("La contraseña debe tener al menos 8 caracteres.");
+
       return;
     }
 
@@ -41,7 +43,7 @@ export default function RecoveryPasswordPage() {
     } catch (error: any) {
       setAlertType("danger");
       setAlertMessage(
-        error.response?.data?.message || "Error al actualizar la contraseña."
+        error.response?.data?.message || "Error al actualizar la contraseña.",
       );
     } finally {
       setLoading(false);
@@ -69,18 +71,18 @@ export default function RecoveryPasswordPage() {
                 </div>
               )}
               <Input
+                isRequired
                 label="Nueva contraseña"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                isRequired
               />
               <Spacer y={4} />
               <Button
-                color="primary"
-                onPress={handleSubmit}
-                isDisabled={isButtonDisabled}
                 fullWidth
+                color="primary"
+                isDisabled={isButtonDisabled}
+                onPress={handleSubmit}
               >
                 Cambiar Contraseña
               </Button>
@@ -91,4 +93,3 @@ export default function RecoveryPasswordPage() {
     </div>
   );
 }
-

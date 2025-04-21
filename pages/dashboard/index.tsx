@@ -1,21 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
-import { BACKEND_URL } from "@/config";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
 
 import TopCareersChart from "@/components/TopCareers";
 import DefaultLayout from "@/layouts/default";
@@ -26,11 +10,10 @@ import AttendancePerSchedule from "@/components/AttendancePerSchedule";
 const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [reports, setReports] = useState<any>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRange, setSelectedRange] = useState("last7days");
+
   const router = useRouter();
 
   useEffect(() => {

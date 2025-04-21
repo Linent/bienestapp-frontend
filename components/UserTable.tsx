@@ -13,6 +13,7 @@ import {
   Button,
   useDisclosure,
 } from "@heroui/react";
+
 import { fetchUsers } from "@/services/userService";
 import {
   EyeIcon,
@@ -36,7 +37,7 @@ const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
 };
 
 interface User {
-  _id: string
+  _id: string;
   name: string;
   email: string;
   codigo: string;
@@ -62,6 +63,7 @@ const UserTable = () => {
     const getUsers = async () => {
       try {
         const data = await fetchUsers();
+
         if (Array.isArray(data)) {
           setUsers(data as User[]);
         } else {
@@ -86,6 +88,7 @@ const UserTable = () => {
       ? user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
+
     return matchesStatus && matchesSearch;
   });
 
@@ -107,6 +110,7 @@ const UserTable = () => {
     setLoading(true);
     try {
       const data = await fetchUsers();
+
       setUsers(data);
     } catch (error) {
       setError("No se pudo actualizar la lista de usuarios.");
@@ -119,9 +123,9 @@ const UserTable = () => {
     <div className="m-4">
       <div className="flex justify-between items-center mb-4">
         <input
-          type="text"
-          placeholder="Buscar usuario..."
           className="border p-2 rounded"
+          placeholder="Buscar usuario..."
+          type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -162,6 +166,7 @@ const UserTable = () => {
             const statusText: "Activo" | "Inactivo" = user.enable
               ? "Activo"
               : "Inactivo";
+
             return (
               <TableRow key={user._id || index}>
                 <TableCell>{index + 1}</TableCell>
@@ -183,8 +188,8 @@ const UserTable = () => {
                     <Tooltip content="Ver detalles">
                       <button
                         aria-label="Ver detalles"
-                        onClick={() => openViewModal(user)}
                         className="cursor-pointer text-default-400 hover:text-primary"
+                        onClick={() => openViewModal(user)}
                       >
                         <EyeIcon />
                       </button>
@@ -218,14 +223,14 @@ const UserTable = () => {
       <AddUserModal isOpen={isOpen} onClose={onClose} />
       <ViewUserModal
         isOpen={isViewModalOpen}
-        onClose={closeViewModal}
         user={selectedUser}
+        onClose={closeViewModal}
       />
       {isEditModalOpen && selectedUserId && (
         <EditUserModal
           isOpen={isEditModalOpen}
-          onClose={() => setEditModalOpen(false)}
           userId={selectedUserId}
+          onClose={() => setEditModalOpen(false)}
           onUpdateSuccess={refreshUsers}
         />
       )}

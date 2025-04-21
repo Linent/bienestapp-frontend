@@ -9,6 +9,7 @@ import {
   Alert,
   Skeleton,
 } from "@heroui/react";
+
 import DefaultLayout from "@/layouts/default";
 import { sendRecoveryEmail } from "@/services/userService";
 
@@ -29,6 +30,7 @@ export default function ForgotPasswordPage() {
         message: "Por favor ingresa un correo válido.",
         type: "warning",
       });
+
       return;
     }
 
@@ -76,21 +78,21 @@ export default function ForgotPasswordPage() {
               <Skeleton className="h-12 w-full rounded-lg mb-4" />
             ) : (
               <Input
+                isRequired
                 label="Correo electrónico"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                isRequired
               />
             )}
 
             <Button
               fullWidth
-              color="primary"
               className="mt-4"
-              onPress={handleSubmit}
+              color="primary"
               isDisabled={buttonDisabled}
               isLoading={loading}
+              onPress={handleSubmit}
             >
               Enviar enlace de recuperación
             </Button>
@@ -100,6 +102,3 @@ export default function ForgotPasswordPage() {
     </DefaultLayout>
   );
 }
-
-
-

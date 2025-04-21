@@ -8,7 +8,6 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-  Link,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -16,6 +15,7 @@ import {
 } from "@heroui/react";
 import { Button } from "@heroui/button";
 import NextLink from "next/link";
+
 import { Logo } from "@/components/icons";
 import { siteConfig } from "@/config/site";
 
@@ -30,6 +30,7 @@ export const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
+
     setIsAuthenticated(!!token);
     setUserRole(role);
   }, []);
@@ -42,7 +43,11 @@ export const Navbar = () => {
   };
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky" onMenuOpenChange={setIsMenuOpen}>
+    <HeroUINavbar
+      maxWidth="xl"
+      position="sticky"
+      onMenuOpenChange={setIsMenuOpen}
+    >
       {/* Logo y botón de menú en móviles */}
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarMenuToggle
@@ -51,7 +56,7 @@ export const Navbar = () => {
         />
         <NavbarBrand>
           <NextLink href="/">
-            <Logo src={'/logo-bienestapp.webp'} />
+            <Logo src={"/logo-bienestapp.webp"} />
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
@@ -66,17 +71,26 @@ export const Navbar = () => {
                 <Dropdown
                   key={item.href}
                   isOpen={openDropdown === item.href}
-                  onOpenChange={(isOpen) => setOpenDropdown(isOpen ? item.href : null)}
+                  onOpenChange={(isOpen) =>
+                    setOpenDropdown(isOpen ? item.href : null)
+                  }
                 >
                   <DropdownTrigger>
-                    <Button onPointerDown={() => router.push(item.href)} variant="light" onMouseEnter={() => setOpenDropdown(item.href)}>
+                    <Button
+                      variant="light"
+                      onMouseEnter={() => setOpenDropdown(item.href)}
+                      onPointerDown={() => router.push(item.href)}
+                    >
                       {item.label}
                     </Button>
                   </DropdownTrigger>
-                  <DropdownMenu  aria-label={`Submenú de ${item.label}`} onMouseLeave={() => setOpenDropdown(null)}>
+                  <DropdownMenu
+                    aria-label={`Submenú de ${item.label}`}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
                     {item.subItems.map((subItem) => (
                       <DropdownItem key={subItem.href}>
-                        <NextLink href={subItem.href} className="w-full block">
+                        <NextLink className="w-full block" href={subItem.href}>
                           {subItem.label}
                         </NextLink>
                       </DropdownItem>
@@ -85,11 +99,11 @@ export const Navbar = () => {
                 </Dropdown>
               ) : (
                 <NavbarItem key={item.href}>
-                  <NextLink href={item.href} className="hover:text-primary">
+                  <NextLink className="hover:text-primary" href={item.href}>
                     {item.label}
                   </NextLink>
                 </NavbarItem>
-              )
+              ),
             )}
         </NavbarContent>
       )}
@@ -98,7 +112,7 @@ export const Navbar = () => {
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
           {isAuthenticated ? (
-            <Button onClick={handleLogout} variant="flat">
+            <Button variant="flat" onClick={handleLogout}>
               Cerrar sesión
             </Button>
           ) : (
@@ -116,7 +130,7 @@ export const Navbar = () => {
             .filter((item) => !userRole || item.roles.includes(userRole))
             .map((item) => (
               <NavbarMenuItem key={item.href}>
-                <NextLink href={item.href} className="block px-4 py-2">
+                <NextLink className="block px-4 py-2" href={item.href}>
                   {item.label}
                 </NextLink>
                 {item.subItems &&
@@ -130,12 +144,12 @@ export const Navbar = () => {
         ) : (
           <>
             <NavbarMenuItem key="/">
-              <NextLink href="/" className="block px-4 py-2">
+              <NextLink className="block px-4 py-2" href="/">
                 Inicio
               </NextLink>
             </NavbarMenuItem>
             <NavbarMenuItem key="/login">
-              <NextLink href="/login" className="block px-4 py-2">
+              <NextLink className="block px-4 py-2" href="/login">
                 Iniciar sesión
               </NextLink>
             </NavbarMenuItem>

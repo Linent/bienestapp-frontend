@@ -10,7 +10,6 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   return (
-    
     <div className="relative flex flex-col h-screen">
       <Head />
       <Navbar />
@@ -24,7 +23,9 @@ export default function DefaultLayout({
           href="#"
           title="#"
         >
-          <span className="text-default-600">Deserallada por estudiantes de Ingenieria de Sistemas</span>
+          <span className="text-default-600">
+            Deserallada por estudiantes de Ingenieria de Sistemas
+          </span>
           <p className="text-primary">Bienestapp</p>
         </Link>
       </footer>

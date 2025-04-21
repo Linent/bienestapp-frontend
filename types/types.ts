@@ -10,7 +10,6 @@ export interface User {
   availableHours: number;
 }
 
-
 export interface Career {
   _id: string;
   name: string;
@@ -22,16 +21,16 @@ export interface AdvisoryData {
   advisorId: string;
   careerId: string;
   dateStart: string; // Formato ISO (datetime-local)
-  dateEnd: string;   // Formato ISO
+  dateEnd: string; // Formato ISO
   status?: "pending" | "approved" | "canceled";
   recurring?: boolean;
 }
 export interface Advisory {
-          _id: string;
-          advisorId?: { name: string };
-          careerId?: { name: string };
-          dateStart: string;
-          dateEnd: string;
-          recurring: boolean;
-          status: string;
-        }
+  _id: string;
+  advisorId?: { name: string };
+  careerId?: { name: string };
+  dateStart: string;
+  dateEnd: string;
+  recurring: boolean;
+  status: string;
+}

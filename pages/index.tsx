@@ -1,7 +1,7 @@
 import React from "react";
+import { Card, CardBody, CardHeader, Image } from "@heroui/react";
 
 import DefaultLayout from "@/layouts/default";
-import { Card, CardBody, CardHeader, Image } from "@heroui/react";
 
 export default function IndexPage() {
   // Datos de cada tarjeta (puedes modificar el contenido aquí)
@@ -51,8 +51,8 @@ export default function IndexPage() {
             <a
               key={index}
               href={card.href}
-              target="_blank"
               rel="noreferrer noopener"
+              target="_blank"
             >
               <Card className="py-4 w-5/6 h-85 mt-2">
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">

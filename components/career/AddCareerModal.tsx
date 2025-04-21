@@ -11,6 +11,7 @@ import {
   Skeleton,
   addToast,
 } from "@heroui/react";
+
 import { createCareer } from "@/services/careerService";
 
 interface AddCareerModalProps {
@@ -19,7 +20,11 @@ interface AddCareerModalProps {
   onSuccess: () => void;
 }
 
-const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const AddCareerModal: React.FC<AddCareerModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}) => {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [enable, setEnable] = useState(true);
@@ -29,6 +34,7 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSucc
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 5000);
+
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -36,6 +42,7 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSucc
   const handleSave = async () => {
     if (!name || !code) {
       setError("Por favor, complete todos los campos.");
+
       return;
     }
     setError(null);
@@ -63,7 +70,9 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSucc
   return (
     <Modal isOpen={isOpen} placement="top-center" onOpenChange={onClose}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Agregar Carrera</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">
+          Agregar Carrera
+        </ModalHeader>
         <ModalBody>
           {loading ? (
             <>
@@ -73,25 +82,25 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSucc
           ) : (
             <>
               <Input
+                isRequired
                 label="Código"
                 placeholder="Ingrese el código de la carrera"
-                variant="bordered"
                 value={code}
+                variant="bordered"
                 onChange={(e) => setCode(e.target.value)}
-                isRequired
               />
               <Input
+                isRequired
                 label="Nombre"
                 placeholder="Ingrese el nombre de la carrera"
-                variant="bordered"
                 value={name}
+                variant="bordered"
                 onChange={(e) => setName(e.target.value)}
-                isRequired
               />
             </>
           )}
           {error && (
-            <Alert color="warning" variant="solid" className="mt-4">
+            <Alert className="mt-4" color="warning" variant="solid">
               {error}
             </Alert>
           )}
@@ -100,7 +109,7 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({ isOpen, onClose, onSucc
           <Button color="danger" variant="flat" onPress={onClose}>
             Cancelar
           </Button>
-          <Button color="primary" onPress={handleSave} isLoading={loading}>
+          <Button color="primary" isLoading={loading} onPress={handleSave}>
             Guardar
           </Button>
         </ModalFooter>

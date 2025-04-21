@@ -16,7 +16,7 @@ export const siteConfig = {
       subItems: [
         { label: "Mis asesorías", href: "/schedules/view" },
         { label: "Crear asesoría", href: "/schedules/new" },
-      ]
+      ],
     },
     {
       label: "Asesores",
@@ -37,7 +37,7 @@ export const siteConfig = {
       label: "Carreras",
       href: "/career",
       roles: ["admin"],
-    }
+    },
   ],
   navMenuItems: [
     {
@@ -49,6 +49,6 @@ export const siteConfig = {
       label: "Cerrar sesión",
       href: "/logout",
       roles: ["admin", "student", "academic_friend"],
-    }
+    },
   ],
 };

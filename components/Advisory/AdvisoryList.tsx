@@ -7,13 +7,13 @@ import {
   TableRow,
   TableCell,
   Chip,
-  Tooltip,
   Input,
   Select,
   SelectItem,
   Button,
   useDisclosure,
 } from "@heroui/react";
+
 import { fetchUsers } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
 import { createAdvisory } from "@/services/advisoryService";
@@ -43,14 +43,15 @@ const AdvisoryList = () => {
         const careerMap = careersData.reduce(
           (acc: Record<string, string>, career: Career) => {
             acc[career._id] = career.name;
+
             return acc;
           },
-          {}
+          {},
         );
 
         setCareers(careerMap);
         setAdvisors(
-          users.filter((user: User) => user.role === "academic_friend")
+          users.filter((user: User) => user.role === "academic_friend"),
         );
       } catch (err) {
         console.error("Error cargando los datos:", err);
@@ -59,20 +60,23 @@ const AdvisoryList = () => {
         setLoading(false);
       }
     };
+
     loadData();
   }, []);
 
   const handleCreateAdvisory = async (advisorId: string) => {
     const advisor = advisors.find((a) => a._id === advisorId);
+
     if (!advisor || (advisor.availableHours ?? 0) >= MAX_HOURS) {
       alert("Este asesor ya ha alcanzado el máximo de 20 horas.");
+
       return;
     }
 
     try {
       const dateStart = new Date().toISOString();
       const dateEnd = new Date(
-        new Date().setHours(new Date().getHours() + 1)
+        new Date().setHours(new Date().getHours() + 1),
       ).toISOString();
 
       await createAdvisory({
@@ -106,14 +110,16 @@ const AdvisoryList = () => {
           ? advisor.career
           : advisor.career?._id) === filterCareer
       : true;
+
     return matchSearch && matchStatus && matchCareer;
   });
 
   const getCareerName = (
-    career: string | { _id: string } | null | undefined
+    career: string | { _id: string } | null | undefined,
   ) => {
     if (!career) return "Desconocida";
     if (typeof career === "string") return careers[career] || "Desconocida";
+
     return careers[career._id] || "Desconocida";
   };
 
@@ -163,56 +169,56 @@ const AdvisoryList = () => {
           </>
         </Select>
         <Button
+          className="min-w-[120px]"
           color="primary"
           startContent={<PlusIcon />}
           onPress={onOpen}
-          className="min-w-[120px]"
         >
           Agregar
         </Button>
       </div>
       <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
-      <Table isStriped aria-label="Lista de Asesores">
-        <TableHeader>
-          <TableColumn>#</TableColumn>
-          <TableColumn>Nombre</TableColumn>
-          <TableColumn>Código</TableColumn>
-          <TableColumn>Correo</TableColumn>
-          <TableColumn>Carrera</TableColumn>
-          <TableColumn>Estado</TableColumn>
-          <TableColumn>Acciones</TableColumn>
-        </TableHeader>
-        <TableBody>
-          {filteredAdvisors.map((advisor, index) => (
-            <TableRow key={advisor._id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{advisor.name}</TableCell>
-              <TableCell>{advisor.codigo}</TableCell>
-              <TableCell>{advisor.email}</TableCell>
-              <TableCell>{getCareerName(advisor.career)}</TableCell>
-              <TableCell>
-                <Chip
-                  color={advisor.enable ? "success" : "danger"}
-                  size="sm"
-                  variant="flat"
-                >
-                  {advisor.enable ? "Activo" : "Inactivo"}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                <Button
-                  color="primary"
-                  size="sm"
-                  onClick={() => handleCreateAdvisory(advisor._id)}
-                  isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
-                >
-                  Crear Asesoría
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+        <Table isStriped aria-label="Lista de Asesores">
+          <TableHeader>
+            <TableColumn>#</TableColumn>
+            <TableColumn>Nombre</TableColumn>
+            <TableColumn>Código</TableColumn>
+            <TableColumn>Correo</TableColumn>
+            <TableColumn>Carrera</TableColumn>
+            <TableColumn>Estado</TableColumn>
+            <TableColumn>Acciones</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {filteredAdvisors.map((advisor, index) => (
+              <TableRow key={advisor._id}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{advisor.name}</TableCell>
+                <TableCell>{advisor.codigo}</TableCell>
+                <TableCell>{advisor.email}</TableCell>
+                <TableCell>{getCareerName(advisor.career)}</TableCell>
+                <TableCell>
+                  <Chip
+                    color={advisor.enable ? "success" : "danger"}
+                    size="sm"
+                    variant="flat"
+                  >
+                    {advisor.enable ? "Activo" : "Inactivo"}
+                  </Chip>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    color="primary"
+                    isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
+                    size="sm"
+                    onClick={() => handleCreateAdvisory(advisor._id)}
+                  >
+                    Crear Asesoría
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
       <AddUserModal isOpen={isOpen} onClose={onClose} />
     </div>
