@@ -29,7 +29,7 @@ const AdvisoryForm = () => {
     setSelectedAdvisor(advisorId);
     const advisor = advisors.find((a: User) => a._id === advisorId);
     if (advisor) {
-      setSelectedCareer(advisor.career);
+      setSelectedCareer(typeof advisor.career === "string" ? advisor.career : "");
     }
   };
 

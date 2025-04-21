@@ -64,7 +64,6 @@ export const Navbar = () => {
             .map((item) =>
               item.subItems && item.subItems.length > 0 ? (
                 <Dropdown
-                  
                   key={item.href}
                   isOpen={openDropdown === item.href}
                   onOpenChange={(isOpen) => setOpenDropdown(isOpen ? item.href : null)}
@@ -112,22 +111,36 @@ export const Navbar = () => {
 
       {/* Menú desplegable en móviles */}
       <NavbarMenu>
-        {siteConfig.navItems
-          .filter((item) => !userRole || item.roles.includes(userRole))
-          .map((item) => (
-            <NavbarMenuItem key={item.href}>
-              <NextLink href={item.href} className="block px-4 py-2">
-                {item.label}
+        {isAuthenticated ? (
+          siteConfig.navItems
+            .filter((item) => !userRole || item.roles.includes(userRole))
+            .map((item) => (
+              <NavbarMenuItem key={item.href}>
+                <NextLink href={item.href} className="block px-4 py-2">
+                  {item.label}
+                </NextLink>
+                {item.subItems &&
+                  item.subItems.map((subItem) => (
+                    <NavbarMenuItem key={subItem.href} className="pl-6 text-sm">
+                      <NextLink href={subItem.href}>{subItem.label}</NextLink>
+                    </NavbarMenuItem>
+                  ))}
+              </NavbarMenuItem>
+            ))
+        ) : (
+          <>
+            <NavbarMenuItem key="/">
+              <NextLink href="/" className="block px-4 py-2">
+                Inicio
               </NextLink>
-              {/* Submenús en versión móvil */}
-              {item.subItems &&
-                item.subItems.map((subItem) => (
-                  <NavbarMenuItem key={subItem.href} className="pl-6 text-sm">
-                    <NextLink href={subItem.href}>{subItem.label}</NextLink>
-                  </NavbarMenuItem>
-                ))}
             </NavbarMenuItem>
-          ))}
+            <NavbarMenuItem key="/login">
+              <NextLink href="/login" className="block px-4 py-2">
+                Iniciar sesión
+              </NextLink>
+            </NavbarMenuItem>
+          </>
+        )}
       </NavbarMenu>
     </HeroUINavbar>
   );

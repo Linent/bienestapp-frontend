@@ -17,7 +17,7 @@ import {
 import { fetchUsers } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
 import { createAdvisory } from "@/services/advisoryService";
-import { User, Career, AdvisoryData } from "@/types";
+import { User, Career } from "@/types";
 import { PlusIcon } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/AddUserModal";
 
@@ -27,6 +27,7 @@ const AdvisoryList = () => {
   const [advisors, setAdvisors] = useState<User[]>([]);
   const [careers, setCareers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterCareer, setFilterCareer] = useState<string>("");
@@ -37,14 +38,23 @@ const AdvisoryList = () => {
       try {
         const users = await fetchUsers();
         const careersData = await fetchCareers();
-        const careerMap = careersData.reduce((acc: Record<string, string>, career: Career) => {
-          acc[career._id] = career.name;
-          return acc;
-        }, {});
+
+        // Mapeo de ID de carrera a nombre
+        const careerMap = careersData.reduce(
+          (acc: Record<string, string>, career: Career) => {
+            acc[career._id] = career.name;
+            return acc;
+          },
+          {}
+        );
+
         setCareers(careerMap);
-        setAdvisors(users.filter((user: User) => user.role === "academic_friend"));
-      } catch (error) {
-        console.error("Error cargando los datos:", error);
+        setAdvisors(
+          users.filter((user: User) => user.role === "academic_friend")
+        );
+      } catch (err) {
+        console.error("Error cargando los datos:", err);
+        setError("No se pudieron cargar los datos.");
       } finally {
         setLoading(false);
       }
@@ -54,23 +64,29 @@ const AdvisoryList = () => {
 
   const handleCreateAdvisory = async (advisorId: string) => {
     const advisor = advisors.find((a) => a._id === advisorId);
-    if (!advisor || advisor.availableHours >= MAX_HOURS) {
+    if (!advisor || (advisor.availableHours ?? 0) >= MAX_HOURS) {
       alert("Este asesor ya ha alcanzado el máximo de 20 horas.");
       return;
     }
 
     try {
-      const dateStart = new Date().toISOString(); // Example: current date as start
-      const dateEnd = new Date(new Date().setHours(new Date().getHours() + 1)).toISOString(); // Example: 1 hour later as end
+      const dateStart = new Date().toISOString();
+      const dateEnd = new Date(
+        new Date().setHours(new Date().getHours() + 1)
+      ).toISOString();
 
       await createAdvisory({
         advisorId,
-        careerId: advisor.career,
+        careerId:
+          typeof advisor.career === "string"
+            ? advisor.career
+            : advisor.career?._id || "",
         status: "pending",
         recurring: true,
         dateStart,
         dateEnd,
       });
+
       alert("Asesoría creada exitosamente.");
     } catch (error) {
       console.error("Error al crear la asesoría:", error);
@@ -79,23 +95,42 @@ const AdvisoryList = () => {
   };
 
   const filteredAdvisors = advisors.filter((advisor) => {
-    const matchSearch = advisor.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchStatus = filterStatus ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus : true;
-    const matchCareer = filterCareer ? advisor.career === filterCareer : true;
+    const matchSearch = advisor.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchStatus = filterStatus
+      ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus
+      : true;
+    const matchCareer = filterCareer
+      ? (typeof advisor.career === "string"
+          ? advisor.career
+          : advisor.career?._id) === filterCareer
+      : true;
     return matchSearch && matchStatus && matchCareer;
   });
 
-  if (loading) return <p>Cargando...</p>;
+  const getCareerName = (
+    career: string | { _id: string } | null | undefined
+  ) => {
+    if (!career) return "Desconocida";
+    if (typeof career === "string") return careers[career] || "Desconocida";
+    return careers[career._id] || "Desconocida";
+  };
+
+  if (loading) return <p>Cargando datos...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-lg">
-      <div className="flex justify-between items-center gap-4 mb-4">
+      <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
         <Input
+          className="flex-1 min-w-[180px]"
           placeholder="Buscar por nombre..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Select
+          className="flex-1 min-w-[180px]"
           label="Filtrar por estado"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -111,6 +146,7 @@ const AdvisoryList = () => {
           </SelectItem>
         </Select>
         <Select
+          className="flex-1 min-w-[180px]"
           label="Filtrar por carrera"
           value={filterCareer}
           onChange={(e) => setFilterCareer(e.target.value)}
@@ -126,10 +162,16 @@ const AdvisoryList = () => {
             ))}
           </>
         </Select>
-        <Button color="primary" startContent={<PlusIcon />} onPress={onOpen}>
+        <Button
+          color="primary"
+          startContent={<PlusIcon />}
+          onPress={onOpen}
+          className="min-w-[120px]"
+        >
           Agregar
         </Button>
       </div>
+      <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
       <Table isStriped aria-label="Lista de Asesores">
         <TableHeader>
           <TableColumn>#</TableColumn>
@@ -147,7 +189,7 @@ const AdvisoryList = () => {
               <TableCell>{advisor.name}</TableCell>
               <TableCell>{advisor.codigo}</TableCell>
               <TableCell>{advisor.email}</TableCell>
-              <TableCell>{careers[advisor.career] || "Desconocida"}</TableCell>
+              <TableCell>{getCareerName(advisor.career)}</TableCell>
               <TableCell>
                 <Chip
                   color={advisor.enable ? "success" : "danger"}
@@ -162,7 +204,7 @@ const AdvisoryList = () => {
                   color="primary"
                   size="sm"
                   onClick={() => handleCreateAdvisory(advisor._id)}
-                  isDisabled={advisor.availableHours >= MAX_HOURS}
+                  isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
                 >
                   Crear Asesoría
                 </Button>
@@ -171,11 +213,10 @@ const AdvisoryList = () => {
           ))}
         </TableBody>
       </Table>
-
+      </div>
       <AddUserModal isOpen={isOpen} onClose={onClose} />
     </div>
   );
 };
 
 export default AdvisoryList;
-

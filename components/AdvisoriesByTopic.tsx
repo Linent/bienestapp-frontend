@@ -11,7 +11,7 @@ const AdvisoriesByTopic = () => {
       try {
         const result = await fetchSchedulesByTopic();
         setData(result.slice(0, 10).map(item => ({ // Tomar solo los primeros 10 registros
-          topicName: item._id || "Desconocido", // Asegura que siempre haya un valor
+          topicName: item.topic || "Desconocido", // Asegura que siempre haya un valor
           count: item.count
         })));
       } catch (err) {

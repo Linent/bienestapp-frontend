@@ -52,7 +52,7 @@ export default function IndexPage() {
               key={index}
               href={card.href}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer noopener"
             >
               <Card className="py-4 w-5/6 h-85 mt-2">
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">

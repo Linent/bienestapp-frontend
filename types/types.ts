@@ -2,7 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  career: string;
+  career?: string | { _id: string } | null;
   codigo: string;
   role: "admin" | "student" | "academic_friend";
   enable: boolean;

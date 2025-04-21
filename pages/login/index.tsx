@@ -86,7 +86,6 @@ const LoginPage = () => {
   return (
     <DefaultLayout>
       <div className=" flex flex-col w-full items-center">
-
         <Card className="m-4 max-w-full pt-4 w-96 shadow-lg rounded-lg">
           <CardHeader className="text-center py-4">
             <h2 className="text-2xl font-bold text-gray-800">Iniciar sesión</h2>
@@ -125,6 +124,11 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
+
+              {/* Enlace "¿Olvidaste tu contraseña?" */}
+              <div className="text-right text-sm text-primary hover:underline">
+                <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
+              </div>
 
               <div className="flex justify-center">
                 <Button

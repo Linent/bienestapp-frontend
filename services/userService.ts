@@ -11,7 +11,16 @@ export const fetchUsers = async () => {
   });
   return response.data;
 };
+export const recoveryPassword = async (token: string, password: string) => {
+  const response = await axios.post(`${BACKEND_URL}/${UserPath}/recovery-password/${token}`, {
+    password,
+  });
+  return response.data;
+};
 
+export const sendRecoveryEmail = async (email: string) => {
+  return await axios.post(`${BACKEND_URL}/${UserPath}/forgot-password`, { email });
+};
 export const registerUser = async (userData: {
   name: string;
   email: string;
