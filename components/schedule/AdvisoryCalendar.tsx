@@ -95,7 +95,7 @@ const AdvisoryCalendar = () => {
   };
 
   return (
-    <div className="min-h-[600px] p-4 bg-white shadow-lg rounded-lg">
+    <div className="w-full min-h-[600px] p-4 bg-white shadow-lg rounded-lg">
       <h2 className="text-xl font-bold mb-4">Calendario de Asesorías</h2>
 
       <Calendar
@@ -109,8 +109,8 @@ const AdvisoryCalendar = () => {
         messages={{
           next: "Siguiente",
           previous: "Anterior",
-          today: "Hoy",
           month: "Mes",
+          today: "Hoy",
           week: "Semana",
           day: "Día",
           agenda: "Agenda",
