@@ -27,7 +27,7 @@ export const fetchCareerById = async (id: string): Promise<Career> => {
 export const createCareer = async (
   careerData: Partial<Career>,
 ): Promise<Career> => {
-  console.log(careerData);
+
   const response = await axios.post(
     `${BACKEND_URL}/${carreraPath}/create`,
     careerData,

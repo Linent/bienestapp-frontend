@@ -49,16 +49,13 @@ export const registerUser = async (userData: {
 };
 
 export const fetchUserById = async (userId: string): Promise<User> => {
-  try {
+
     const response = await axios.get(`${BACKEND_URL}/${UserPath}/${userId}`, {
       headers: getAuthHeaders(),
     }); // Corrección aquí
 
     return response.data;
-  } catch (error) {
-    console.error("❌ Error en fetchUserById:", error);
-    throw error;
-  }
+  
 };
 
 export const updateUser = async (

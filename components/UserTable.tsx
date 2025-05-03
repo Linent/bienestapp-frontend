@@ -63,9 +63,10 @@ const UserTable = () => {
     const getUsers = async () => {
       try {
         const data = await fetchUsers();
-
+  
         if (Array.isArray(data)) {
-          setUsers(data as User[]);
+          const onlyStudents = data.filter((user: User) => user.role === "student");
+          setUsers(onlyStudents);
         } else {
           throw new Error("Formato de datos inválido");
         }
@@ -76,7 +77,7 @@ const UserTable = () => {
         setLoading(false);
       }
     };
-
+  
     getUsers();
   }, []);
 
@@ -110,8 +111,8 @@ const UserTable = () => {
     setLoading(true);
     try {
       const data = await fetchUsers();
-
-      setUsers(data);
+      const onlyStudents = data.filter((user: User) => user.role === "student");
+      setUsers(onlyStudents);
     } catch (error) {
       setError("No se pudo actualizar la lista de usuarios.");
     } finally {

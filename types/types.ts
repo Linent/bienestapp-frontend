@@ -34,3 +34,44 @@ export interface Advisory {
   recurring: boolean;
   status: string;
 }
+export interface AdvisoryEvent {
+  id: string;
+  title: string;
+  advisorName: string;
+  career: string;
+  time: string;
+  start: Date;
+  end: Date;
+  status: string;
+  dateStart: Date;
+}
+
+
+export interface Student {
+  _id: string;
+  topic: string;
+  attendance: boolean;
+  status: string;
+  studentId: {
+    _id: string;
+    name: string;
+    email: string;
+    codigo: string;
+    career: {
+      name: string;
+    };
+  };
+}
+export interface TopCareerReport {
+  totalAdvisories: number;
+  career: string;
+}
+export interface AdvisoryReport {
+  date: string;
+  count: number;
+}
+
+export interface MostActiveAdvisor {
+  advisorName: string;
+  totalAdvisories: number;
+}

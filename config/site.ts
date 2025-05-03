@@ -24,7 +24,7 @@ export const siteConfig = {
       roles: ["admin"],
     },
     {
-      label: "Usuarios",
+      label: "Estudiantes",
       href: "/user",
       roles: ["admin"],
     },

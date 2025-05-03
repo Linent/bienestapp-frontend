@@ -2,23 +2,9 @@ import axios from "axios";
 
 import { BACKEND_URL } from "@/config";
 const Advisory = "advisory";
+import { getAuthHeaders } from "@/helpers/authHelper";
+import {TopCareerReport, AdvisoryReport, MostActiveAdvisor} from "@/types/types";
 
-export interface TopCareerReport {
-  totalAdvisories: number;
-  career: string;
-}
-export interface AdvisoryReport {
-  date: string;
-  count: number;
-}
-
-export interface MostActiveAdvisor {
-  advisorName: string;
-  totalAdvisories: number;
-}
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
 
 export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
   try {
