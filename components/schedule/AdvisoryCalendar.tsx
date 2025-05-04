@@ -19,9 +19,9 @@ const AdvisoryCalendar = () => {
         const data = await fetchAdvisories();
   
         const today = moment().startOf("day");
-        const formattedEvents = [];
+        const formattedEvents:any = [];
   
-        data.forEach((advisory) => {
+        data.forEach((advisory: any) => {
           const start = moment(advisory.dateStart);
           const end = moment(advisory.dateEnd);
   
@@ -71,11 +71,11 @@ const AdvisoryCalendar = () => {
     getAdvisories();
   }, []);
   
-  const handleEventClick = (event) => {
+  const handleEventClick = (event:any) => {
     setSelectedAdvisory(event); // Pasamos el evento seleccionado
   };
 
-  const eventStyleGetter = (event) => {
+  const eventStyleGetter = (event:any) => {
     const backgroundColor = event.status === "approved" ? "#007bff" : "#ddd";
     return {
       style: {
