@@ -5,7 +5,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recha
 const COLORS = ["#0088FE", "#FF8042"];
 
 const AttendancePerSchedule = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ advisoryId: string; attendanceRate: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

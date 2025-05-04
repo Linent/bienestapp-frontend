@@ -5,13 +5,14 @@ import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { fetchAdvisories } from "@/services/advisoryService";
 import AdvisoryList from "@/components/schedule/AdvisoryList"; // Asegúrate que sea export default
+import { Advisory } from "@/types";
 moment.locale("es");
 
 const localizer = momentLocalizer(moment);
 
 const AdvisoryCalendar = () => {
-  const [events, setEvents] = useState([]);
-  const [selectedAdvisory, setSelectedAdvisory] = useState(null);
+  const [events, setEvents] = useState<AdvisoryEvent[]>([]);
+  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
 
   useEffect(() => {
     const getAdvisories = async () => {
@@ -19,45 +20,38 @@ const AdvisoryCalendar = () => {
         const data = await fetchAdvisories();
   
         const today = moment().startOf("day");
-        const formattedEvents:any = [];
+        // Remove this duplicate declaration
   
-        data.forEach((advisory: any) => {
+        
+
+        const formattedEvents: AdvisoryEvent[] = [];
+
+        data.forEach((advisory: Advisory) => {
           const start = moment(advisory.dateStart);
           const end = moment(advisory.dateEnd);
-  
+        
           // Si la fecha ya pasó y no es recurrente, no lo mostramos
           if (!advisory.recurring && start.isBefore(today)) return;
-  
+        
           if (advisory.recurring) {
             for (let i = 0; i < 8; i++) {
               const newStart = start.clone().add(i, "weeks");
               const newEnd = end.clone().add(i, "weeks");
-  
+        
               // Evita fechas pasadas
               if (newStart.isBefore(today)) continue;
-  
+        
               formattedEvents.push({
-                id: `${advisory._id}-${i}`,
-                title: advisory.advisorId?.name || "Sin nombre",
-                advisorName: advisory.advisorId?.name || "Sin nombre",
-                career: advisory.careerId?.name || "Sin carrera",
-                time: newStart.format("LLLL"),
-                start: newStart.toDate(),
-                end: newEnd.toDate(),
-                status: advisory.status,
-              });
-            }
-          } else {
-            formattedEvents.push({
-              id: advisory._id,
-              title: advisory.advisorId?.name || "Sin nombre",
-              advisorName: advisory.advisorId?.name || "Sin nombre",
-              career: advisory.careerId?.name || "Sin carrera",
-              time: start.format("LLLL"),
-              start: start.toDate(),
-              end: end.toDate(),
-              status: advisory.status,
+          id: `${advisory._id}-${i}`,
+          title: advisory.advisorId?.name || "Sin nombre",
+          advisorName: advisory.advisorId?.name || "Sin nombre",
+          career: advisory.careerId?.name || "Sin carrera",
+          time: newStart.format("LLLL"),
+          start: newStart.toDate(),
+          end: newEnd.toDate(),
+          status: advisory.status,
             });
+            }
           }
         });
   
@@ -71,11 +65,22 @@ const AdvisoryCalendar = () => {
     getAdvisories();
   }, []);
   
-  const handleEventClick = (event:any) => {
+  const handleEventClick = (event: AdvisoryEvent): void => {
     setSelectedAdvisory(event); // Pasamos el evento seleccionado
   };
 
-  const eventStyleGetter = (event:any) => {
+  interface AdvisoryEvent {
+    id: string;
+    title: string;
+    advisorName: string;
+    career: string;
+    time: string;
+    start: Date;
+    end: Date;
+    status: string;
+  }
+
+  const eventStyleGetter = (event: AdvisoryEvent): { style: React.CSSProperties } => {
     const backgroundColor = event.status === "approved" ? "#007bff" : "#ddd";
     return {
       style: {

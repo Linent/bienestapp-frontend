@@ -3,7 +3,7 @@ import { fetchSchedulesByAdvisor } from "@/services/reportService";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const AdvisoriesByAdvisor = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ advisorName: string; count: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
