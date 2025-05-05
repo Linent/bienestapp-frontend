@@ -24,7 +24,7 @@ export default function DefaultLayout({
           title="#"
         >
           <span className="text-default-600">
-            Deserallada por estudiantes de Ingenieria de Sistemas
+            Desarollada por estudiantes de Ingenieria de Sistemas
           </span>
           <p className="text-primary">Bienestapp</p>
         </Link>
