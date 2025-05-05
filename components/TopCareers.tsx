@@ -9,8 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { fetchTopCareers, TopCareerReport } from "@/services/reportService";
-
+import { fetchTopCareers } from "@/services/reportService";
+import { TopCareerReport } from "@/types/types";
 const TopCareersChart = () => {
   const [data, setData] = useState<TopCareerReport[]>([]);
   const [error, setError] = useState<string | null>(null);
