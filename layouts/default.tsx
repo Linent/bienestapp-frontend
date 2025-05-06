@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { Link } from "@heroui/link";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Head } from "./head";
 import { Navbar } from "@/components/navbar";
 import { isTokenExpired } from "@/utils/auth";
