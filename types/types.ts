@@ -28,7 +28,7 @@ export interface AdvisoryData {
 export interface Advisory {
   _id: string;
   advisorId?: { name: string };
-  careerId?: { name: string };
+  careerId?: { name: string; _id: string };
   dateStart: string;
   dateEnd: string;
   recurring: boolean;
