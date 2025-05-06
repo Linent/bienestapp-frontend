@@ -6,6 +6,9 @@ import { AdvisoryData } from "@/types/"; // Asegúrate de que la ruta sea correc
 const advisory = "advisory";
 
 export const fetchAdvisories = async () => {
+  const headers = getAuthHeaders();
+  console.log("Enviando headers:", headers); // DEBUG
+
   try {
     const response = await axios.get(`${BACKEND_URL}/${advisory}`, {
       headers: getAuthHeaders(),

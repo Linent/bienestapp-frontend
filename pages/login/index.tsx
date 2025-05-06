@@ -48,6 +48,9 @@ const LoginPage = () => {
 
         localStorage.setItem("token", token);
         localStorage.setItem("role", user.role); // Guardar el rol en localStorage
+        localStorage.setItem("codigo", user.codigo); // 👈 Aquí guardas el codigo del usuario logueado
+        localStorage.setItem("email", user.email); // (opcional) Guarda también el email si quieres
+
         setIsAuthenticated(true);
         router.push("/");
       }

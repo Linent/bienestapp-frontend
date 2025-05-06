@@ -12,7 +12,7 @@ export const siteConfig = {
     {
       label: "Asesorías",
       href: "/schedules",
-      roles: ["admin", "academic_friend"],
+      roles: ["admin"],
       subItems: [
         { label: "Mis asesorías", href: "/schedules/view" },
         { label: "Crear asesoría", href: "/schedules/new" },
@@ -38,6 +38,12 @@ export const siteConfig = {
       href: "/career",
       roles: ["admin"],
     },
+    {
+      label: "Mi Calendario",
+      href: "/advisor/calendar",
+      roles: ["academic_friend"],
+    },
+    
   ],
   navMenuItems: [
     {
