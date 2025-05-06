@@ -1,5 +1,4 @@
-"use client"; // si estás en Next.js 13+
-
+"use client";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { Link } from "@heroui/link";
@@ -16,9 +15,9 @@ export default function DefaultLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const expired = isTokenExpired();
+    const token = localStorage.getItem("token");
 
-    if (expired) {
+    if (token && isTokenExpired()) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       router.push("/login");

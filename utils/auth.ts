@@ -1,4 +1,3 @@
-// utils/auth.ts
 import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
@@ -7,14 +6,15 @@ interface JwtPayload {
 
 export const isTokenExpired = (): boolean => {
   const token = localStorage.getItem("token");
-  if (!token) return true;
+  if (!token) return false; // No está logueado, pero no consideramos el token expirado
 
   try {
     const { exp } = jwtDecode<JwtPayload>(token);
-    return exp * 1000 < Date.now(); // true si el token ya expiró
+    return exp * 1000 < Date.now(); // true si expiró
   } catch (error) {
     console.error("Token inválido o malformado", error);
     return true;
   }
 };
+
 
