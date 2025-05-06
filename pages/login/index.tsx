@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Form,
   Input,
@@ -12,7 +11,7 @@ import {
 } from "@heroui/react";
 
 import DefaultLayout from "@/layouts/default";
-import { BACKEND_URL } from "@/config";
+import { loginUser } from "@/services/userService"; // 🔄 nueva importación
 
 const LoginPage = () => {
   const router = useRouter();
@@ -22,7 +21,6 @@ const LoginPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
       setIsAuthenticated(true);
       router.push("/");
@@ -38,23 +36,16 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/user/login`, {
-        email: formData.email,
-        password: formData.password,
-      });
+      const { token, user } = await loginUser(formData.email, formData.password);
 
-      if (response.status === 200) {
-        const { token, user } = response.data; // Suponiendo que el backend devuelve el rol del usuario
-
-        localStorage.setItem("token", token);
-        localStorage.setItem("role", user.role); // Guardar el rol en localStorage
-        setIsAuthenticated(true);
-        router.push("/");
-      }
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", user.role);
+      setIsAuthenticated(true);
+      router.push("/");
     } catch (err: any) {
       console.error("Error en el login:", err.toJSON ? err.toJSON() : err);
 
-      if (axios.isAxiosError(err) && err.response) {
+      if (err.response) {
         const status = err.response.status;
         const message = "usuario o contraseña incorrectos";
 
@@ -69,7 +60,6 @@ const LoginPage = () => {
         setError("No se pudo conectar con el servidor.");
       }
 
-      // Ocultar la alerta después de 5 segundos
       setTimeout(() => setError(null), 5000);
     }
   };
@@ -86,7 +76,7 @@ const LoginPage = () => {
 
   return (
     <DefaultLayout>
-      <div className=" flex flex-col w-full items-center">
+      <div className="flex flex-col w-full items-center">
         <Card className="m-4 max-w-full pt-4 w-96 shadow-lg rounded-lg">
           <CardHeader className="text-center py-4">
             <h2 className="text-2xl font-bold text-gray-800">Iniciar sesión</h2>
@@ -102,10 +92,7 @@ const LoginPage = () => {
               />
             )}
 
-            <Form
-              className="w-full flex flex-col gap-5"
-              onSubmit={handleSubmit}
-            >
+            <Form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
               <Input
                 isRequired
                 label="Correo electrónico"
@@ -126,18 +113,12 @@ const LoginPage = () => {
                 onChange={handleChange}
               />
 
-              {/* Enlace "¿Olvidaste tu contraseña?" */}
               <div className="text-right text-sm text-primary hover:underline">
                 <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
               </div>
 
               <div className="flex justify-center">
-                <Button
-                  fullWidth
-                  className="py-3 text-lg"
-                  color="primary"
-                  type="submit"
-                >
+                <Button fullWidth className="py-3 text-lg" color="primary" type="submit">
                   Iniciar sesión
                 </Button>
               </div>

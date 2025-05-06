@@ -1,5 +1,4 @@
-import axios from "axios";
-
+import api from "./axiosInstance";
 import { BACKEND_URL } from "@/config";
 const Advisory = "advisory";
 import { getAuthHeaders } from "@/helpers/authHelper";
@@ -11,7 +10,7 @@ export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
     const token = localStorage.getItem("token");
     const headers = { Authorization: `Bearer ${token}` };
 
-    const response = await axios.get<TopCareerReport[]>(
+    const response = await api.get<TopCareerReport[]>(
       `${BACKEND_URL}/${Advisory}/report/top-careers`,
       { headers },
     );
@@ -24,7 +23,7 @@ export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
 };
 // Funciones para obtener los datos
 export const fetchAdvisoriesLast7Days = async (): Promise<AdvisoryReport[]> => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${Advisory}/report/last7days`,
     { headers: getAuthHeaders() },
   );
@@ -38,7 +37,7 @@ export const fetchAdvisoriesLast7Days = async (): Promise<AdvisoryReport[]> => {
 export const fetchAdvisoriesLast30Days = async (): Promise<
   AdvisoryReport[]
 > => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${Advisory}/report/last30days`,
     { headers: getAuthHeaders() },
   );
@@ -50,7 +49,7 @@ export const fetchAdvisoriesLast30Days = async (): Promise<
 };
 
 export const fetchAdvisoriesLastYear = async (): Promise<AdvisoryReport[]> => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${Advisory}/report/lastyear`,
     { headers: getAuthHeaders() },
   );
@@ -66,7 +65,7 @@ export const fetchAdvisoriesLastYear = async (): Promise<AdvisoryReport[]> => {
 export const fetchMostActiveAdvisor = async (): Promise<
   MostActiveAdvisor[]
 > => {
-  const response = await axios.get<MostActiveAdvisor[]>(
+  const response = await api.get<MostActiveAdvisor[]>(
     `${BACKEND_URL}/${Advisory}/report/mostActiveAdvisor`,
     { headers: getAuthHeaders() },
   );
@@ -80,7 +79,7 @@ const reportPath = "schedules";
 export const fetchSchedulesByAdvisor = async (): Promise<
   { advisorName: string; count: number }[]
 > => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${reportPath}/schedules-by-advisor`,
     {
       headers: getAuthHeaders(),
@@ -94,7 +93,7 @@ export const fetchSchedulesByAdvisor = async (): Promise<
 export const fetchSchedulesByTopic = async (): Promise<
   { topic: string; count: number }[]
 > => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${reportPath}/schedules-by-topic`,
     {
       headers: getAuthHeaders(),
@@ -108,7 +107,7 @@ export const fetchSchedulesByTopic = async (): Promise<
 export const fetchAttendancePerSchedule = async (): Promise<
   { advisoryId: string; attendanceRate: number }[]
 > => {
-  const response = await axios.get(
+  const response = await api.get(
     `${BACKEND_URL}/${reportPath}/attendance-per-schedule`,
     {
       headers: getAuthHeaders(),

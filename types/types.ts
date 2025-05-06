@@ -21,9 +21,9 @@ export interface AdvisoryData {
   advisorId: string;
   careerId: string;
   dateStart: string; // Formato ISO (datetime-local)
-  dateEnd: string; // Formato ISO
   status?: "pending" | "approved" | "canceled";
   recurring?: boolean;
+  day: string;
 }
 export interface Advisory {
   _id: string;

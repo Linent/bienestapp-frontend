@@ -12,10 +12,12 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Image,
 } from "@heroui/react";
 import { Button } from "@heroui/button";
 import NextLink from "next/link";
-
+import icons8CerrarSesion from "@/public/icons8-cerrar-sesión-100-(1).png";
+import icon8CerrarSesion from "@/public/icons8-logout-96.png";
 import { Logo } from "@/components/icons";
 import { siteConfig } from "@/config/site";
 
@@ -103,7 +105,7 @@ export const Navbar = () => {
                     {item.label}
                   </NextLink>
                 </NavbarItem>
-              ),
+              )
             )}
         </NavbarContent>
       )}
@@ -113,6 +115,13 @@ export const Navbar = () => {
         <NavbarItem className="hidden lg:flex">
           {isAuthenticated ? (
             <Button variant="flat" onClick={handleLogout}>
+              <Image
+                src={icon8CerrarSesion.src}
+                alt="Cerrar sesión"
+                className="w-5 h-5 mr-2"
+                width={20}
+                height={20}
+              />
               Cerrar sesión
             </Button>
           ) : (
@@ -154,6 +163,21 @@ export const Navbar = () => {
               </NextLink>
             </NavbarMenuItem>
           </>
+        )}
+        {isAuthenticated && (
+            <NavbarMenuItem
+            className="mt-auto border-t pt-4 flex items-center gap-2 px-4 cursor-pointer text-danger hover:text-red-600"
+            onClick={handleLogout}
+            >
+            <Image
+              src={icons8CerrarSesion.src}
+              alt="Cerrar sesión"
+              className="w-5 h-5"
+              width={20}
+              height={20}
+            />
+            <span>Cerrar sesión</span>
+            </NavbarMenuItem>
         )}
       </NavbarMenu>
     </HeroUINavbar>
