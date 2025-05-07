@@ -39,6 +39,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [careers, setCareers] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [updating, setUpdating] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
@@ -46,11 +47,11 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         setLoading(true);
         try {
           const userData = await fetchUserById(userId);
-
           const careerData = await fetchCareers();
 
           setUser(userData);
           setCareers(careerData);
+          setPassword("");
         } catch (error) {
           console.error("Error al obtener datos del usuario:", error);
           toast.error("No se pudo cargar la información del usuario.");
@@ -65,13 +66,22 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleUpdate = async () => {
     if (!user) return;
+
+    if (password && password.length < 6) {
+      toast.error("La nueva contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
     setUpdating(true);
     try {
       const updatedUser = Object.keys(user).reduce((acc, key) => {
         if (user[key] !== "") acc[key] = user[key];
-
         return acc;
       }, {} as any);
+
+      if (password.trim() !== "") {
+        updatedUser.password = password.trim();
+      }
 
       await updateUser(userId, updatedUser);
       toast.success("Usuario actualizado correctamente");
@@ -137,6 +147,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   </SelectItem>
                 ))}
               </Select>
+
+              <Input
+                label="Nueva contraseña (opcional)"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Deja en blanco para no cambiarla"
+              />
             </>
           )}
         </ModalBody>

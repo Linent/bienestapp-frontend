@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { title } from "@/components/primitives";
-import AdvisoryList from "@/components/Advisory/AdvisoryList"; // Asegúrate que sea export default
+import AdvisoryList from "@/components/Advisory/AdvisorList"; // Asegúrate que sea export default
 import DefaultLayout from "@/layouts/default";
 
 export default function CareerPage() {

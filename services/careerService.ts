@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "./axiosInstance";
 
 import { BACKEND_URL } from "@/config";
 const carreraPath = "career";
@@ -7,7 +7,7 @@ import { getAuthHeaders } from "@/helpers/authHelper";
 import { Career } from "@/types";
 
 export const fetchCareers = async (): Promise<Career[]> => {
-  const response = await axios.get(`${BACKEND_URL}/${carreraPath}`, {
+  const response = await api.get(`${BACKEND_URL}/${carreraPath}`, {
     headers: getAuthHeaders(),
   });
 
@@ -16,7 +16,7 @@ export const fetchCareers = async (): Promise<Career[]> => {
 
 // Obtener una carrera por ID
 export const fetchCareerById = async (id: string): Promise<Career> => {
-  const response = await axios.get(`${BACKEND_URL}/${carreraPath}/${id}`, {
+  const response = await api.get(`${BACKEND_URL}/${carreraPath}/${id}`, {
     headers: getAuthHeaders(),
   });
 
@@ -28,7 +28,7 @@ export const createCareer = async (
   careerData: Partial<Career>,
 ): Promise<Career> => {
 
-  const response = await axios.post(
+  const response = await api.post(
     `${BACKEND_URL}/${carreraPath}/create`,
     careerData,
     {
@@ -44,7 +44,7 @@ export const updateCareer = async (
   id: string,
   careerData: Partial<Career>,
 ): Promise<Career> => {
-  const response = await axios.put(
+  const response = await api.put(
     `${BACKEND_URL}/${carreraPath}/${id}`,
     careerData,
     {
@@ -60,7 +60,7 @@ export const toggleCareerStatus = async (
   id: string,
   enable: boolean,
 ): Promise<Career> => {
-  const response = await axios.post(
+  const response = await api.post(
     `${BACKEND_URL}/${carreraPath}/enable/${id}`,
     { enable },
     {
