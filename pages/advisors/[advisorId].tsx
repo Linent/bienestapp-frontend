@@ -1,20 +1,15 @@
-// pages/advisories/[advisorId].tsx
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-  Chip,
-} from "@heroui/react";
+import { Button, Card, CardBody } from "@heroui/react";
 import { fetchAdvisoriesByAdvisor } from "@/services/advisoryService";
 import { Advisory } from "@/types";
 import CreateAdvisoryModal from "@/components/Advisory/CreateAdvisoryModal";
 import DefaultLayout from "@/layouts/default";
+import EditAdvisoryModal from "@/components/Advisory/EditAdvisoryModal";
 
 const MAX_HOURS = 20;
+const DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes"];
+const TIME_SLOTS = ["08:00", "10:00", "14:00", "16:00"];
 
 const AdvisoryCardsPage = () => {
   const router = useRouter();
@@ -25,6 +20,7 @@ const AdvisoryCardsPage = () => {
   const [careerName, setCareerName] = useState("");
   const [availableHours, setAvailableHours] = useState<number>(0);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedAdvisory, setSelectedAdvisory] = useState<Advisory | null>(null);
 
   useEffect(() => {
     if (!advisorId) return;
@@ -37,10 +33,7 @@ const AdvisoryCardsPage = () => {
         if (data.length > 0) {
           setAdvisorName(data[0].advisorId.name);
           setCareerName(data[0].careerId.name);
-          const total = data.reduce(
-            (acc: number, advisory: Advisory) => acc + 2,
-            0
-          ); // cada asesoría = 2h
+          const total = data.reduce((acc: number) => acc + 2, 0);
           setAvailableHours(total);
         }
       } catch (error) {
@@ -51,60 +44,127 @@ const AdvisoryCardsPage = () => {
     getAdvisories();
   }, [advisorId]);
 
+  const handleEdit = (advisory: Advisory) => {
+    setSelectedAdvisory(advisory);
+  };
+
+  const handleUpdateSuccess = async () => {
+    if (advisorId) {
+      const data = await fetchAdvisoriesByAdvisor(advisorId as string);
+      setAdvisories(data);
+    }
+    setSelectedAdvisory(null);
+  };
+
+  const formatTimeRange = (start: Date, end: Date) => {
+    const format = (date: Date) =>
+      new Date(date).toLocaleTimeString("es-CO", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    return `${format(start)} - ${format(end)}`;
+  };
+
+  const getAdvisoryMap = () => {
+    const map: Record<string, Record<string, Advisory[]>> = {};
+    DAYS.forEach((day) => {
+      map[day] = {};
+      TIME_SLOTS.forEach((slot) => {
+        map[day][slot] = [];
+      });
+    });
+
+    advisories.forEach((advisory) => {
+      const day = advisory.day.toLowerCase();
+      const hour = new Date(advisory.dateStart).getHours();
+      const slot = TIME_SLOTS.find((s) => parseInt(s) === hour);
+      if (slot && map[day]) {
+        map[day][slot].push(advisory);
+      }
+    });
+
+    return map;
+  };
+
+  const advisoryMap = getAdvisoryMap();
+
   return (
     <DefaultLayout>
       <div className="p-6 max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-2">Asesor: {advisorName}</h2>
-        <p className="mb-6 text-gray-600">Carrera: {careerName}</p>
-        <Button color="primary" onPress={() => router.back()} className="mb-6">
-          ⬅️ Volver
-        </Button>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {advisories.map((advisory) => (
-            <Card key={advisory._id} className="shadow-md">
-              <CardHeader>
-                <h3 className="font-semibold text-lg capitalize">
-                  {new Date(advisory.dateStart).toLocaleDateString("es-CO", {
-                    weekday: "long",
-                  })}
-                </h3>
-              </CardHeader>
-              <CardBody>
-                <p>
-                  <strong>Inicio:</strong>{" "}
-                  {new Date(advisory.dateStart).toLocaleTimeString("es-CO", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <p>
-                  <strong>Fin:</strong>{" "}
-                  {new Date(advisory.dateEnd).toLocaleTimeString("es-CO", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </CardBody>
-              <CardFooter className="justify-end">
-                <Chip
-                  color={advisory.status === "approved" ? "success" : "warning"}
-                >
-                  {advisory.status === "approved"
-                    ? "Aprobada"
-                    : advisory.status}
-                </Chip>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-
-        {availableHours < MAX_HOURS && (
-          <div className="mt-8 flex justify-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Asesor: {advisorName}</h2>
+            <p className="mb-2 text-gray-600">Carrera: {careerName}</p>
+          </div>
+          {availableHours < MAX_HOURS && (
             <Button color="primary" onPress={() => setCreateModalOpen(true)}>
               Agregar Asesoría
             </Button>
-          </div>
-        )}
+          )}
+        </div>
+
+        <Button color="primary" onPress={() => router.back()} className="mb-6">
+          ⬅️ Volver
+        </Button>
+
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full border text-center">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Hora</th>
+                {DAYS.map((day) => (
+                  <th key={day} className="border px-4 py-2 capitalize">
+                    {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {TIME_SLOTS.map((slot) => (
+                <tr key={slot}>
+                  <td className="border px-4 py-2 font-medium">{slot}</td>
+                  {DAYS.map((day) => {
+                    const slotAdvisories = advisoryMap[day][slot];
+                    return (
+                      <td key={day + slot} className="border px-2 py-2">
+                        {slotAdvisories.length > 0 ? (
+                          slotAdvisories.map((advisory) => (
+                            <Card
+                              key={advisory._id}
+                              className="mb-2 p-2 rounded bg-green-200 border border-green-200"
+                            >
+                              <CardBody>
+                              <div className="font-semibold">
+                                {formatTimeRange(
+                                  new Date(advisory.dateStart),
+                                  new Date(advisory.dateEnd)
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-600 mb-1">
+                                 {advisory.status}
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="light"
+                                onClick={() => handleEdit(advisory)}
+                              >
+                                ✏️ Editar
+                              </Button>
+                              </CardBody>
+                            </Card>
+                          ))
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <CreateAdvisoryModal
           isOpen={isCreateModalOpen}
@@ -112,11 +172,20 @@ const AdvisoryCardsPage = () => {
           advisorId={advisorId as string}
           careerId={
             typeof advisories[0]?.careerId === "object"
-              ? advisories[0]?.careerId._id // <-- usa _id en lugar de name
+              ? advisories[0]?.careerId._id
               : (advisories[0]?.careerId ?? "")
           }
           onSuccess={() => router.reload()}
         />
+
+        {selectedAdvisory && (
+          <EditAdvisoryModal
+            isOpen={!!selectedAdvisory}
+            onClose={() => setSelectedAdvisory(null)}
+            advisory={selectedAdvisory}
+            onSuccess={handleUpdateSuccess}
+          />
+        )}
       </div>
     </DefaultLayout>
   );
