@@ -54,7 +54,57 @@ const AdvisoryCalendar = () => {
         if (!advisorId) return;
 
         const data = await fetchAdvisoriesByAdvisor(advisorId);
-        const formattedEvents = data.map((advisory: Advisory) => convertToEvent(advisory));
+        // const formattedEvents = data.map((advisory: Advisory) => convertToEvent(advisory));
+        // LO DE ABAJO REEMPLAZA LA LINEA DE ARRIBA PARA CARGAR 2 O MAS SEMANAS, DEPENDE DEL
+        // VALOR EN EL FOR DE ABAJO
+        const formattedEvents: AdvisoryEvent[] = [];
+        data.forEach((advisory: Advisory) => {
+          const start = moment(advisory.dateStart);
+          const end = moment(advisory.dateEnd);
+
+          if (!advisory.recurring) {
+            formattedEvents.push(convertToEvent(advisory));
+          } else {
+            for (let i = 0; i < 2; i++) {
+              const newStart = start.clone().add(i, "weeks");
+              const newEnd = end.clone().add(i, "weeks");
+
+              formattedEvents.push({
+                id: `${advisory._id}-${i}`,
+                title: advisory.advisorId?.name || "Sin nombre",
+                advisorName: advisory.advisorId?.name || "Sin nombre",
+                career: advisory.careerId?.name || "Sin carrera",
+                time: newStart.format("dddd HH:mm"),
+                start: newStart.toDate(),
+                end: newEnd.toDate(),
+                status: advisory.status,
+                dateStart: newStart.toDate(),
+                fullDateString: newStart.toDate().toLocaleDateString("es-ES", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }),
+              });
+            }
+          }
+        });/////////////////////////
+
+
+        // Filtrar asesorías del mes actual
+      const now = moment();
+      const currentMonth = now.month(); // Enero = 0
+      const currentYear = now.year();
+
+      const currentMonthAdvisories = formattedEvents.filter((event) => {
+        const eventDate = moment(event.dateStart);
+        return (
+          eventDate.month() === currentMonth &&
+          eventDate.year() === currentYear
+        );
+      });
+
+      console.log("Asesorías del mes actual:", currentMonthAdvisories);
 
         setEvents(formattedEvents);
       } catch (error) {

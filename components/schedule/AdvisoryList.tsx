@@ -52,9 +52,9 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
     });
   };
 
-  if (selectedAdvisory && selectedAdvisory.fullDateString) {
-    console.log("Full Date String:", selectedAdvisory.fullDateString);
-  }
+  // if (selectedAdvisory && selectedAdvisory.fullDateString) {
+  //   console.log("Full Date String:", selectedAdvisory.fullDateString);
+  // }
 
   const isSameDay = selectedAdvisory && selectedAdvisory.fullDateString
     ? (() => {
@@ -68,14 +68,14 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
         const advisoryDate = new Date(year, month, day);
         const currentDate = new Date();
 
-        console.log("Fecha actual:", currentDate.toLocaleDateString());
-        console.log("Fecha de la asesoría:", advisoryDate.toLocaleDateString());
+        // console.log("Fecha actual:", currentDate.toLocaleDateString());
+        // console.log("Fecha de la asesoría:", advisoryDate.toLocaleDateString());
 
         return currentDate.toLocaleDateString() === advisoryDate.toLocaleDateString();
       })()
     : false;
 
-  console.log("¿Son las mismas fechas?:", isSameDay);
+  // console.log("¿Son las mismas fechas?:", isSameDay);
 
   function getMonthFromName(monthName: string): number {
     const months = new Map<string, number>([
