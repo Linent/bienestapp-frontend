@@ -18,6 +18,7 @@ interface AdvisoryEvent {
   start: Date;
   status: string;
   dateStart: Date;
+  fullDateString?: string;
 }
 
 interface AdvisoryListProps {
@@ -43,13 +44,48 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
     if (!selectedAdvisory) return;
     const advisoryId = selectedAdvisory.id.split("-")[0];
     const day = selectedAdvisory.start.toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
-    const dateStart = selectedAdvisory.dateStart.toISOString(); // 👈 Enviamos dateStart completo
+    const dateStart = selectedAdvisory.dateStart.toISOString();
 
     router.push({
       pathname: "/schedules/StudentsByAdvisory",
       query: { advisoryId, day, dateStart },
     });
   };
+
+  if (selectedAdvisory && selectedAdvisory.fullDateString) {
+    console.log("Full Date String:", selectedAdvisory.fullDateString);
+  }
+
+  const isSameDay = selectedAdvisory && selectedAdvisory.fullDateString
+    ? (() => {
+        const advisoryDateString = selectedAdvisory.fullDateString.split(',')[1].trim(); // "6 de mayo de 2025"
+        const [dayStr, , monthName, , yearStr] = advisoryDateString.split(" "); // "6", "de", "mayo", "de", "2025"
+        
+        const day = parseInt(dayStr, 10);
+        const month = getMonthFromName(monthName) - 1; // Mes indexado desde 0
+        const year = parseInt(yearStr, 10);
+        
+        const advisoryDate = new Date(year, month, day);
+        const currentDate = new Date();
+
+        console.log("Fecha actual:", currentDate.toLocaleDateString());
+        console.log("Fecha de la asesoría:", advisoryDate.toLocaleDateString());
+
+        return currentDate.toLocaleDateString() === advisoryDate.toLocaleDateString();
+      })()
+    : false;
+
+  console.log("¿Son las mismas fechas?:", isSameDay);
+
+  function getMonthFromName(monthName: string): number {
+    const months = new Map<string, number>([
+      ["enero", 1], ["febrero", 2], ["marzo", 3], ["abril", 4],
+      ["mayo", 5], ["junio", 6], ["julio", 7], ["agosto", 8],
+      ["septiembre", 9], ["octubre", 10], ["noviembre", 11], ["diciembre", 12],
+    ]);
+  
+    return months.get(monthName.toLowerCase()) || 1;
+  }
 
   return (
     <div>
@@ -76,9 +112,11 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
           </ModalBody>
           <ModalFooter className="flex justify-between">
             <Button variant="light" onPress={closeModal}>Cerrar</Button>
-            <Button variant="solid" color="primary" onPress={handleViewStudents}>
-              Ver estudiantes
-            </Button>
+            {isSameDay && (
+              <Button variant="solid" color="primary" onPress={handleViewStudents}>
+                Ver estudiantes
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

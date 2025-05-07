@@ -21,6 +21,8 @@ const diasMap: Record<string, number> = {
 };
 
 const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
+  const dateStart = new Date(advisory.dateStart);
+
   return {
     id: advisory._id,
     title: advisory.advisorId?.name || "Sin nombre",
@@ -31,6 +33,12 @@ const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
     end: new Date(advisory.dateEnd),
     status: advisory.status,
     dateStart: new Date(advisory.dateStart),
+    fullDateString: dateStart.toLocaleDateString("es-ES", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }), // Fecha completa para uso interno
   };
 };
 

@@ -46,6 +46,7 @@ export interface AdvisoryEvent {
   end: Date;
   status: string;
   dateStart: Date;
+  fullDateString?: string;  // Agrega esto para que sea reconocido
 }
 
 
