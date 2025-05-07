@@ -21,18 +21,20 @@ export interface AdvisoryData {
   advisorId: string;
   careerId: string;
   dateStart: string; // Formato ISO (datetime-local)
+  dateEnd: string; // Added dateEnd property
   status?: "pending" | "approved" | "canceled";
   recurring?: boolean;
   day: string;
 }
 export interface Advisory {
   _id: string;
-  advisorId?: { name: string };
-  careerId?: { name: string; _id: string };
+  day: string;
   dateStart: string;
   dateEnd: string;
-  recurring: boolean;
   status: string;
+  careerId: string | { _id: string; name: string };
+  advisorId: string | { _id: string; name: string };
+  recurring?: boolean;
 }
 export interface AdvisoryEvent {
   id: string;

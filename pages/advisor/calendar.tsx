@@ -11,15 +11,7 @@ export default function SchedulePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // const role = localStorage.getItem("role");
-    // const codigo = localStorage.getItem("codigo");
-    // const email = localStorage.getItem("email");
 
-    // // Imprimir los datos en consola
-    // console.log("Token:", token);
-    // console.log("Role:", role);
-    // console.log("Codigo:", codigo);
-    // console.log("Email:", email);
 
     if (!token) {
       router.replace("/login"); // Redirige automáticamente

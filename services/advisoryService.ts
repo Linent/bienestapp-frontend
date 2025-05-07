@@ -29,3 +29,21 @@ export const fetchAdvisoriesByAdvisor = async (advisorId: string) => {
   const response = await api.get(`${BACKEND_URL}/${advisory}/${advisor}/${advisorId}`);
   return response.data;
 };
+
+export const updateAdvisoryStatus = async (advisoryId: string, advisoryData: AdvisoryData) => {
+  const response = await api.put(`${BACKEND_URL}/${advisory}/updateStatus/${advisoryId}`, advisoryData,
+    {
+      headers: getAuthHeaders(),
+    },);
+
+  return response.data;
+};
+
+export const updateAdvisory = async (advisoryId: string, advisoryData: AdvisoryData) => {
+  const response = await api.put(`${BACKEND_URL}/${advisory}/update/${advisoryId}`, advisoryData,
+    {
+      headers: getAuthHeaders(),
+    },);
+
+  return response.data;
+};

@@ -1,51 +1,36 @@
 import { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-
 import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { fetchAdvisoriesThisWeek } from "@/services/advisorAdvisoryService";
+
+import { fetchAdvisoriesByAdvisor } from "@/services/advisoryService";
 import AdvisoryList from "@/components/schedule/AdvisoryList";
-import { AdvisoryEvent } from "@/types";
+import { Advisory, AdvisoryEvent } from "@/types";
+import { getTokenPayload } from "@/utils/auth";
 
 moment.locale("es");
 const localizer = momentLocalizer(moment);
 
-const parseHorario = (diaHora: string, nombre: string, email: string): AdvisoryEvent | null => {
-  const [dia, horario] = diaHora.split(" de ");
-  const [horaInicio, horaFin] = horario.split(" a ");
-  const diasMap: Record<string, number> = {
-    lunes: 1,
-    martes: 2,
-    miércoles: 3,
-    jueves: 4,
-    viernes: 5,
-  };
+const diasMap: Record<string, number> = {
+  lunes: 1,
+  martes: 2,
+  miércoles: 3,
+  jueves: 4,
+  viernes: 5,
+};
 
-  const diaSemana = diasMap[dia.toLowerCase()];
-  if (diaSemana === undefined) return null;
-
-  const now = moment();
-  const fechaBase = moment().day(diaSemana);
-  if (fechaBase.isBefore(now, "day")) {
-    fechaBase.add(7, "days"); // ir a la próxima semana si ya pasó
-  }
-
-  const [h1, m1] = horaInicio.split(":").map(Number);
-  const [h2, m2] = horaFin.split(":").map(Number);
-  const start = fechaBase.clone().hour(h1).minute(m1).toDate();
-  const end = fechaBase.clone().hour(h2).minute(m2).toDate();
-
+const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
   return {
-    id: `${email}-${diaHora}`,
-    title: nombre,
-    advisorName: nombre,
-    career: "N/A",
-    time: diaHora,
-    start,
-    end,
-    status: "available",
-    dateStart: start,
+    id: advisory._id,
+    title: advisory.advisorId?.name || "Sin nombre",
+    advisorName: advisory.advisorId?.name || "Sin nombre",
+    career: advisory.careerId?.name || "Sin carrera",
+    time: moment(advisory.dateStart).format("dddd HH:mm"),
+    start: new Date(advisory.dateStart),
+    end: new Date(advisory.dateEnd),
+    status: advisory.status,
+    dateStart: new Date(advisory.dateStart),
   };
 };
 
@@ -54,35 +39,14 @@ const AdvisoryCalendar = () => {
   const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
 
   useEffect(() => {
-
-    // Obtener los datos del localStorage y mostrar en consola
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    const codigo = localStorage.getItem("codigo");
-    const email = localStorage.getItem("email");
-
-    // Imprimir los datos en consola
-    console.log("Token:", token);
-    console.log("Role:", role);
-    console.log("Codigo:", codigo);
-    console.log("Email:", email);
-
     const loadAdvisories = async () => {
       try {
-        const data = await fetchAdvisoriesThisWeek();
-        const formattedEvents: AdvisoryEvent[] = [];
+        const payload = getTokenPayload();
+        const advisorId = payload?.id;
+        if (!advisorId) return;
 
-        data.forEach((advisor: any) => {
-          advisor.horarios.forEach((horario: string) => {
-            const event = parseHorario(horario, advisor.name, advisor.email);
-            if (event) {
-              // Filtrar por 'codigo'
-              if (advisor.codigo === codigo) {
-                formattedEvents.push(event);
-              }
-            }
-          });
-        });
+        const data = await fetchAdvisoriesByAdvisor(advisorId);
+        const formattedEvents = data.map((advisory: Advisory) => convertToEvent(advisory));
 
         setEvents(formattedEvents);
       } catch (error) {
@@ -98,9 +62,13 @@ const AdvisoryCalendar = () => {
   };
 
   const eventStyleGetter = (event: AdvisoryEvent): { style: React.CSSProperties } => {
+    let backgroundColor = "#007bff";
+    if (event.status === "pending") backgroundColor = "#facc15";
+    if (event.status === "canceled") backgroundColor = "#ef4444";
+
     return {
       style: {
-        backgroundColor: "#007bff",
+        backgroundColor,
         color: "white",
         borderRadius: "6px",
         padding: "4px",
