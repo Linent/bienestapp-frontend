@@ -34,6 +34,7 @@ export interface Advisory {
   status: string;
   careerId: string | { _id: string; name: string };
   advisorId: string | { _id: string; name: string };
+  recurring?: boolean;
 }
 export interface AdvisoryEvent {
   id: string;
