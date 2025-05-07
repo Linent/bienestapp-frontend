@@ -1,0 +1,194 @@
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { Button, Card, CardBody } from "@heroui/react";
+import { fetchAdvisoriesByAdvisor } from "@/services/advisoryService";
+import { Advisory } from "@/types";
+import CreateAdvisoryModal from "@/components/Advisory/CreateAdvisoryModal";
+import DefaultLayout from "@/layouts/default";
+import EditAdvisoryModal from "@/components/Advisory/EditAdvisoryModal";
+
+const MAX_HOURS = 20;
+const DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes"];
+const TIME_SLOTS = ["08:00", "10:00", "14:00", "16:00"];
+
+const AdvisoryCardsPage = () => {
+  const router = useRouter();
+  const { advisorId } = router.query;
+
+  const [advisories, setAdvisories] = useState<Advisory[]>([]);
+  const [advisorName, setAdvisorName] = useState("");
+  const [careerName, setCareerName] = useState("");
+  const [availableHours, setAvailableHours] = useState<number>(0);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedAdvisory, setSelectedAdvisory] = useState<Advisory | null>(null);
+
+  useEffect(() => {
+    if (!advisorId) return;
+
+    const getAdvisories = async () => {
+      try {
+        const data = await fetchAdvisoriesByAdvisor(advisorId as string);
+        setAdvisories(data);
+
+        if (data.length > 0) {
+          setAdvisorName(data[0].advisorId.name);
+          setCareerName(data[0].careerId.name);
+          const total = data.reduce((acc: number) => acc + 2, 0);
+          setAvailableHours(total);
+        }
+      } catch (error) {
+        console.error("Error cargando asesorías:", error);
+      }
+    };
+
+    getAdvisories();
+  }, [advisorId]);
+
+  const handleEdit = (advisory: Advisory) => {
+    setSelectedAdvisory(advisory);
+  };
+
+  const handleUpdateSuccess = async () => {
+    if (advisorId) {
+      const data = await fetchAdvisoriesByAdvisor(advisorId as string);
+      setAdvisories(data);
+    }
+    setSelectedAdvisory(null);
+  };
+
+  const formatTimeRange = (start: Date, end: Date) => {
+    const format = (date: Date) =>
+      new Date(date).toLocaleTimeString("es-CO", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    return `${format(start)} - ${format(end)}`;
+  };
+
+  const getAdvisoryMap = () => {
+    const map: Record<string, Record<string, Advisory[]>> = {};
+    DAYS.forEach((day) => {
+      map[day] = {};
+      TIME_SLOTS.forEach((slot) => {
+        map[day][slot] = [];
+      });
+    });
+
+    advisories.forEach((advisory) => {
+      const day = advisory.day.toLowerCase();
+      const hour = new Date(advisory.dateStart).getHours();
+      const slot = TIME_SLOTS.find((s) => parseInt(s) === hour);
+      if (slot && map[day]) {
+        map[day][slot].push(advisory);
+      }
+    });
+
+    return map;
+  };
+
+  const advisoryMap = getAdvisoryMap();
+
+  return (
+    <DefaultLayout>
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Asesor: {advisorName}</h2>
+            <p className="mb-2 text-gray-600">Carrera: {careerName}</p>
+          </div>
+          {availableHours < MAX_HOURS && (
+            <Button color="primary" onPress={() => setCreateModalOpen(true)}>
+              Agregar Asesoría
+            </Button>
+          )}
+        </div>
+
+        <Button color="primary" onPress={() => router.back()} className="mb-6">
+          ⬅️ Volver
+        </Button>
+
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full border text-center">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Hora</th>
+                {DAYS.map((day) => (
+                  <th key={day} className="border px-4 py-2 capitalize">
+                    {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {TIME_SLOTS.map((slot) => (
+                <tr key={slot}>
+                  <td className="border px-4 py-2 font-medium">{slot}</td>
+                  {DAYS.map((day) => {
+                    const slotAdvisories = advisoryMap[day][slot];
+                    return (
+                      <td key={day + slot} className="border px-2 py-2">
+                        {slotAdvisories.length > 0 ? (
+                          slotAdvisories.map((advisory) => (
+                            <Card
+                              key={advisory._id}
+                              className="mb-2 p-2 rounded bg-green-200 border border-green-200"
+                            >
+                              <CardBody>
+                              <div className="font-semibold">
+                                {formatTimeRange(
+                                  new Date(advisory.dateStart),
+                                  new Date(advisory.dateEnd)
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-600 mb-1">
+                                 {advisory.status}
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="light"
+                                onClick={() => handleEdit(advisory)}
+                              >
+                                ✏️ Editar
+                              </Button>
+                              </CardBody>
+                            </Card>
+                          ))
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <CreateAdvisoryModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          advisorId={advisorId as string}
+          careerId={
+            typeof advisories[0]?.careerId === "object"
+              ? advisories[0]?.careerId._id
+              : (advisories[0]?.careerId ?? "")
+          }
+          onSuccess={() => router.reload()}
+        />
+
+        {selectedAdvisory && (
+          <EditAdvisoryModal
+            isOpen={!!selectedAdvisory}
+            onClose={() => setSelectedAdvisory(null)}
+            advisory={selectedAdvisory}
+            onSuccess={handleUpdateSuccess}
+          />
+        )}
+      </div>
+    </DefaultLayout>
+  );
+};
+
+export default AdvisoryCardsPage;

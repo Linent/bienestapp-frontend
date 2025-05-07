@@ -1,5 +1,4 @@
-import axios from "axios";
-
+import api from "./axiosInstance";
 import { BACKEND_URL } from "@/config";
 import { User } from "@/types";
 import { getAuthHeaders } from "@/helpers/authHelper"; // Se mantiene la importación correcta
@@ -7,14 +6,32 @@ import { getAuthHeaders } from "@/helpers/authHelper"; // Se mantiene la importa
 const UserPath = "user";
 
 export const fetchUsers = async () => {
-  const response = await axios.get(`${BACKEND_URL}/${UserPath}`, {
+  const response = await api.get(`${BACKEND_URL}/${UserPath}`, {
     headers: getAuthHeaders(),
   });
 
   return response.data;
 };
+
+export const deleteUser = async (userId: string) => {
+  const response = await api.put(`${BACKEND_URL}/${UserPath}/delete/${userId}`, {
+    headers: getAuthHeaders(),
+  });
+
+  return response.data;
+}
+export const updateEnableUser = async (userId: string, enable: boolean) => {
+  const response = await api.post(
+    `${BACKEND_URL}/${UserPath}/enable/${userId}`,
+    { enable },
+    {
+      headers: getAuthHeaders(),
+    },
+  );
+  return response.data;
+};
 export const recoveryPassword = async (token: string, password: string) => {
-  const response = await axios.post(
+  const response = await api.post(
     `${BACKEND_URL}/${UserPath}/recovery-password/${token}`,
     {
       password,
@@ -25,7 +42,7 @@ export const recoveryPassword = async (token: string, password: string) => {
 };
 
 export const sendRecoveryEmail = async (email: string) => {
-  return await axios.post(`${BACKEND_URL}/${UserPath}/forgot-password`, {
+  return await api.post(`${BACKEND_URL}/${UserPath}/forgot-password`, {
     email,
   });
 };
@@ -37,7 +54,7 @@ export const registerUser = async (userData: {
   password: string;
   career: string;
 }) => {
-  const response = await axios.post(
+  const response = await api.post(
     `${BACKEND_URL}/${UserPath}/register`,
     userData,
     {
@@ -50,7 +67,7 @@ export const registerUser = async (userData: {
 
 export const fetchUserById = async (userId: string): Promise<User> => {
 
-    const response = await axios.get(`${BACKEND_URL}/${UserPath}/${userId}`, {
+    const response = await api.get(`${BACKEND_URL}/${UserPath}/${userId}`, {
       headers: getAuthHeaders(),
     }); // Corrección aquí
 
@@ -62,7 +79,18 @@ export const updateUser = async (
   userId: string,
   userData: Partial<User>,
 ): Promise<void> => {
-  await axios.post(`${BACKEND_URL}/${UserPath}/${userId}`, userData, {
+  await api.post(`${BACKEND_URL}/${UserPath}/${userId}`, userData, {
     headers: getAuthHeaders(),
   }); // Corrección aquí
 };
+
+
+
+export const loginUser = async (email: string, password: string) => {
+  const response = await api.post(`${BACKEND_URL}/${UserPath}/login`, {
+    email,
+    password,
+  });
+  return response.data; // debe incluir { token, user }
+};
+
