@@ -44,6 +44,18 @@ const AdvisoryCardsPage = () => {
     getAdvisories();
   }, [advisorId]);
 
+  const statusLabels: Record<"approved" | "canceled" | "pending", string> = {
+    approved: "Aprobada",
+    canceled: "Cancelada",
+    pending: "Pendiente",
+  };
+
+  const statusBadgeStyles: Record<"approved" | "canceled" | "pending", string> = {
+    approved: "bg-green-900 text-green-400",
+    canceled: "bg-red-900 text-red-400",
+    pending: "bg-yellow-900 text-yellow-400",
+  };
+
   const handleEdit = (advisory: Advisory) => {
     setSelectedAdvisory(advisory);
   };
@@ -112,7 +124,6 @@ const AdvisoryCardsPage = () => {
           <table className="w-full border text-center">
             <thead>
               <tr>
-                <th className="border px-4 py-2">Hora</th>
                 {DAYS.map((day) => (
                   <th key={day} className="border px-4 py-2 capitalize">
                     {day}
@@ -123,37 +134,47 @@ const AdvisoryCardsPage = () => {
             <tbody>
               {TIME_SLOTS.map((slot) => (
                 <tr key={slot}>
-                  <td className="border px-4 py-2 font-medium">{slot}</td>
                   {DAYS.map((day) => {
                     const slotAdvisories = advisoryMap[day][slot];
                     return (
                       <td key={day + slot} className="border px-2 py-2">
                         {slotAdvisories.length > 0 ? (
-                          slotAdvisories.map((advisory) => (
-                            <Card
+                          slotAdvisories.map((advisory) => {
+                            const status = advisory.status as "approved" | "canceled" | "pending";
+                            return (
+                              <Card
                               key={advisory._id}
-                              className="mb-2 p-2 rounded bg-green-200 border border-green-200"
-                            >
-                              <CardBody>
-                              <div className="font-semibold">
-                                {formatTimeRange(
-                                  new Date(advisory.dateStart),
-                                  new Date(advisory.dateEnd)
-                                )}
-                              </div>
-                              <div className="text-sm text-gray-600 mb-1">
-                                 {advisory.status}
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="light"
-                                onClick={() => handleEdit(advisory)}
+                              className={`mb-2 p-2 rounded border ${
+                                advisory.status === "approved"
+                                  ? "bg-success-100 border-success-200"
+                                  : advisory.status === "pending"
+                                  ? "bg-warning-100 border-warning-200"
+                                  : "bg-danger-100 border-danger-200"
+                              }`}
                               >
-                                ✏️ Editar
-                              </Button>
-                              </CardBody>
-                            </Card>
-                          ))
+                                <CardBody>
+                                  <div className="font-semibold">
+                                    {formatTimeRange(
+                                      new Date(advisory.dateStart),
+                                      new Date(advisory.dateEnd)
+                                    )}
+                                  </div>
+                                  <span
+                                    className={`text-sm px-3 py-1 rounded-full inline-block mt-1 mb-2 ${statusBadgeStyles[status]}`}
+                                  >
+                                    {statusLabels[status]}
+                                  </span>
+                                  <Button
+                                    size="sm"
+                                    variant="light"
+                                    onClick={() => handleEdit(advisory)}
+                                  >
+                                    ✏️ Editar
+                                  </Button>
+                                </CardBody>
+                              </Card>
+                            );
+                          })
                         ) : (
                           <span className="text-gray-400">-</span>
                         )}
@@ -182,7 +203,11 @@ const AdvisoryCardsPage = () => {
           <EditAdvisoryModal
             isOpen={!!selectedAdvisory}
             onClose={() => setSelectedAdvisory(null)}
-            advisory={selectedAdvisory}
+            advisory={{
+              ...selectedAdvisory,
+              careerId: typeof selectedAdvisory?.careerId === "object" ? selectedAdvisory.careerId._id : selectedAdvisory?.careerId,
+              advisorId: typeof selectedAdvisory?.advisorId === "object" ? selectedAdvisory.advisorId._id : selectedAdvisory?.advisorId,
+            }}
             onSuccess={handleUpdateSuccess}
           />
         )}

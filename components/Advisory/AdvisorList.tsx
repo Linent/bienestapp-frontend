@@ -16,8 +16,7 @@ import {
 } from "@heroui/react";
 import { useRouter } from "next/router";
 import { fetchUsers, updateEnableUser, deleteUser } from "@/services/userService";
-import { fetchCareers } from "@/services/careerService";
-import { User, Career } from "@/types";
+import { User } from "@/types";
 import {
   EyeIcon,
   EditIcon,
@@ -33,7 +32,7 @@ const MAX_HOURS = 20;
 
 const AdvisoryList = () => {
   const [advisors, setAdvisors] = useState<User[]>([]);
-  const [careers, setCareers] = useState<Record<string, string>>({});
+  const [careers, setCareers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,17 +51,16 @@ const AdvisoryList = () => {
     const loadData = async () => {
       try {
         const users = await fetchUsers();
-        const careersData = await fetchCareers();
-        const careerMap = careersData.reduce(
-          (acc: Record<string, string>, career: Career) => {
-            acc[career._id] = career.name;
-            return acc;
-          },
-          {}
-        );
+        const academicFriends = users.filter((user: User) => user.role === "academic_friend");
 
-        setCareers(careerMap);
-        setAdvisors(users.filter((user: User) => user.role === "academic_friend"));
+        const uniqueCareerNames: string[] = Array.from(
+          new Set(
+            academicFriends.map((user: User) => user.career?.name).filter(Boolean)
+          )
+        ) as string[];
+
+        setCareers(uniqueCareerNames);
+        setAdvisors(academicFriends);
       } catch (err) {
         console.error("Error cargando los datos:", err);
         setError("No se pudieron cargar los datos.");
@@ -105,15 +103,9 @@ const AdvisoryList = () => {
   const filteredAdvisors = advisors.filter((advisor) => {
     const matchSearch = advisor.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = filterStatus ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus : true;
-    const matchCareer = filterCareer ? (typeof advisor.career === "string" ? advisor.career : advisor.career?._id) === filterCareer : true;
+    const matchCareer = filterCareer ? advisor.career?.name === filterCareer : true;
     return matchSearch && matchStatus && matchCareer;
   });
-
-  const getCareerName = (career: string | { _id: string } | null | undefined) => {
-    if (!career) return "Desconocida";
-    if (typeof career === "string") return careers[career] || "Desconocida";
-    return careers[career._id] || "Desconocida";
-  };
 
   const openViewModal = (user: User) => {
     setSelectedAdvisor(user);
@@ -167,8 +159,8 @@ const AdvisoryList = () => {
         >
           <SelectItem key="">Todas</SelectItem>
           <>
-            {Object.entries(careers).map(([id, name]) => (
-              <SelectItem key={id}>{name}</SelectItem>
+            {careers.map((career) => (
+              <SelectItem key={career} data-value={career}>{career}</SelectItem>
             ))}
           </>
         </Select>
@@ -200,7 +192,7 @@ const AdvisoryList = () => {
                 <TableCell>{advisor.name}</TableCell>
                 <TableCell>{advisor.codigo}</TableCell>
                 <TableCell>{advisor.email}</TableCell>
-                <TableCell>{getCareerName(advisor.career)}</TableCell>
+                <TableCell>{advisor.career?.name || "Desconocida"}</TableCell>
                 <TableCell>
                   <Chip color={advisor.enable ? "success" : "danger"} size="sm" variant="flat">
                     {advisor.enable ? "Activo" : "Inactivo"}

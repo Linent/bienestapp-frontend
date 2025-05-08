@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import UserTable from "@/components/UserTable";
+import { Divider } from "@heroui/react";
 
 const UsersPage = () => {
   const router = useRouter();
@@ -26,7 +27,8 @@ const UsersPage = () => {
   return (
     <DefaultLayout>
       <div className="p-6">
-        <h1 className={title()}>Lista de Usuarios</h1>
+        <h1 className={title()}>Lista de Estudiantes</h1>
+        <Divider className="my-4" />
         <UserTable />
       </div>
     </DefaultLayout>

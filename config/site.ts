@@ -2,7 +2,7 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Bienestapp",
-  description: "Solicita en tus estudios con tutores especializados.",
+  description: "Solicita en tus estudios con mentores especializados.",
   navItems: [
     {
       label: "Inicio",
@@ -10,16 +10,15 @@ export const siteConfig = {
       roles: ["admin", "student", "academic_friend"],
     },
     {
-      label: "Asesorías",
+      label: "Calendario",
       href: "/schedules",
       roles: ["admin", "academic_friend"],
       subItems: [
-        { label: "Mis asesorías", href: "/schedules/view" },
-        { label: "Crear asesoría", href: "/schedules/new" },
+        { label: "Historial reciente de asesorías", href: "/schedules/view"}
       ],
     },
     {
-      label: "Asesores",
+      label: "Mentores",
       href: "/advisors",
       roles: ["admin"],
     },
@@ -29,7 +28,7 @@ export const siteConfig = {
       roles: ["admin"],
     },
     {
-      label: "Dashboard",
+      label: "Estadisticas",
       href: "/dashboard",
       roles: ["admin"],
     },

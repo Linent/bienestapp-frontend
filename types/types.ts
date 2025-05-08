@@ -76,3 +76,17 @@ export interface MostActiveAdvisor {
   advisorName: string;
   totalAdvisories: number;
 }
+
+export interface Schedule {
+  _id: string;
+  studentId: {  name:string  };
+  AdvisoryId: { 
+    advisorId: { name:string };
+    careerId: { name: string };
+    day: string;
+ };
+  topic: string;
+  career: string;
+  dateStart: string; // ISO date string
+  attendance: boolean;
+}

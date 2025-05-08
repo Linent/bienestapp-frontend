@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
+import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import AdvisoryCalendar from "@/components/schedule/AdvisoryCalendar";
+import { Divider } from "@heroui/react";
 
 export default function SchedulePage() {
   const router = useRouter();
@@ -25,7 +26,8 @@ export default function SchedulePage() {
   return (
     <DefaultLayout>
       <div className=" flex flex-col w-full items-center p-6">
-        <h1 className="text-3xl font-bold">Todas las asesorías</h1>
+        <h1 className={title()}>Calendario</h1>
+        <Divider className="my-4"/>
         <AdvisoryCalendar />
       </div>
     </DefaultLayout>

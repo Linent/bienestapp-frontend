@@ -24,7 +24,7 @@ interface AdvisoryListProps {
   advisories: AdvisoryEvent[];
 }
 
-const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
+const AdvisorList: React.FC<AdvisoryListProps> = ({ advisories }) => {
   const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -86,4 +86,4 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
   );
 };
 
-export default AdvisoryList;
+export default AdvisorList;

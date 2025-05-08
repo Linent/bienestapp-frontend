@@ -11,7 +11,8 @@ import {
   Select,
   SelectItem,
   Button,
-  useDisclosure
+  useDisclosure,
+  Input
 } from "@heroui/react";
 
 import { fetchUsers, updateEnableUser, deleteUser } from "@/services/userService";
@@ -43,6 +44,9 @@ interface User {
   codigo: string;
   role: keyof typeof roleMap;
   enable: boolean;
+  career: {
+    name: string;
+  };
 }
 
 const UserTable = () => {
@@ -50,6 +54,7 @@ const UserTable = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterCareer, setFilterCareer] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -63,13 +68,13 @@ const UserTable = () => {
       try {
         const data = await fetchUsers();
         if (Array.isArray(data)) {
-          const onlyStudents = data.filter((user: User) => user.role === "student");
-          setUsers(onlyStudents);
+          const onlyAdvisors = data.filter((user: User) => user.role === "student");
+          setUsers(onlyAdvisors);
         } else {
           throw new Error("Formato de datos inválido");
         }
       } catch (err) {
-        setError("No se pudo cargar la lista de usuarios.");
+        setError("No se pudo cargar la lista de asesores.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -79,16 +84,23 @@ const UserTable = () => {
     getUsers();
   }, []);
 
+  const uniqueCareers = Array.from(
+    new Set(users.map((user) => user.career?.name).filter(Boolean))
+  );
+
   const filteredUsers = users.filter((user) => {
     const matchesStatus = filterStatus
       ? (user.enable ? "Activo" : "Inactivo") === filterStatus
+      : true;
+    const matchesCareer = filterCareer
+      ? user.career?.name === filterCareer
       : true;
     const matchesSearch = searchTerm
       ? user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
 
-    return matchesStatus && matchesSearch;
+    return matchesStatus && matchesCareer && matchesSearch;
   });
 
   const openViewModal = (user: User) => {
@@ -110,25 +122,25 @@ const UserTable = () => {
     setLoading(true);
     try {
       const data = await fetchUsers();
-      const onlyStudents = data.filter((user: User) => user.role === "student");
-      setUsers(onlyStudents);
+      const onlyAdvisors = data.filter((user: User) => user.role === "student");
+      setUsers(onlyAdvisors);
     } catch (error) {
-      setError("No se pudo actualizar la lista de usuarios.");
+      setError("No se pudo actualizar la lista de asesores.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <p>Cargando usuarios...</p>;
+  if (loading) return <p>Cargando asesores...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="m-4">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:max-w-md">
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Buscar usuario..."
+    <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:max-w-2xl">
+          <Input
+            className="p-2 rounded w-full"
+            placeholder="Buscar asesor..."
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -139,15 +151,25 @@ const UserTable = () => {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
-            <SelectItem key="" data-value="">
-              Todos
-            </SelectItem>
-            <SelectItem key="Activo" data-value="Activo">
-              Activo
-            </SelectItem>
-            <SelectItem key="Inactivo" data-value="Inactivo">
-              Inactivo
-            </SelectItem>
+            <SelectItem key="" data-value="">Todos</SelectItem>
+            <SelectItem key="Activo" data-value="Activo">Activo</SelectItem>
+            <SelectItem key="Inactivo" data-value="Inactivo">Inactivo</SelectItem>
+          </Select>
+
+          <Select
+            className="w-full"
+            label="Filtrar por carrera"
+            value={filterCareer}
+            onChange={(e) => setFilterCareer(e.target.value)}
+          >
+            <SelectItem key="" data-value="">Todas las carreras</SelectItem>
+            <>
+              {uniqueCareers.map((careerName) => (
+                <SelectItem key={careerName} data-value={careerName}>
+                  {careerName}
+                </SelectItem>
+              ))}
+            </>
           </Select>
         </div>
 
@@ -157,18 +179,19 @@ const UserTable = () => {
           className="w-full md:w-auto"
           onPress={onOpen}
         >
-          Agregar Usuario
+          Agregar Asesor
         </Button>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <Table isStriped aria-label="Lista de Usuarios">
+      <div className="min-w-full table-auto border-gray-300">
+        <Table isStriped aria-label="Lista de Asesores">
           <TableHeader>
             <TableColumn>#</TableColumn>
             <TableColumn>Nombre</TableColumn>
             <TableColumn>Email</TableColumn>
             <TableColumn>Código</TableColumn>
             <TableColumn>Rol</TableColumn>
+            <TableColumn>Carrera</TableColumn>
             <TableColumn>Estado</TableColumn>
             <TableColumn>Acciones</TableColumn>
           </TableHeader>
@@ -179,21 +202,21 @@ const UserTable = () => {
               const handleToggleStatus = async () => {
                 try {
                   await updateEnableUser(user._id, !user.enable);
-                  alert(`Usuario ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`);
+                  alert(`Asesor ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`);
                   refreshUsers();
                 } catch (error) {
-                  alert("No se pudo cambiar el estado del usuario.");
+                  alert("No se pudo cambiar el estado del asesor.");
                 }
               };
 
               const handleDelete = async () => {
-                if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+                if (confirm("¿Estás seguro de que deseas eliminar este asesor?")) {
                   try {
                     await deleteUser(user._id);
-                    alert("Usuario eliminado correctamente");
+                    alert("Asesor eliminado correctamente");
                     refreshUsers();
                   } catch (error) {
-                    alert("No se pudo eliminar el usuario.");
+                    alert("No se pudo eliminar el asesor.");
                   }
                 }
               };
@@ -205,6 +228,7 @@ const UserTable = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.codigo}</TableCell>
                   <TableCell>{roleMap[user.role] ?? "Desconocido"}</TableCell>
+                  <TableCell>{user.career?.name}</TableCell>
                   <TableCell>
                     <Chip color={statusColorMap[statusText]} size="sm" variant="flat">
                       {statusText}
@@ -221,9 +245,9 @@ const UserTable = () => {
                           <EyeIcon />
                         </button>
                       </Tooltip>
-                      <Tooltip content="Editar usuario">
+                      <Tooltip content="Editar asesor">
                         <button
-                          aria-label="Editar usuario"
+                          aria-label="Editar asesor"
                           className="cursor-pointer text-default-400 hover:text-warning"
                           onClick={() => openEditModal(user._id)}
                         >
@@ -239,9 +263,9 @@ const UserTable = () => {
                           {user.enable ? "⛔" : "✔️"}
                         </button>
                       </Tooltip>
-                      <Tooltip content="Eliminar usuario">
+                      <Tooltip content="Eliminar asesor">
                         <button
-                          aria-label="Eliminar usuario"
+                          aria-label="Eliminar asesor"
                           className="cursor-pointer text-danger hover:text-red-600"
                           onClick={handleDelete}
                         >

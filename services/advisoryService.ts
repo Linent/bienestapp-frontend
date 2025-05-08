@@ -39,11 +39,15 @@ export const updateAdvisoryStatus = async (advisoryId: string, advisoryData: Adv
   return response.data;
 };
 
+// ✅ Suponiendo que la ruta del backend sea /advisory/update/:advisoryId
 export const updateAdvisory = async (advisoryId: string, advisoryData: AdvisoryData) => {
-  const response = await api.put(`${BACKEND_URL}/${advisory}/update/${advisoryId}`, advisoryData,
+  const response = await api.put(
+    `${BACKEND_URL}/${advisory}/${advisoryId}`,
+    advisoryData,
     {
       headers: getAuthHeaders(),
-    },);
+    }
+  );
 
   return response.data;
 };

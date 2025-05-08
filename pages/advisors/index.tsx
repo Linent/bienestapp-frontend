@@ -2,8 +2,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { title } from "@/components/primitives";
-import AdvisoryList from "@/components/Advisory/AdvisorList"; // Asegúrate que sea export default
+import AdvisorList from "@/components/Advisory/AdvisorList"; // Asegúrate que sea export default
 import DefaultLayout from "@/layouts/default";
+import { Divider } from "@heroui/react";
 
 export default function CareerPage() {
   const router = useRouter();
@@ -26,8 +27,9 @@ export default function CareerPage() {
   return (
     <DefaultLayout>
       <div className="p-6">
-        <h1 className={title()}>Lista de Asesores</h1>
-        <AdvisoryList />
+        <h1 className={title()}>Lista de Mentores</h1>
+        <Divider className="my-4" />
+        <AdvisorList/>
       </div>
     </DefaultLayout>
   );

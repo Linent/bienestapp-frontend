@@ -16,6 +16,12 @@ export const fetchStudentsByAdvisory = async (advisoryId: string, day: string, d
   
 };
 
+export const fetchSchedules = async () => {
+  const res = await api.get(`${BACKEND_URL}/${schedulePath}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.data;
+}
 
 export const updateAttendance = async (
   scheduleId: string,
