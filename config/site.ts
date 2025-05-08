@@ -43,6 +43,11 @@ export const siteConfig = {
       href: "/advisor/calendar",
       roles: ["academic_friend"],
     },
+    {
+      label: "Perfil",
+      href: "/user/profile",
+      roles: ["admin", "student", "academic_friend"],
+    },
     
   ],
   navMenuItems: [
