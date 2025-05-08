@@ -1,33 +1,23 @@
 import { useEffect, useState } from "react";
-import { fetchUserById } from "@/services/userService"; // Ajusta según tu path real
-import { getTokenPayload } from "@/utils/auth"; // Asegúrate que la ruta sea correcta
+import {
+  Button,
+  Skeleton,
+  Alert,
+  Card,
+  User as UserAvatar,
+} from "@heroui/react";
+import EditUserModal from "@/components/EditUserModal";
+import Link from "next/link";
+import { fetchUserById } from "@/services/userService";
+import { getTokenPayload } from "@/utils/auth";
+import { User } from "@/types/types";
+import toast from "react-hot-toast";
 
-interface Career {
-  name: string;
-}
-
-interface User {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  career: Career | string;
-  codigo: string;
-}
-
-interface ProfileComponentProps {
-  user: User;
-}
-
-const ProfileComponent: React.FC<ProfileComponentProps> = ({ user }) => {
-  const [formData, setFormData] = useState<User>({
-    name: '',
-    email: '',
-    password: '',
-    role: '',
-    career: '',
-    codigo: ''
-  });
+const ProfileCard = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     const payload = getTokenPayload();
@@ -35,178 +25,132 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ user }) => {
 
     const fetchData = async () => {
       if (!userId) {
-        console.warn("No se encontró el ID del usuario en el token.");
+        setErrorMsg("No se encontró el ID del usuario en el token.");
+        setLoading(false);
         return;
       }
 
       try {
-        const userData = await fetchUserById(userId);
+        const userData: User = await fetchUserById(userId);
+        const careerName: string =
+          typeof userData.career === "object" && userData.career !== null && "name" in userData.career
+            ? String(userData.career.name)
+            : typeof userData.career === "object" && userData.career !== null && "_id" in userData.career
+            ? String(userData.career._id)
+            : "";
 
-        // Extraer el nombre de la carrera si es un objeto
-        const careerName = userData.career && typeof userData.career !== 'string' ? userData.career.name : userData.career;
-
-        // Asignar un valor legible al rol
-        let roleDisplay = '';
-        switch (userData.role) {
-          case 'admin':
-            roleDisplay = 'Admin';
-            break;
-          case 'student':
-            roleDisplay = 'Estudiante';
-            break;
-          case 'academic_friend':
-            roleDisplay = 'Amigo Académico';
-            break;
-          default:
-            roleDisplay = userData.role; // En caso de un rol no esperado
-        }
-
-        setFormData({
-          name: userData.name || '',
-          email: userData.email || '',
-          password: '',
-          role: roleDisplay, // Aquí asignamos el valor legible del rol
-          career: careerName || '', // Asignamos el nombre de la carrera
-          codigo: userData.codigo || '',
+        setUser({
+          ...userData,
+          career: careerName,
         });
-
-        console.log("Datos del usuario desde la API:", userData);
       } catch (error) {
-        console.error("Error al obtener los datos del usuario:", error);
+        console.error("Error al obtener el usuario:", error);
+        setErrorMsg("No se pudo cargar el perfil del usuario.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Datos antes de actualizar:", formData);
-    console.log("Datos actualizados:", formData);
-  };
+  if (loading) return <Skeleton className="w-full h-64" />;
+  if (errorMsg) return <Alert color="danger">{errorMsg}</Alert>;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-4xl p-4 bg-white shadow-lg rounded-lg"
-    >
-      <div className="grid grid-cols-2 gap-6">
-        {/* Columna izquierda */}
-        <div>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-lg font-medium mb-2">
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              disabled
+    <div className="w-full max-w-4xl mx-auto">
+      <Card className="w-full p-6 bg-white rounded-2xl shadow-xl">
+        <div className="relative rounded-xl mb-20"></div>
+
+        <div className="px-6 -mt-20 flex items-center gap-4">
+          <div className="bg-gray-200 rounded-full flex items-center justify-center">
+            <UserAvatar
+              name=""
+              avatarProps={{
+                src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+              }}
             />
           </div>
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-lg font-medium mb-2">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              disabled
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-lg font-medium mb-2">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              placeholder="Deja en blanco si no quieres cambiarla"
-            />
+          <div>
+            <h2 className="text-xl font-bold capitalize leading-tight">
+              {user?.name}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {user?.role === "admin"
+                ? "Administrador"
+                : user?.role === "student"
+                ? "Estudiante"
+                : user?.role === "academic_friend"
+                ? "Mentor"
+                : user?.role}
+            </p>
+            <p className="text-gray-500 text-sm">
+              {typeof user?.career === "object" && user?.career !== null
+                ? user.career._id
+                : user?.career}
+            </p>
           </div>
         </div>
 
-        {/* Columna derecha */}
-        <div>
-          <div className="mb-4">
-            <label htmlFor="role" className="block text-lg font-medium mb-2">
-              Rol
-            </label>
-            <input
-              type="text"
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              disabled
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="career" className="block text-lg font-medium mb-2">
-              Carrera
-            </label>
-            <input
-              type="text"
-              id="career"
-              name="career"
-              value={formData.career}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              disabled
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="codigo" className="block text-lg font-medium mb-2">
-              Código
-            </label>
-            <input
-              type="text"
-              id="codigo"
-              name="codigo"
-              value={formData.codigo}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-              disabled
-            />
-          </div>
+        <div className="px-6 mt-4 text-sm text-gray-700 space-y-1">
+          <p>
+            <strong>Horas disponibles:</strong> {user?.availableHours}
+          </p>
+          <p>
+            <strong>Correo:</strong> {user?.email}
+          </p>
+          <p>
+            <strong>Código:</strong> {user?.codigo}
+          </p>
         </div>
-      </div>
 
-      {/* Botón de actualización centrado */}
-      <div className="mb-4 flex justify-center col-span-2">
-        <button
-          type="submit"
-          className="w-1/2 p-2 bg-blue-500 text-white font-bold rounded-md"
-        >
-          Actualizar Perfil
-        </button>
-      </div>
-    </form>
+        <div className="flex gap-4 mt-6 px-6">
+          <Button color="primary" variant="solid" onPress={() => setIsEditOpen(true)}>
+            Editar perfil
+          </Button>
+          {/*<Button variant="bordered">Configuraciones</Button>*/}
+        </div>
+
+        {/* Accesos según el rol */}
+        <div className="mt-8 px-6 space-y-2">
+          <h3 className="text-lg font-semibold mb-2">Accesos Rápidos</h3>
+          {user?.role === "admin" && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Link href="/schedules">
+                <div className="p-4 border rounded-xl hover:bg-gray-50 cursor-pointer text-center">Horarios</div>
+              </Link>
+              <Link href="/dashboard">
+                <div className="p-4 border rounded-xl hover:bg-gray-50 cursor-pointer text-center">Estadísticas</div>
+              </Link>
+              <Link href="/schedules/view">
+                <div className="p-4 border rounded-xl hover:bg-gray-50 cursor-pointer text-center">Vista de Horarios</div>
+              </Link>
+            </div>
+          )}
+          {user?.role === "academic_friend" && (
+            <div className="grid grid-cols-1 gap-4">
+              <Link href="/advisor/calendar">
+                <div className="p-4 border rounded-xl hover:bg-gray-50 cursor-pointer text-center">Ver calendarios</div>
+              </Link>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Modal de edición del perfil */}
+      {user && (
+        <EditUserModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          userId={user._id}
+          onUpdateSuccess={() => {
+            toast.success("Perfil actualizado");
+            window.location.reload(); // Puedes reemplazar con un nuevo fetch si lo prefieres
+          }}
+        />
+      )}
+    </div>
   );
 };
 
-export default ProfileComponent;
+export default ProfileCard;
