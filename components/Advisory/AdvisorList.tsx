@@ -55,7 +55,7 @@ const AdvisoryList = () => {
 
         const uniqueCareerNames: string[] = Array.from(
           new Set(
-            academicFriends.map((user: User) => user.career?.name).filter(Boolean)
+            academicFriends.map((user: User) => user.career && typeof user.career === "object" && "name" in user.career ? user.career.name : null).filter(Boolean)
           )
         ) as string[];
 
@@ -103,7 +103,11 @@ const AdvisoryList = () => {
   const filteredAdvisors = advisors.filter((advisor) => {
     const matchSearch = advisor.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = filterStatus ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus : true;
-    const matchCareer = filterCareer ? advisor.career?.name === filterCareer : true;
+    const matchCareer = filterCareer
+      ? advisor.career && typeof advisor.career === "object" && "name" in advisor.career
+        ? advisor.career.name === filterCareer
+        : false
+      : true;
     return matchSearch && matchStatus && matchCareer;
   });
 
@@ -192,7 +196,11 @@ const AdvisoryList = () => {
                 <TableCell>{advisor.name}</TableCell>
                 <TableCell>{advisor.codigo}</TableCell>
                 <TableCell>{advisor.email}</TableCell>
-                <TableCell>{advisor.career?.name || "Desconocida"}</TableCell>
+                <TableCell>
+                  {advisor.career && typeof advisor.career === "object" && "name" in advisor.career
+                    ? String(advisor.career.name)
+                    : "Desconocida"}
+                </TableCell>
                 <TableCell>
                   <Chip color={advisor.enable ? "success" : "danger"} size="sm" variant="flat">
                     {advisor.enable ? "Activo" : "Inactivo"}

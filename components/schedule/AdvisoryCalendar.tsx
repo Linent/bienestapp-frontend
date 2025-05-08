@@ -7,34 +7,38 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { fetchAdvisories } from "@/services/advisoryService";
 import AdvisoryList from "@/components/schedule/AdvisoryList";
 import { Advisory, AdvisoryEvent } from "@/types";
-
+import { getTokenPayload } from "@/utils/auth";
 moment.locale("es");
 const localizer = momentLocalizer(moment);
 
-const getNext7Weekdays = (): Date[] => {
-  const result: Date[] = [];
-  let current = moment();
-  while (result.length < 7) {
-    if (current.day() !== 0 && current.day() !== 6) {
-      result.push(current.toDate());
+const getNextWeekdaysRange = (): [Date, Date] => {
+  const start = moment().startOf("day");
+  const weekdays: Date[] = [];
+
+  while (weekdays.length < 7) {
+    if (![0, 6].includes(start.day())) {
+      weekdays.push(start.toDate());
     }
-    current = current.add(1, "day");
+    start.add(1, "day");
   }
-  return result;
+
+  return [weekdays[0], weekdays[6]];
 };
 
 const AdvisoryCalendar = () => {
   const [events, setEvents] = useState<AdvisoryEvent[]>([]);
-  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
+  const [selectedAdvisory, setSelectedAdvisory] =
+    useState<AdvisoryEvent | null>(null);
+  const [userRole, setUserRole] = useState<string>("");
 
   useEffect(() => {
     const today = moment();
-    const [minDate, maxDate] = [getNext7Weekdays()[0], getNext7Weekdays().slice(-1)[0]];
-
+    const [minDate, maxDate] = getNextWeekdaysRange();
+    const payload = getTokenPayload() as { id: string; role?: string };
+    setUserRole(payload.role || "");
     const getAdvisories = async () => {
       try {
         const data = await fetchAdvisories();
-
         const formattedEvents: AdvisoryEvent[] = [];
 
         data.forEach((advisory: Advisory) => {
@@ -43,15 +47,32 @@ const AdvisoryCalendar = () => {
 
           if (!advisory.recurring) {
             if (
-              start.isBetween(moment(minDate).startOf("day"), moment(maxDate).endOf("day"), undefined, "[]") &&
+              start.isBetween(
+                moment(minDate).startOf("day"),
+                moment(maxDate).endOf("day"),
+                undefined,
+                "[]"
+              ) &&
               ![0, 6].includes(start.day()) &&
               start.isAfter(today)
             ) {
               formattedEvents.push({
                 id: advisory._id,
-                title: advisory.advisorId?.name || "Sin nombre",
-                advisorName: advisory.advisorId?.name || "Sin nombre",
-                career: advisory.careerId?.name || "Sin carrera",
+                title:
+                  typeof advisory.advisorId === "object" &&
+                  advisory.advisorId?.name
+                    ? advisory.advisorId.name
+                    : "Sin nombre",
+                advisorName:
+                  typeof advisory.advisorId === "object" &&
+                  advisory.advisorId?.name
+                    ? advisory.advisorId.name
+                    : "Sin nombre",
+                career:
+                  typeof advisory.careerId === "object" &&
+                  advisory.careerId?.name
+                    ? advisory.careerId.name
+                    : "Sin carrera",
                 time: start.format("LLLL"),
                 start: start.toDate(),
                 end: end.toDate(),
@@ -65,15 +86,32 @@ const AdvisoryCalendar = () => {
               const newEnd = end.clone().add(i, "weeks");
 
               if (
-                newStart.isBetween(moment(minDate).startOf("day"), moment(maxDate).endOf("day"), undefined, "[]") &&
+                newStart.isBetween(
+                  moment(minDate).startOf("day"),
+                  moment(maxDate).endOf("day"),
+                  undefined,
+                  "[]"
+                ) &&
                 ![0, 6].includes(newStart.day()) &&
                 newStart.isAfter(today)
               ) {
                 formattedEvents.push({
                   id: `${advisory._id}-${i}`,
-                  title: advisory.advisorId?.name || "Sin nombre",
-                  advisorName: advisory.advisorId?.name || "Sin nombre",
-                  career: advisory.careerId?.name || "Sin carrera",
+                  title:
+                    typeof advisory.advisorId === "object" &&
+                    advisory.advisorId?.name
+                      ? advisory.advisorId.name
+                      : "Sin nombre",
+                  advisorName:
+                    typeof advisory.advisorId === "object" &&
+                    advisory.advisorId?.name
+                      ? advisory.advisorId.name
+                      : "Sin nombre",
+                  career:
+                    typeof advisory.careerId === "object" &&
+                    advisory.careerId?.name
+                      ? advisory.careerId.name
+                      : "Sin carrera",
                   time: newStart.format("LLLL"),
                   start: newStart.toDate(),
                   end: newEnd.toDate(),
@@ -98,7 +136,9 @@ const AdvisoryCalendar = () => {
     setSelectedAdvisory(event);
   };
 
-  const eventStyleGetter = (event: AdvisoryEvent): { style: React.CSSProperties } => {
+  const eventStyleGetter = (
+    event: AdvisoryEvent
+  ): { style: React.CSSProperties } => {
     const backgroundColor = event.status === "approved" ? "#007bff" : "#ccc";
     return {
       style: {
@@ -116,7 +156,7 @@ const AdvisoryCalendar = () => {
 
       <Calendar
         localizer={localizer}
-        views={['day', 'week', 'agenda']}
+        views={["day", "week", "agenda"]}
         defaultView="day"
         events={events}
         startAccessor="start"
@@ -138,12 +178,11 @@ const AdvisoryCalendar = () => {
         onSelectEvent={handleEventClick}
       />
 
-      {selectedAdvisory && <AdvisoryList advisories={[selectedAdvisory]} />}
+      {selectedAdvisory && (
+        <AdvisoryList advisories={[selectedAdvisory]} userRole={userRole} />
+      )}
     </div>
   );
 };
 
-
-
 export default AdvisoryCalendar;
-

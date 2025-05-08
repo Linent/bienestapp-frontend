@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button, Card, CardBody } from "@heroui/react";
+import { Button, Card, CardBody, Divider } from "@heroui/react";
 import { fetchAdvisoriesByAdvisor } from "@/services/advisoryService";
 import { Advisory } from "@/types";
 import CreateAdvisoryModal from "@/components/Advisory/CreateAdvisoryModal";
 import DefaultLayout from "@/layouts/default";
 import EditAdvisoryModal from "@/components/Advisory/EditAdvisoryModal";
+import { title } from "@/components/primitives";
 
 const MAX_HOURS = 20;
 const DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes"];
@@ -22,26 +23,25 @@ const AdvisoryCardsPage = () => {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [selectedAdvisory, setSelectedAdvisory] = useState<Advisory | null>(null);
 
-  useEffect(() => {
+  const loadAdvisories = async () => {
     if (!advisorId) return;
+    try {
+      const data = await fetchAdvisoriesByAdvisor(advisorId as string);
+      setAdvisories(data);
 
-    const getAdvisories = async () => {
-      try {
-        const data = await fetchAdvisoriesByAdvisor(advisorId as string);
-        setAdvisories(data);
-
-        if (data.length > 0) {
-          setAdvisorName(data[0].advisorId.name);
-          setCareerName(data[0].careerId.name);
-          const total = data.reduce((acc: number) => acc + 2, 0);
-          setAvailableHours(total);
-        }
-      } catch (error) {
-        console.error("Error cargando asesorías:", error);
+      if (data.length > 0) {
+        setAdvisorName(data[0].advisorId.name);
+        setCareerName(data[0].careerId.name);
+        const total = data.reduce((acc: number) => acc + 2, 0);
+        setAvailableHours(total);
       }
-    };
+    } catch (error) {
+      console.error("Error cargando asesorías:", error);
+    }
+  };
 
-    getAdvisories();
+  useEffect(() => {
+    loadAdvisories();
   }, [advisorId]);
 
   const statusLabels: Record<"approved" | "canceled" | "pending", string> = {
@@ -61,10 +61,7 @@ const AdvisoryCardsPage = () => {
   };
 
   const handleUpdateSuccess = async () => {
-    if (advisorId) {
-      const data = await fetchAdvisoriesByAdvisor(advisorId as string);
-      setAdvisories(data);
-    }
+    await loadAdvisories();
     setSelectedAdvisory(null);
   };
 
@@ -104,6 +101,8 @@ const AdvisoryCardsPage = () => {
   return (
     <DefaultLayout>
       <div className="p-6 max-w-6xl mx-auto">
+          <h1 className={title()}>Horario del Asesor</h1>
+          <Divider className="my-4" />
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold mb-2">Asesor: {advisorName}</h2>
@@ -143,14 +142,14 @@ const AdvisoryCardsPage = () => {
                             const status = advisory.status as "approved" | "canceled" | "pending";
                             return (
                               <Card
-                              key={advisory._id}
-                              className={`mb-2 p-2 rounded border ${
-                                advisory.status === "approved"
-                                  ? "bg-success-100 border-success-200"
-                                  : advisory.status === "pending"
-                                  ? "bg-warning-100 border-warning-200"
-                                  : "bg-danger-100 border-danger-200"
-                              }`}
+                                key={advisory._id}
+                                className={`mb-2 p-2 rounded border ${
+                                  advisory.status === "approved"
+                                    ? "bg-success-100 border-success-200"
+                                    : advisory.status === "pending"
+                                    ? "bg-warning-100 border-warning-200"
+                                    : "bg-danger-100 border-danger-200"
+                                }`}
                               >
                                 <CardBody>
                                   <div className="font-semibold">
@@ -164,7 +163,7 @@ const AdvisoryCardsPage = () => {
                                   >
                                     {statusLabels[status]}
                                   </span>
-                                  <Button
+                                  <Button className="bg-blue-300"
                                     size="sm"
                                     variant="light"
                                     onClick={() => handleEdit(advisory)}
@@ -187,6 +186,7 @@ const AdvisoryCardsPage = () => {
           </table>
         </div>
 
+        {/* Modal para crear asesoría */}
         <CreateAdvisoryModal
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}
@@ -196,17 +196,24 @@ const AdvisoryCardsPage = () => {
               ? advisories[0]?.careerId._id
               : (advisories[0]?.careerId ?? "")
           }
-          onSuccess={() => router.reload()}
+          onSuccess={loadAdvisories}
         />
 
+        {/* Modal para editar asesoría */}
         {selectedAdvisory && (
           <EditAdvisoryModal
             isOpen={!!selectedAdvisory}
             onClose={() => setSelectedAdvisory(null)}
             advisory={{
               ...selectedAdvisory,
-              careerId: typeof selectedAdvisory?.careerId === "object" ? selectedAdvisory.careerId._id : selectedAdvisory?.careerId,
-              advisorId: typeof selectedAdvisory?.advisorId === "object" ? selectedAdvisory.advisorId._id : selectedAdvisory?.advisorId,
+              careerId:
+                typeof selectedAdvisory?.careerId === "object"
+                  ? selectedAdvisory.careerId._id
+                  : selectedAdvisory?.careerId,
+              advisorId:
+                typeof selectedAdvisory?.advisorId === "object"
+                  ? selectedAdvisory.advisorId._id
+                  : selectedAdvisory?.advisorId,
             }}
             onSuccess={handleUpdateSuccess}
           />

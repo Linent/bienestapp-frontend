@@ -28,7 +28,7 @@ export default function Scheduleview() {
       <div className=" flex flex-col w-full items-center p-6">
         <h1 className={title()}>Estudiantes agendados esta semana</h1>
         <Divider className="my-4"/>
-        <WeeklySchedules />
+        <WeeklySchedules/>
       </div>
     </DefaultLayout>
   );

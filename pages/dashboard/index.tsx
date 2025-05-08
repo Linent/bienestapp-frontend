@@ -6,6 +6,7 @@ import DefaultLayout from "@/layouts/default";
 import AdvisoriesByTopic from "@/components/AdvisoriesByTopic";
 import AdvisoriesByAdvisor from "@/components/AdvisoriesByAdvisor";
 import AttendancePerSchedule from "@/components/AttendancePerSchedule";
+import { Divider } from "@heroui/react";
 
 const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -60,7 +61,7 @@ const Dashboard = () => {
     <DefaultLayout>
       <div className="w-full  p-6">
         <h1 className="text-3xl font-bold mb-6">Estadísticas de Asesorías</h1>
-
+        <Divider className="my-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <AdvisoriesByAdvisor />
           <AdvisoriesByTopic />

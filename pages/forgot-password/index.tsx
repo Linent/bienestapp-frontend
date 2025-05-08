@@ -8,6 +8,7 @@ import {
   CardHeader,
   Alert,
   Skeleton,
+  Divider,
 } from "@heroui/react";
 
 import DefaultLayout from "@/layouts/default";
@@ -66,6 +67,7 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <h2 className="text-xl font-bold">¿Olvidaste tu contraseña?</h2>
+            <Divider className="my-4" />
           </CardHeader>
           <CardBody>
             {alert && (

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import AdvisorCalendar from "@/components/schedule/AdvisorCalendar"; // <== ¡Este es el nuevo componente!
+import { Divider } from "@heroui/react";
 
 export default function SchedulePage() {
   const router = useRouter();
@@ -28,7 +29,8 @@ export default function SchedulePage() {
     <DefaultLayout>
       <div className=" flex flex-col w-full items-center p-6">
         <h1 className="text-3xl font-bold">Todas las asesorías</h1>
-        <AdvisorCalendar  />
+        <Divider className="my-4" />
+        <AdvisorCalendar />
       </div>
     </DefaultLayout>
   );

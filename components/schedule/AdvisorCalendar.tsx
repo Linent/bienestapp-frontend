@@ -25,9 +25,9 @@ const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
 
   return {
     id: advisory._id,
-    title: advisory.advisorId?.name || "Sin nombre",
-    advisorName: advisory.advisorId?.name || "Sin nombre",
-    career: advisory.careerId?.name || "Sin carrera",
+    title: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
+    advisorName: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
+    career: typeof advisory.careerId === "object" && advisory.careerId?.name ? advisory.careerId.name : "Sin carrera",
     time: moment(advisory.dateStart).format("dddd HH:mm"),
     start: new Date(advisory.dateStart),
     end: new Date(advisory.dateEnd),
@@ -44,19 +44,19 @@ const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
 
 const AdvisoryCalendar = () => {
   const [events, setEvents] = useState<AdvisoryEvent[]>([]);
-  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
+  const [userRole, setUserRole] = useState<string>("");
+  const [selectedAdvisory, setSelectedAdvisory] =
+    useState<AdvisoryEvent | null>(null);
 
   useEffect(() => {
     const loadAdvisories = async () => {
       try {
-        const payload = getTokenPayload();
+        const payload = getTokenPayload() as { id: string; role?: string };
+        setUserRole(payload.role || "");
         const advisorId = payload?.id;
         if (!advisorId) return;
 
         const data = await fetchAdvisoriesByAdvisor(advisorId);
-        // const formattedEvents = data.map((advisory: Advisory) => convertToEvent(advisory));
-        // LO DE ABAJO REEMPLAZA LA LINEA DE ARRIBA PARA CARGAR 2 O MAS SEMANAS, DEPENDE DEL
-        // VALOR EN EL FOR DE ABAJO
         const formattedEvents: AdvisoryEvent[] = [];
         data.forEach((advisory: Advisory) => {
           const start = moment(advisory.dateStart);
@@ -71,9 +71,9 @@ const AdvisoryCalendar = () => {
 
               formattedEvents.push({
                 id: `${advisory._id}-${i}`,
-                title: advisory.advisorId?.name || "Sin nombre",
-                advisorName: advisory.advisorId?.name || "Sin nombre",
-                career: advisory.careerId?.name || "Sin carrera",
+                title: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
+                advisorName: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
+                career: typeof advisory.careerId === "object" && advisory.careerId?.name ? advisory.careerId.name : "Sin carrera",
                 time: newStart.format("dddd HH:mm"),
                 start: newStart.toDate(),
                 end: newEnd.toDate(),
@@ -88,24 +88,20 @@ const AdvisoryCalendar = () => {
               });
             }
           }
-        });/////////////////////////
-
+        }); /////////////////////////
 
         // Filtrar asesorías del mes actual
-      const now = moment();
-      const currentMonth = now.month(); // Enero = 0
-      const currentYear = now.year();
+        const now = moment();
+        const currentMonth = now.month(); // Enero = 0
+        const currentYear = now.year();
 
-      const currentMonthAdvisories = formattedEvents.filter((event) => {
-        const eventDate = moment(event.dateStart);
-        return (
-          eventDate.month() === currentMonth &&
-          eventDate.year() === currentYear
-        );
-      });
-
-      console.log("Asesorías del mes actual:", currentMonthAdvisories);
-
+        const currentMonthAdvisories = formattedEvents.filter((event) => {
+          const eventDate = moment(event.dateStart);
+          return (
+            eventDate.month() === currentMonth &&
+            eventDate.year() === currentYear
+          );
+        });
         setEvents(formattedEvents);
       } catch (error) {
         console.error("Error cargando asesorías:", error);
@@ -119,7 +115,9 @@ const AdvisoryCalendar = () => {
     setSelectedAdvisory(event);
   };
 
-  const eventStyleGetter = (event: AdvisoryEvent): { style: React.CSSProperties } => {
+  const eventStyleGetter = (
+    event: AdvisoryEvent
+  ): { style: React.CSSProperties } => {
     let backgroundColor = "#007bff";
     if (event.status === "pending") backgroundColor = "#facc15";
     if (event.status === "canceled") backgroundColor = "#ef4444";
@@ -162,7 +160,9 @@ const AdvisoryCalendar = () => {
         onSelectEvent={handleEventClick}
       />
 
-      {selectedAdvisory && <AdvisoryList advisories={[selectedAdvisory]} />}
+      {selectedAdvisory && (
+        <AdvisoryList advisories={[selectedAdvisory]} userRole={userRole} />
+      )}
     </div>
   );
 };

@@ -94,9 +94,6 @@ const ProfileCard = () => {
 
         <div className="px-6 mt-4 text-sm text-gray-700 space-y-1">
           <p>
-            <strong>Horas disponibles:</strong> {user?.availableHours}
-          </p>
-          <p>
             <strong>Correo:</strong> {user?.email}
           </p>
           <p>

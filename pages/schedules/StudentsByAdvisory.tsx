@@ -8,6 +8,7 @@ import {
   TableRow,
   Button,
   TableColumn,
+  Divider,
 } from "@heroui/react";
 import {
   fetchStudentsByAdvisory,
@@ -15,6 +16,7 @@ import {
 } from "@/services/scheduleService";
 import { Student } from "@/types";
 import DefaultLayout from "@/layouts/default";
+import { title } from "@/components/primitives";
 
 const StudentsByAdvisory = () => {
   const router = useRouter();
@@ -78,8 +80,8 @@ const StudentsByAdvisory = () => {
   return (
     <DefaultLayout>
       <div className="p-6 max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Estudiantes Agendados</h2>
-
+        <h2 className={title()}>Estudiantes Agendados</h2>
+        <Divider className="my-4" />
         {loading ? (
           <p>Cargando estudiantes...</p>
         ) : error ? (

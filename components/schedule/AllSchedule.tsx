@@ -29,7 +29,6 @@ const WeeklySchedules = () => {
     const loadSchedules = async () => {
       try {
         const schedules: Schedule[] = await fetchSchedules();
-        console.log(schedules);
         const { monday, friday } = getWeekRange();
 
         // Filtrar solo los que están dentro del rango lunes-viernes
