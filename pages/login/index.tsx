@@ -11,13 +11,14 @@ import {
 } from "@heroui/react";
 
 import DefaultLayout from "@/layouts/default";
-import { loginUser } from "@/services/userService"; // 🔄 nueva importación
+import { loginUser } from "@/services/userService";
 
 const LoginPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [careerName, setCareerName] = useState<string>("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -37,6 +38,9 @@ const LoginPage = () => {
 
     try {
       const { token, user } = await loginUser(formData.email, formData.password);
+
+      const nameFromCareer = user.career?.name || "No especificada";
+      setCareerName(nameFromCareer);
 
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
@@ -69,6 +73,7 @@ const LoginPage = () => {
       <DefaultLayout>
         <div className="flex flex-col w-full items-center">
           <h1 className="text-3xl font-bold mb-4">Redirigiendo...</h1>
+          <p className="text-lg">Carrera: {careerName}</p>
         </div>
       </DefaultLayout>
     );

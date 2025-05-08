@@ -12,7 +12,7 @@ export const siteConfig = {
     {
       label: "Calendario",
       href: "/schedules",
-      roles: ["admin", "academic_friend"],
+      roles: ["admin"],
       subItems: [
         { label: "Historial reciente de asesorías", href: "/schedules/view"}
       ],
@@ -37,6 +37,17 @@ export const siteConfig = {
       href: "/career",
       roles: ["admin"],
     },
+    {
+      label: "Mi Calendario",
+      href: "/advisor/calendar",
+      roles: ["academic_friend"],
+    },
+    {
+      label: "Perfil",
+      href: "/user/profile",
+      roles: ["admin", "student", "academic_friend"],
+    },
+    
   ],
   navMenuItems: [
     {
