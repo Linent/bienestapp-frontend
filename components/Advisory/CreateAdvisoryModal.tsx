@@ -76,11 +76,15 @@ const CreateAdvisoryModal = ({
 
     try {
       const dateStart = getNextDateInUTC(day, hour);
+      const dateEnd = new Date(dateStart);
+      dateEnd.setHours(dateEnd.getHours() + 1); // Assuming the advisory lasts 1 hour
+
       const payload = {
         advisorId,
         careerId,
         day,
         dateStart: dateStart.toISOString(),
+        dateEnd: dateEnd.toISOString(),
         status: "approved" as "approved",
       };
 
