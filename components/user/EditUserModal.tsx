@@ -107,13 +107,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
             <Skeleton className="h-10 w-full mb-3" />
           ) : (
             <>
-              {user?.role === "admin" && (
-                <>
                   <Input
                     label="Nombre"
                     value={user?.name || ""}
                     onChange={(e) => setUser({ ...user, name: e.target.value })}
                   />
+              {user?.role === "admin" && (
+                <>
                   <Input
                     label="Email"
                     type="email"

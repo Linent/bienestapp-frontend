@@ -47,6 +47,11 @@ export const siteConfig = {
       href: "/user/profile",
       roles: ["admin", "student", "academic_friend"],
     },
+    {
+      label: "Documentos",
+      href: "/topics",
+      roles: ["admin"],
+    },
     
   ],
   navMenuItems: [

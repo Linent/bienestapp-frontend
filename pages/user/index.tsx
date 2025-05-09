@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
-import UserTable from "@/components/UserTable";
+import UserTable from "@/components/user/UserTable";
 import { Divider } from "@heroui/react";
 
 const UsersPage = () => {

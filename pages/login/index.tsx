@@ -1,4 +1,6 @@
-import { useRouter } from "next/router";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   Form,
@@ -26,7 +28,7 @@ const LoginPage = () => {
       setIsAuthenticated(true);
       router.push("/");
     }
-  }, []);
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,10 +40,9 @@ const LoginPage = () => {
 
     try {
       const { token, user } = await loginUser(formData.email, formData.password);
-
       const nameFromCareer = user.career?.name || "No especificada";
-      setCareerName(nameFromCareer);
 
+      setCareerName(nameFromCareer);
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
       setIsAuthenticated(true);
@@ -51,7 +52,7 @@ const LoginPage = () => {
 
       if (err.response) {
         const status = err.response.status;
-        const message = "usuario o contraseña incorrectos";
+        const message = "Usuario o contraseña incorrectos";
 
         if (status === 400 || status === 401) {
           setError(message);
@@ -99,7 +100,7 @@ const LoginPage = () => {
 
             <Form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
               <Input
-                isRequired
+                required
                 label="Correo electrónico"
                 name="email"
                 placeholder="Ingresa tu correo"
@@ -109,7 +110,7 @@ const LoginPage = () => {
               />
 
               <Input
-                isRequired
+                required
                 label="Contraseña"
                 name="password"
                 placeholder="Ingresa tu contraseña"

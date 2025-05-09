@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { Link } from "@heroui/link";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Head } from "./head";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/navbar/navbar";
 import { isTokenExpired } from "@/utils/auth";
 
 export default function DefaultLayout({
@@ -26,7 +26,6 @@ export default function DefaultLayout({
 
   return (
     <div className="relative flex flex-col h-screen">
-      <SpeedInsights/>
       <Head />
       <Navbar />
       <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">

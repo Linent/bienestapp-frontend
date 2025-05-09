@@ -6,7 +6,7 @@ import {
   Card,
   User as UserAvatar,
 } from "@heroui/react";
-import EditUserModal from "@/components/EditUserModal";
+import EditUserModal from "@/components/user/EditUserModal";
 import Link from "next/link";
 import { fetchUserById } from "@/services/userService";
 import { getTokenPayload } from "@/utils/auth";

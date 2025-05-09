@@ -92,3 +92,22 @@ export interface Schedule {
   dateStart: string; // ISO date string
   attendance: boolean;
 }
+export interface Props {
+  topic: {
+    _id: string;
+    name: string;
+    description: string;
+    filePath: string;
+  };
+  onEdit: () => void;
+  onDelete: (id: string) => void;
+}
+export interface Topic {
+  _id: string;
+  name: string;
+  description: string;
+  filePath: string;
+  keywords: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}

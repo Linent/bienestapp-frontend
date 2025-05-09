@@ -22,9 +22,9 @@ import {
   DeleteIcon,
   PlusIcon
 } from "@/components/icons/ActionIcons";
-import AddUserModal from "@/components/AddUserModal";
-import ViewUserModal from "@/components/ViewUserModal";
-import EditUserModal from "@/components/EditUserModal";
+import AddUserModal from "@/components/user/AddUserModal";
+import ViewUserModal from "@/components/user/ViewUserModal";
+import EditUserModal from "@/components/user/EditUserModal";
 
 const roleMap: Record<string, string> = {
   admin: "Administrador",

@@ -20,6 +20,7 @@ import icons8CerrarSesion from "@/public/icons8-cerrar-sesión-100-(1).png";
 import icon8CerrarSesion from "@/public/icons8-logout-96.png";
 import { Logo } from "@/components/icons";
 import { siteConfig } from "@/config/site";
+import { ThemeSwitch } from "../theme-switch";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -179,6 +180,7 @@ export const Navbar = () => {
             <span>Cerrar sesión</span>
             </NavbarMenuItem>
         )}
+        <ThemeSwitch />
       </NavbarMenu>
     </HeroUINavbar>
   );
