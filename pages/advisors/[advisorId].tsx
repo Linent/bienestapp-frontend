@@ -7,6 +7,7 @@ import CreateAdvisoryModal from "@/components/Advisory/CreateAdvisoryModal";
 import DefaultLayout from "@/layouts/default";
 import EditAdvisoryModal from "@/components/Advisory/EditAdvisoryModal";
 import { title } from "@/components/primitives";
+import { BackArrowIcon } from "@/components/icons/ActionIcons";
 
 const MAX_HOURS = 20;
 const DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes"];
@@ -116,7 +117,7 @@ const AdvisoryCardsPage = () => {
         </div>
 
         <Button color="primary" onPress={() => router.back()} className="mb-6">
-          ⬅️ Volver
+          <BackArrowIcon /> Volver
         </Button>
 
         <div className="overflow-x-auto mb-6">

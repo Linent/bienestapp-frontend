@@ -16,6 +16,7 @@ import CreateTopicModal from "@/components/topics/CreateTopicModal";
 import EditTopicModal from "@/components/topics/EditTopicModal";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
+import { PlusIcon, TrashIcon, EditIcon, EyeIcon } from "@/components/icons/ActionIcons";
 
 const TopicsPage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -56,7 +57,7 @@ const TopicsPage = () => {
           <CardHeader className="flex justify-between items-center">
             <h1 className={title()}>Gestión de Temas</h1>
             <Button color="primary" onPress={() => setIsCreateOpen(true)}>
-              + Nuevo Tema
+              <PlusIcon /> Nuevo Tema
             </Button>
           </CardHeader>
 

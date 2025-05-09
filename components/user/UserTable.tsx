@@ -181,7 +181,7 @@ const UserTable = () => {
           className="w-full md:w-auto"
           onPress={onOpen}
         >
-          + Agregar Estudiante
+          <PlusIcon /> Agregar Estudiante
         </Button>
       </div>
 

@@ -176,7 +176,7 @@ const AdvisoryList = () => {
           color="primary"
           onPress={onOpen}
         >
-          + Agregar Mentor
+          <PlusIcon /> Agregar Mentor
         </Button>
       </div>
 

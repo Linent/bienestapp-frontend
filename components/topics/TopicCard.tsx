@@ -1,7 +1,7 @@
 import { Card, CardBody, Button } from "@heroui/react";
 import { Topic } from "@/types";
 import { BACKEND_URL } from "@/config";
-
+import { TrashIcon, EditIcon, EyeIcon } from "@/components/icons/ActionIcons";
 interface Props {
   topic: Topic;
   onEdit: () => void;
@@ -23,10 +23,12 @@ const TopicCard: React.FC<Props> = ({ topic, onEdit, onDelete }) => {
         <div className="flex flex-wrap gap-2 justify-end">
           <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
             <Button variant="light" color="primary">
+              <EyeIcon/>
               Ver documento
             </Button>
           </a>
           <Button variant="ghost" color="warning" onPress={onEdit}>
+            <EditIcon/>
             Editar
           </Button>
           <Button
@@ -34,6 +36,7 @@ const TopicCard: React.FC<Props> = ({ topic, onEdit, onDelete }) => {
             color="danger"
             onPress={() => onDelete(topic._id)}
           >
+            <TrashIcon/>
             Eliminar
           </Button>
         </div>
