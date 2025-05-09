@@ -68,6 +68,7 @@ const ProfileCard = () => {
               name=""
               avatarProps={{
                 src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                style: { width: 100, height: 100 },
               }}
             />
           </div>

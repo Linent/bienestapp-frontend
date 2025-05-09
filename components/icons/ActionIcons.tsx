@@ -74,3 +74,113 @@ export const PlusIcon = (props: any) => (
     <path d="M 11.5 2 C 6.259214 2 2 6.2592178 2 11.5 C 2 16.740782 6.259214 21 11.5 21 C 16.740786 21 21 16.740782 21 11.5 C 21 6.2592178 16.740786 2 11.5 2 z M 11.5 3 C 16.200346 3 20 6.7996569 20 11.5 C 20 16.200343 16.200346 20 11.5 20 C 6.7996538 20 3 16.200343 3 11.5 C 3 6.7996569 6.7996538 3 11.5 3 z M 11.492188 6.9921875 A 0.50005 0.50005 0 0 0 11 7.5 L 11 11 L 7.5 11 A 0.50005 0.50005 0 1 0 7.5 12 L 11 12 L 11 15.5 A 0.50005 0.50005 0 1 0 12 15.5 L 12 12 L 15.5 12 A 0.50005 0.50005 0 1 0 15.5 11 L 12 11 L 12 7.5 A 0.50005 0.50005 0 0 0 11.492188 6.9921875 z" />
   </svg>
 );
+
+export const ClipboardIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    height="1.2em"
+    width="1.2em"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    aria-hidden="true"
+    {...props}
+  >
+    <path
+      d="M16 4H18C19.1046 4 20 4.89543 20 6V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V6C4 4.89543 4.89543 4 6 4H8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 2H15C15.5523 2 16 2.44772 16 3V5C16 5.55228 15.5523 6 15 6H9C8.44772 6 8 5.55228 8 5V3C8 2.44772 8.44772 2 9 2Z"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    height="1.2em"
+    width="1.2em"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    {...props}
+  >
+    <path
+      d="M3 6H5H21"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M19 6L18.3333 19.3333C18.2982 20.0579 17.6875 20.6667 16.9629 20.6667H7.03712C6.31252 20.6667 5.70182 20.0579 5.66675 19.3333L5 6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10 11V17"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 11V17"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const CheckIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    viewBox="0 0 24 24"
+    height="1.2em"
+    width="1.2em"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    {...props}
+  >
+    <path
+      d="M5 13L9 17L19 7"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const BlockIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    viewBox="0 0 24 24"
+    height="1.2em"
+    width="1.2em"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    {...props}
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <line
+      x1="7.5"
+      y1="16.5"
+      x2="16.5"
+      y2="7.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);

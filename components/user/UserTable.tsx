@@ -19,8 +19,11 @@ import { fetchUsers, updateEnableUser, deleteUser } from "@/services/userService
 import {
   EyeIcon,
   EditIcon,
-  DeleteIcon,
-  PlusIcon
+  PlusIcon,
+  ClipboardIcon,
+  TrashIcon,
+  BlockIcon,
+  CheckIcon
 } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
@@ -175,11 +178,10 @@ const UserTable = () => {
 
         <Button
           color="primary"
-          startContent={<PlusIcon />}
           className="w-full md:w-auto"
           onPress={onOpen}
         >
-          Agregar Asesor
+          + Agregar Estudiante
         </Button>
       </div>
 
@@ -260,7 +262,7 @@ const UserTable = () => {
                           className={`cursor-pointer ${user.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
                           onClick={handleToggleStatus}
                         >
-                          {user.enable ? "⛔" : "✔️"}
+                          {user.enable ? <BlockIcon/> : <CheckIcon/>}
                         </button>
                       </Tooltip>
                       <Tooltip content="Eliminar asesor">
@@ -269,7 +271,7 @@ const UserTable = () => {
                           className="cursor-pointer text-danger hover:text-red-600"
                           onClick={handleDelete}
                         >
-                          <DeleteIcon />
+                          <TrashIcon />
                         </button>
                       </Tooltip>
                     </div>

@@ -21,7 +21,10 @@ import {
   EyeIcon,
   EditIcon,
   PlusIcon,
-  DeleteIcon,
+  ClipboardIcon,
+  TrashIcon,
+  BlockIcon,
+  CheckIcon
 } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
@@ -171,10 +174,9 @@ const AdvisoryList = () => {
         <Button
           className="min-w-[120px]"
           color="primary"
-          startContent={<PlusIcon />}
           onPress={onOpen}
         >
-          Agregar
+          + Agregar Mentor
         </Button>
       </div>
 
@@ -223,7 +225,7 @@ const AdvisoryList = () => {
                         className={`cursor-pointer ${advisor.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
                         onClick={() => handleToggleStatus(advisor)}
                       >
-                        {advisor.enable ? "⛔" : "✔️"}
+                        {advisor.enable ? <BlockIcon/> : <CheckIcon/>}
                       </button>
                     </Tooltip>
                     <Tooltip content="Eliminar asesor">
@@ -231,7 +233,7 @@ const AdvisoryList = () => {
                         className="cursor-pointer text-danger hover:text-red-600"
                         onClick={() => handleDelete(advisor)}
                       >
-                        <DeleteIcon />
+                        <TrashIcon/>
                       </button>
                     </Tooltip>
                     <Tooltip content="Crear asesoría">
@@ -242,7 +244,7 @@ const AdvisoryList = () => {
                         isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
                         onClick={() => openCreateModal(advisor)}
                       >
-                        <PlusIcon />
+                        +
                       </Button>
                     </Tooltip>
                     <Tooltip content="Ver asesorías">
@@ -252,7 +254,7 @@ const AdvisoryList = () => {
                         color="secondary"
                         onClick={() => router.push(`/advisors/${advisor._id}`)}
                       >
-                        📋
+                        <ClipboardIcon/>
                       </Button>
                     </Tooltip>
                   </div>

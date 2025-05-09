@@ -21,6 +21,7 @@ interface EditUserModalProps {
   onClose: () => void;
   userId: string;
   onUpdateSuccess: () => void;
+  fromProfile?: boolean; // <- NUEVA PROP
 }
 
 const roleOptions = [
@@ -34,6 +35,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   onClose,
   userId,
   onUpdateSuccess,
+  fromProfile,
 }) => {
   const [user, setUser] = useState<any>(null);
   const [careers, setCareers] = useState<{ _id: string; name: string }[]>([]);
@@ -107,23 +109,29 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
             <Skeleton className="h-10 w-full mb-3" />
           ) : (
             <>
-                  <Input
-                    label="Nombre"
-                    value={user?.name || ""}
-                    onChange={(e) => setUser({ ...user, name: e.target.value })}
-                  />
-              {user?.role === "admin" && (
+              <Input
+                label="Nombre"
+                value={user?.name || ""}
+                onChange={(e) => setUser({ ...user, name: e.target.value })}
+              />
+
+              {/* Solo muestra estos si es admin y no viene desde el perfil */}
+              {user?.role === "admin" && !fromProfile && (
                 <>
                   <Input
                     label="Email"
                     type="email"
                     value={user?.email || ""}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
+                    onChange={(e) =>
+                      setUser({ ...user, email: e.target.value })
+                    }
                   />
                   <Input
                     label="Código"
                     value={user?.codigo || ""}
-                    onChange={(e) => setUser({ ...user, codigo: e.target.value })}
+                    onChange={(e) =>
+                      setUser({ ...user, codigo: e.target.value })
+                    }
                   />
                   <Select
                     label="Rol"
@@ -138,7 +146,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                       </SelectItem>
                     ))}
                   </Select>
-
                   <Select
                     label="Carrera"
                     selectedKeys={new Set([user?.career || ""])}
