@@ -184,7 +184,7 @@ const UserTable = () => {
           <PlusIcon /> Agregar Estudiante
         </Button>
       </div>
-
+      
       <div className="min-w-full table-auto border-gray-300">
         <Table isStriped aria-label="Lista de Asesores">
           <TableHeader>

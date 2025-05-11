@@ -75,6 +75,7 @@ const CreateTopicModal: React.FC<Props> = ({ isOpen, onClose, onCreateSuccess })
             label="Palabras clave (separadas por coma)"
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
+            required
           />
           <Input
             type="file"

@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+
 import {
   Table,
   TableHeader,
@@ -9,7 +10,19 @@ import {
   Button,
   TableColumn,
   Divider,
+  Tooltip,
 } from "@heroui/react";
+
+import {
+  PlusIcon,
+  CloseIcon,
+  EditIcon,
+  EyeIcon,
+} from "@/components/icons/ActionIcons";
+
+import EditObservationModal from "@/components/schedule/EditObservationModal";
+import ViewObservationModal from "@/components/schedule/ViewObservationModal";
+
 import {
   fetchStudentsByAdvisory,
   updateAttendance,
@@ -20,21 +33,18 @@ import { title } from "@/components/primitives";
 
 const StudentsByAdvisory = () => {
   const router = useRouter();
-  const {
-    advisoryId,
-    day,
-    dateStart,
-    advisorName,
-  } = router.query as {
+  const { advisoryId, day, dateStart } = router.query as {
     advisoryId: string;
     day: string;
     dateStart: string;
-    advisorName?: string;
   };
 
   const [students, setStudents] = useState<Student[]>([]);
+  const [mentorName, setMentorName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingSchedule, setEditingSchedule] = useState<any>(null);
+  const [viewingObservation, setViewingObservation] = useState<string | null>(null);
 
   const canEditAttendance = (start: Date) => {
     const now = new Date();
@@ -50,16 +60,15 @@ const StudentsByAdvisory = () => {
 
       try {
         const data = await fetchStudentsByAdvisory(advisoryId, day, dateStart);
-
         if (Array.isArray(data)) {
           setStudents(data);
+          setMentorName(data[0]?.AdvisoryId?.advisorId?.name || "");
           setError(null);
         } else {
           throw new Error("Formato de datos inválido");
         }
       } catch (err: any) {
         const apiMessage = err?.response?.data?.message;
-
         if (err.response?.status === 400 && apiMessage === "schedules.is_empty") {
           setError("No hay estudiantes inscritos para esta asesoría.");
           setStudents([]);
@@ -94,11 +103,16 @@ const StudentsByAdvisory = () => {
   return (
     <DefaultLayout>
       <div className="p-6 max-w-6xl mx-auto">
-        <h2 className={title()}>Estudiantes Agendados</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className={title()}>Estudiantes Agendados</h2>
+          <Button color="primary" onPress={() => router.back()}>
+            Volver
+          </Button>
+        </div>
 
-        {advisorName && (
+        {mentorName && (
           <p className="text-lg text-gray-600 mt-1 mb-4">
-            Asesor: <span className="font-medium">{advisorName}</span>
+            Mentor: <span className="font-medium">{mentorName}</span>
           </p>
         )}
 
@@ -119,6 +133,8 @@ const StudentsByAdvisory = () => {
                 <TableColumn>Email</TableColumn>
                 <TableColumn>Carrera</TableColumn>
                 <TableColumn>Tema</TableColumn>
+                <TableColumn>Hora</TableColumn>
+                <TableColumn>Acciones</TableColumn>
                 <TableColumn>Asistencia</TableColumn>
               </TableHeader>
               <TableBody>
@@ -131,6 +147,34 @@ const StudentsByAdvisory = () => {
                     <TableCell>{s.studentId.email}</TableCell>
                     <TableCell>{s.studentId.career.name}</TableCell>
                     <TableCell>{s.topic}</TableCell>
+                    <TableCell width={100}>
+                      {new Date(s.dateStart).toLocaleTimeString("es-CO", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </TableCell>
+                    <TableCell className="flex gap-2 items-center">
+                      <Tooltip content="Agregar observación">
+                        <button
+                          aria-label="Agregar observación"
+                          className="cursor-pointer text-default-400 hover:text-warning"
+                          onClick={() => setEditingSchedule(s)}
+                        >
+                          <EditIcon />
+                        </button>
+                      </Tooltip>
+                      {s.observation && s.observation.trim() !== "" && (
+                        <Tooltip content="Ver observación">
+                          <button
+                            aria-label="Ver observación"
+                            className="cursor-pointer text-default-400 hover:text-primary"
+                            onClick={() => setViewingObservation(s.observation)}
+                          >
+                            <EyeIcon />
+                          </button>
+                        </Tooltip>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Button
                         size="sm"
@@ -143,11 +187,11 @@ const StudentsByAdvisory = () => {
                       >
                         {s.attendance ? (
                           <>
-                            ✅ <span>Presente</span>
+                            <PlusIcon /> <span>Presente</span>
                           </>
                         ) : (
                           <>
-                            ❌ <span>Ausente</span>
+                            <CloseIcon /> <span>Ausente</span>
                           </>
                         )}
                       </Button>
@@ -160,9 +204,25 @@ const StudentsByAdvisory = () => {
         )}
 
         <div className="mt-6 flex justify-end">
-          <Button color="primary" onPress={() => router.back()}>
-            Volver
-          </Button>
+          {editingSchedule && (
+            <EditObservationModal
+              isOpen={!!editingSchedule}
+              scheduleId={editingSchedule._id}
+              initialObservation={editingSchedule.observation || ""}
+              onClose={() => setEditingSchedule(null)}
+              onUpdateSuccess={() => {
+                setEditingSchedule(null);
+                router.reload(); // Recarga para ver los cambios
+              }}
+            />
+          )}
+          {viewingObservation && (
+            <ViewObservationModal
+              isOpen={!!viewingObservation}
+              observation={viewingObservation}
+              onClose={() => setViewingObservation(null)}
+            />
+          )}
         </div>
       </div>
     </DefaultLayout>

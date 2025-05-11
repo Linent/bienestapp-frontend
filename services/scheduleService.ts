@@ -23,6 +23,21 @@ export const fetchSchedules = async () => {
   return res.data;
 }
 
+export const updateSchedule = async (
+  scheduleId: string,
+  scheduleData: { observation: string }
+) => {
+  const res = await api.put(
+    `${BACKEND_URL}/${schedulePath}/${scheduleId}`,
+    scheduleData,
+    {
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return res.data;
+}
+
 export const updateAttendance = async (
   scheduleId: string,
   attendanceStatus: boolean
@@ -36,4 +51,13 @@ export const updateAttendance = async (
   );
 
   return res.data;
+};
+
+export const updateFeedback = async (scheduleId: string, feedback: string) => {
+  const response = await api.put(
+    `${BACKEND_URL}/schedules/${scheduleId}`,
+    { feedback },
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
 };

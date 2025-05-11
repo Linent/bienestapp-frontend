@@ -9,16 +9,8 @@ import {
   Button,
 } from "@heroui/react";
 import { useRouter } from "next/router";
+import { AdvisoryEvent } from "@/types/types"; // Asegúrate de que la ruta sea correcta
 
-interface AdvisoryEvent {
-  id: string;
-  advisorName: string;
-  career: string;
-  time: string;
-  start: Date;
-  status: string;
-  dateStart: Date;
-}
 
 interface AdvisoryListProps {
   advisories: AdvisoryEvent[];
@@ -55,10 +47,6 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
         advisoryId,
         day,
         dateStart,
-        advisorName: selectedAdvisory.advisorName,
-        career: selectedAdvisory.career,
-        time: selectedAdvisory.time,
-        status: selectedAdvisory.status,
       },
     });
   };

@@ -102,7 +102,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
       // Manejo de errores
       console.error(
         "Error al registrar el usuario:",
-        err.toJSON ? err.toJSON() : err,
+        err.toJSON ? err.toJSON() : err
       );
 
       if (axios.isAxiosError(err) && err.response) {
@@ -183,19 +183,19 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                   errorMessage="Por favor, seleccione un rol"
                   label="Rol"
                   placeholder="Seleccione un rol"
-                  value={role}
+                  selectedKeys={new Set([role])}
                   variant="bordered"
                   onSelectionChange={(keys) =>
                     setRole(Array.from(keys)[0] as string)
                   }
                 >
-                  <SelectItem key="admin" textValue="admin">
+                  <SelectItem key="admin" textValue="Administrador">
                     Administrador
                   </SelectItem>
-                  <SelectItem key="academic_friend" textValue="academic_friend">
+                  <SelectItem key="academic_friend" textValue="Amigo Académico">
                     Amigo Académico
                   </SelectItem>
-                  <SelectItem key="student" textValue="student">
+                  <SelectItem key="student" textValue="Estudiante">
                     Estudiante
                   </SelectItem>
                 </Select>
@@ -221,7 +221,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                   }
                 >
                   {careers.map((career) => (
-                    <SelectItem key={career._id} textValue={career._id}>
+                    <SelectItem key={career._id} textValue={career.name}>
                       {career.name}
                     </SelectItem>
                   ))}

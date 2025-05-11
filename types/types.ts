@@ -64,6 +64,8 @@ export interface Student {
       name: string;
     };
   };
+  dateStart: string;
+  observation: string;
 }
 export interface TopCareerReport {
   totalAdvisories: number;

@@ -15,7 +15,11 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { useRouter } from "next/router";
-import { fetchUsers, updateEnableUser, deleteUser } from "@/services/userService";
+import {
+  fetchUsers,
+  updateEnableUser,
+  deleteUser,
+} from "@/services/userService";
 import { User } from "@/types";
 import {
   EyeIcon,
@@ -24,7 +28,7 @@ import {
   ClipboardIcon,
   TrashIcon,
   BlockIcon,
-  CheckIcon
+  CheckIcon,
 } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
@@ -42,11 +46,16 @@ const AdvisoryList = () => {
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterCareer, setFilterCareer] = useState<string>("");
   const [selectedAdvisor, setSelectedAdvisor] = useState<User | null>(null);
-  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(null);
+  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(
+    null
+  );
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [createTarget, setCreateTarget] = useState<{ advisorId: string; careerId: string }>({ advisorId: "", careerId: "" });
+  const [createTarget, setCreateTarget] = useState<{
+    advisorId: string;
+    careerId: string;
+  }>({ advisorId: "", careerId: "" });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
 
@@ -54,11 +63,21 @@ const AdvisoryList = () => {
     const loadData = async () => {
       try {
         const users = await fetchUsers();
-        const academicFriends = users.filter((user: User) => user.role === "academic_friend");
+        const academicFriends = users.filter(
+          (user: User) => user.role === "academic_friend"
+        );
 
         const uniqueCareerNames: string[] = Array.from(
           new Set(
-            academicFriends.map((user: User) => user.career && typeof user.career === "object" && "name" in user.career ? user.career.name : null).filter(Boolean)
+            academicFriends
+              .map((user: User) =>
+                user.career &&
+                typeof user.career === "object" &&
+                "name" in user.career
+                  ? user.career.name
+                  : null
+              )
+              .filter(Boolean)
           )
         ) as string[];
 
@@ -76,7 +95,10 @@ const AdvisoryList = () => {
   }, []);
 
   const openCreateModal = (advisor: User) => {
-    const careerId = typeof advisor.career === "string" ? advisor.career : advisor.career?._id || "";
+    const careerId =
+      typeof advisor.career === "string"
+        ? advisor.career
+        : advisor.career?._id || "";
     setCreateTarget({ advisorId: advisor._id, careerId });
     setCreateModalOpen(true);
   };
@@ -84,7 +106,9 @@ const AdvisoryList = () => {
   const handleToggleStatus = async (advisor: User) => {
     try {
       await updateEnableUser(advisor._id, !advisor.enable);
-      alert(`Asesor ${!advisor.enable ? "habilitado" : "deshabilitado"} correctamente`);
+      alert(
+        `Asesor ${!advisor.enable ? "habilitado" : "deshabilitado"} correctamente`
+      );
       refreshAdvisors();
     } catch (error) {
       alert("No se pudo cambiar el estado del asesor.");
@@ -104,10 +128,16 @@ const AdvisoryList = () => {
   };
 
   const filteredAdvisors = advisors.filter((advisor) => {
-    const matchSearch = advisor.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchStatus = filterStatus ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus : true;
+    const matchSearch = advisor.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchStatus = filterStatus
+      ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus
+      : true;
     const matchCareer = filterCareer
-      ? advisor.career && typeof advisor.career === "object" && "name" in advisor.career
+      ? advisor.career &&
+        typeof advisor.career === "object" &&
+        "name" in advisor.career
         ? advisor.career.name === filterCareer
         : false
       : true;
@@ -167,17 +197,30 @@ const AdvisoryList = () => {
           <SelectItem key="">Todas</SelectItem>
           <>
             {careers.map((career) => (
-              <SelectItem key={career} data-value={career}>{career}</SelectItem>
+              <SelectItem key={career} data-value={career}>
+                {career}
+              </SelectItem>
             ))}
           </>
         </Select>
-        <Button
-          className="min-w-[120px]"
-          color="primary"
-          onPress={onOpen}
-        >
+        <Button className="min-w-[120px]" color="primary" onPress={onOpen}>
           <PlusIcon /> Agregar Mentor
         </Button>
+        <Button
+          color="secondary"
+          variant="bordered"
+          className="w-full md:w-auto"
+          onClick={() => document.getElementById("csv-upload")?.click()}
+        >
+          Cargar CSV
+        </Button>
+        {/*<Input
+          id="csv-upload"
+          type="file"
+          accept=".csv, .xlsx"
+          hidden
+          onChange={handleFileUpload}
+        />*/}
       </div>
 
       <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
@@ -199,33 +242,47 @@ const AdvisoryList = () => {
                 <TableCell>{advisor.codigo}</TableCell>
                 <TableCell>{advisor.email}</TableCell>
                 <TableCell>
-                  {advisor.career && typeof advisor.career === "object" && "name" in advisor.career
+                  {advisor.career &&
+                  typeof advisor.career === "object" &&
+                  "name" in advisor.career
                     ? String(advisor.career.name)
                     : "Desconocida"}
                 </TableCell>
                 <TableCell>
-                  <Chip color={advisor.enable ? "success" : "danger"} size="sm" variant="flat">
+                  <Chip
+                    color={advisor.enable ? "success" : "danger"}
+                    size="sm"
+                    variant="flat"
+                  >
                     {advisor.enable ? "Activo" : "Inactivo"}
                   </Chip>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2 items-center">
                     <Tooltip content="Ver detalles">
-                      <button className="text-default-400 hover:text-primary" onClick={() => openViewModal(advisor)}>
+                      <button
+                        className="text-default-400 hover:text-primary"
+                        onClick={() => openViewModal(advisor)}
+                      >
                         <EyeIcon />
                       </button>
                     </Tooltip>
                     <Tooltip content="Editar asesor">
-                      <button className="text-default-400 hover:text-warning" onClick={() => openEditModal(advisor._id)}>
+                      <button
+                        className="text-default-400 hover:text-warning"
+                        onClick={() => openEditModal(advisor._id)}
+                      >
                         <EditIcon />
                       </button>
                     </Tooltip>
-                    <Tooltip content={advisor.enable ? "Deshabilitar" : "Habilitar"}>
+                    <Tooltip
+                      content={advisor.enable ? "Deshabilitar" : "Habilitar"}
+                    >
                       <button
                         className={`cursor-pointer ${advisor.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
                         onClick={() => handleToggleStatus(advisor)}
                       >
-                        {advisor.enable ? <BlockIcon/> : <CheckIcon/>}
+                        {advisor.enable ? <BlockIcon /> : <CheckIcon />}
                       </button>
                     </Tooltip>
                     <Tooltip content="Eliminar asesor">
@@ -233,7 +290,7 @@ const AdvisoryList = () => {
                         className="cursor-pointer text-danger hover:text-red-600"
                         onClick={() => handleDelete(advisor)}
                       >
-                        <TrashIcon/>
+                        <TrashIcon />
                       </button>
                     </Tooltip>
                     <Tooltip content="Crear asesoría">
@@ -254,7 +311,7 @@ const AdvisoryList = () => {
                         color="secondary"
                         onClick={() => router.push(`/advisors/${advisor._id}`)}
                       >
-                        <ClipboardIcon/>
+                        <ClipboardIcon />
                       </Button>
                     </Tooltip>
                   </div>
@@ -266,7 +323,11 @@ const AdvisoryList = () => {
       </div>
 
       <AddUserModal isOpen={isOpen} onClose={onClose} />
-      <ViewUserModal isOpen={isViewModalOpen} user={selectedAdvisor} onClose={() => setViewModalOpen(false)} />
+      <ViewUserModal
+        isOpen={isViewModalOpen}
+        user={selectedAdvisor}
+        onClose={() => setViewModalOpen(false)}
+      />
       {isEditModalOpen && selectedAdvisorId && (
         <EditUserModal
           isOpen={isEditModalOpen}
