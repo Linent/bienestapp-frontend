@@ -20,15 +20,29 @@ import { title } from "@/components/primitives";
 
 const StudentsByAdvisory = () => {
   const router = useRouter();
-  const { advisoryId, day, dateStart } = router.query as {
+  const {
+    advisoryId,
+    day,
+    dateStart,
+    advisorName,
+  } = router.query as {
     advisoryId: string;
     day: string;
     dateStart: string;
+    advisorName?: string;
   };
 
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const canEditAttendance = (start: Date) => {
+    const now = new Date();
+    return (
+      start.getTime() - now.getTime() <= 1000 * 60 * 60 * 3 &&
+      start.getTime() > now.getTime()
+    );
+  };
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -81,7 +95,15 @@ const StudentsByAdvisory = () => {
     <DefaultLayout>
       <div className="p-6 max-w-6xl mx-auto">
         <h2 className={title()}>Estudiantes Agendados</h2>
+
+        {advisorName && (
+          <p className="text-lg text-gray-600 mt-1 mb-4">
+            Asesor: <span className="font-medium">{advisorName}</span>
+          </p>
+        )}
+
         <Divider className="my-4" />
+
         {loading ? (
           <p>Cargando estudiantes...</p>
         ) : error ? (
@@ -117,6 +139,7 @@ const StudentsByAdvisory = () => {
                           handleToggleAttendance(s._id, s.attendance)
                         }
                         className="flex items-center gap-1"
+                        isDisabled={!canEditAttendance(new Date(dateStart))}
                       >
                         {s.attendance ? (
                           <>

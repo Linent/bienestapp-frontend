@@ -90,18 +90,18 @@ const AdvisoryCalendar = () => {
           }
         }); /////////////////////////
 
-        // Filtrar asesorías del mes actual
-        const now = moment();
-        const currentMonth = now.month(); // Enero = 0
-        const currentYear = now.year();
+        // // Filtrar asesorías del mes actual
+        // const now = moment();
+        // const currentMonth = now.month(); // Enero = 0
+        // const currentYear = now.year();
 
-        const currentMonthAdvisories = formattedEvents.filter((event) => {
-          const eventDate = moment(event.dateStart);
-          return (
-            eventDate.month() === currentMonth &&
-            eventDate.year() === currentYear
-          );
-        });
+        // const currentMonthAdvisories = formattedEvents.filter((event) => {
+        //   const eventDate = moment(event.dateStart);
+        //   return (
+        //     eventDate.month() === currentMonth &&
+        //     eventDate.year() === currentYear
+        //   );
+        // });
         setEvents(formattedEvents);
       } catch (error) {
         console.error("Error cargando asesorías:", error);

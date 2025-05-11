@@ -22,11 +22,11 @@ interface AdvisoryEvent {
 
 interface AdvisoryListProps {
   advisories: AdvisoryEvent[];
-  userRole: string; // Add userRole as a prop
+  userRole: string;
 }
-const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories, userRole }) => {
-  const [selectedAdvisory, setSelectedAdvisory] =
-    useState<AdvisoryEvent | null>(null);
+
+const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories }) => {
+  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -42,22 +42,34 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories, userRole }) => 
 
   const handleViewStudents = () => {
     if (!selectedAdvisory) return;
+
     const advisoryId = selectedAdvisory.id.split("-")[0];
-    const day = selectedAdvisory.start
-      .toLocaleDateString("es-ES", { weekday: "long" })
-      .toLowerCase();
-    const dateStart = selectedAdvisory.dateStart.toISOString(); // 👈 Enviamos dateStart completo
+    const day = selectedAdvisory.start.toLocaleDateString("es-ES", {
+      weekday: "long",
+    }).toLowerCase();
+    const dateStart = selectedAdvisory.dateStart.toISOString();
 
     router.push({
       pathname: "/schedules/StudentsByAdvisory",
-      query: { advisoryId, day, dateStart },
+      query: {
+        advisoryId,
+        day,
+        dateStart,
+        advisorName: selectedAdvisory.advisorName,
+        career: selectedAdvisory.career,
+        time: selectedAdvisory.time,
+        status: selectedAdvisory.status,
+      },
     });
   };
 
   return (
     <div>
       {advisories.map((advisory) => (
-        <div key={advisory.id} className="p-4 border rounded-md shadow-md mb-2">
+        <div
+          key={advisory.id}
+          className="p-4 border rounded-md shadow-md mb-2"
+        >
           <p className="text-lg font-semibold">{advisory.advisorName}</p>
           <Button variant="bordered" onPress={() => openModal(advisory)}>
             Ver detalles
@@ -71,36 +83,22 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({ advisories, userRole }) => 
           <ModalBody>
             {selectedAdvisory && (
               <>
-                <p>
-                  <strong>Asesor:</strong> {selectedAdvisory.advisorName}
-                </p>
-                <p>
-                  <strong>Carrera:</strong> {selectedAdvisory.career}
-                </p>
-                <p>
-                  <strong>Hora:</strong> {selectedAdvisory.time}
-                </p>
+                <p><strong>Asesor:</strong> {selectedAdvisory.advisorName}</p>
+                <p><strong>Carrera:</strong> {selectedAdvisory.career}</p>
+                <p><strong>Hora:</strong> {selectedAdvisory.time}</p>
+                <p><strong>Estado:</strong> {selectedAdvisory.status}</p>
               </>
             )}
           </ModalBody>
           <ModalFooter className="flex justify-between">
-            <Button variant="light" onPress={closeModal}>
-              Cerrar
+            <Button variant="light" onPress={closeModal}>Cerrar</Button>
+            <Button
+              variant="solid"
+              color="primary"
+              onPress={handleViewStudents}
+            >
+              Ver estudiantes
             </Button>
-            {(userRole === "admin" ||
-              (userRole === "academic_friend" &&
-                selectedAdvisory &&
-                selectedAdvisory.start.getTime() - new Date().getTime() <=
-                  1000 * 60 * 60 * 3 &&
-                selectedAdvisory.start.getTime() > new Date().getTime())) && (
-              <Button
-                variant="solid"
-                color="primary"
-                onPress={handleViewStudents}
-              >
-                Ver estudiantes
-              </Button>
-            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
