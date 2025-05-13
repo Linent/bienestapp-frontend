@@ -94,3 +94,12 @@ export const loginUser = async (email: string, password: string) => {
   return response.data; // debe incluir { token, user }
 };
 
+export const uploadUserFiles = async (userId: string, formData: FormData) => {
+  const res = await api.put(`${BACKEND_URL}/${UserPath}/${userId}/files`, formData, {
+    headers: {
+      ...getAuthHeaders(),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};

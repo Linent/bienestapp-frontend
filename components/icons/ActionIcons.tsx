@@ -27,7 +27,53 @@ export const EyeIcon = (props: any) => (
     />
   </svg>
 );
+export const FacebookIcon = (props: any) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" {...props}>
+    <path d="M22 12a10 10 0 10-11.6 9.9v-7H8v-2.9h2.4V9.4c0-2.4 1.4-3.8 3.5-3.8.7 0 1.4.1 2.1.2v2.3h-1.2c-1.2 0-1.6.8-1.6 1.6v1.9H17l-.4 2.9h-2.2v7A10 10 0 0022 12z" />
+  </svg>
+);
 
+export const TwitterIcon = (props: any) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    width="1em"
+    height="1em"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M3 3h3.6L12 10.2 17.4 3H21l-7.2 9.6L21 21h-3.6L12 13.8 6.6 21H3l7.2-9.6L3 3z" />
+  </svg>
+);
+export const CameraIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    width="1em"
+    viewBox="0 0 24 24"
+    role="presentation"
+    {...props}
+  >
+    <path
+      d="M20 7h-2.586l-1.707-1.707A1 1 0 0015 5h-6a1 1 0 00-.707.293L6.586 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx={12}
+      cy={13}
+      r={4}
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 export const EditIcon = (props: any) => (
   <svg
     aria-hidden="true"

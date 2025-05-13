@@ -2,12 +2,15 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  career?: string | { _id: string } | null;
+  career?: string | { _id: string, name: string; } | null;
   codigo: string;
   role: "admin" | "student" | "academic_friend";
   enable: boolean;
+  profileImage?: string;
   password?: string; // Solo para el registro
   availableHours: number;
+  resume?: string; // URL de la hoja de vida
+  resumePublicId?: string; // ID de la hoja de vida
 }
 
 export interface Career {

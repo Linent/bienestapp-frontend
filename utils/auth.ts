@@ -1,6 +1,8 @@
 import { jwtDecode } from "jwt-decode";
 
-interface JwtPayload {
+export interface JwtPayload {
+  id: string;
+  role: "admin" | "student" | "academic_friend";
   exp: number;
 }
 
@@ -17,16 +19,15 @@ export const isTokenExpired = (): boolean => {
   }
 };
 
-export const getTokenPayload = (): { id: string; role: string } | null => {
-  // Example implementation
+export const getTokenPayload = (): JwtPayload | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
 
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return { id: payload.id, role: payload.role };
+    return { id: payload.id, role: payload.role, exp: payload.exp };
   } catch (error) {
-    console.error("Invalid token:", error);
+    console.error("Token inválido:", error);
     return null;
   }
 };

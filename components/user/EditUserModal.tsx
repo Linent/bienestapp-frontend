@@ -1,3 +1,4 @@
+// components/user/EditUserModal.tsx
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -15,13 +16,14 @@ import toast from "react-hot-toast";
 
 import { fetchUserById, updateUser } from "@/services/userService";
 import { fetchCareers } from "@/services/careerService";
+import { getTokenPayload } from "@/utils/auth";
 
 interface EditUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
   onUpdateSuccess: () => void;
-  fromProfile?: boolean; // <- NUEVA PROP
+  fromProfile?: boolean;
 }
 
 const roleOptions = [
@@ -39,39 +41,43 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 }) => {
   const [user, setUser] = useState<any>(null);
   const [careers, setCareers] = useState<{ _id: string; name: string }[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [updating, setUpdating] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const userData = await fetchUserById(userId);
-          setUser(userData);
-          setPassword("");
+    const role = getTokenPayload()?.role;
+    setIsAdmin(role === "admin");
+  }, []);
 
-          // Solo si es admin, se cargan las carreras
-          if (userData.role === "admin") {
-            const careerData = await fetchCareers();
-            setCareers(careerData);
-          }
-        } catch (error) {
-          console.error("Error al obtener datos del usuario:", error);
-          toast.error("No se pudo cargar la información del usuario.");
-        } finally {
-          setLoading(false);
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const userData = await fetchUserById(userId);
+        setUser(userData);
+        setPassword("");
+
+        if (isAdmin) {
+          const careerData = await fetchCareers();
+          setCareers(careerData);
         }
-      };
+      } catch (error) {
+        console.error("Error al obtener datos del usuario:", error);
+        toast.error("No se pudo cargar la información del usuario.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchData();
-    }
-  }, [isOpen, userId]);
+    fetchData();
+  }, [isOpen, userId, isAdmin]);
 
   const handleUpdate = async () => {
     if (!user) return;
-
     if (password && password.length < 6) {
       toast.error("La nueva contraseña debe tener al menos 6 caracteres.");
       return;
@@ -84,7 +90,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         return acc;
       }, {} as any);
 
-      if (password.trim() !== "") {
+      if (password.trim()) {
         updatedUser.password = password.trim();
       }
 
@@ -113,25 +119,21 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 label="Nombre"
                 value={user?.name || ""}
                 onChange={(e) => setUser({ ...user, name: e.target.value })}
+                isDisabled={!isAdmin && !fromProfile}
               />
 
-              {/* Solo muestra estos si es admin y no viene desde el perfil */}
-              {user?.role === "admin" && !fromProfile && (
+              {isAdmin && !fromProfile && (
                 <>
                   <Input
                     label="Email"
                     type="email"
                     value={user?.email || ""}
-                    onChange={(e) =>
-                      setUser({ ...user, email: e.target.value })
-                    }
+                    onChange={(e) => setUser({ ...user, email: e.target.value })}
                   />
                   <Input
                     label="Código"
                     value={user?.codigo || ""}
-                    onChange={(e) =>
-                      setUser({ ...user, codigo: e.target.value })
-                    }
+                    onChange={(e) => setUser({ ...user, codigo: e.target.value })}
                   />
                   <Select
                     label="Rol"

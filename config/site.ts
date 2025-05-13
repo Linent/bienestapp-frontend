@@ -41,6 +41,9 @@ export const siteConfig = {
       label: "Mi Calendario",
       href: "/advisor/calendar",
       roles: ["academic_friend"],
+      subItems: [
+        { label: "Mis asesorías", href: "/advisors/:advisorId", roles: ["academic_friend"] },
+        ]
     },
     {
       label: "Perfil",
@@ -51,8 +54,7 @@ export const siteConfig = {
       label: "Documentos",
       href: "/topics",
       roles: ["admin"],
-    },
-    
+    }
   ],
   navMenuItems: [
     {

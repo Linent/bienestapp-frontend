@@ -9,7 +9,7 @@ interface Props {
 }
 
 const TopicCard: React.FC<Props> = ({ topic, onEdit, onDelete }) => {
-  const pdfUrl = `${BACKEND_URL}/${topic.filePath}`;
+  const pdfUrl = `${topic.filePath}`;
 
   return (
     <Card className="shadow-md">

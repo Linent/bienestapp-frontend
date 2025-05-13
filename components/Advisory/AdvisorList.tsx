@@ -13,6 +13,7 @@ import {
   Button,
   useDisclosure,
   Tooltip,
+  Skeleton,
 } from "@heroui/react";
 import { useRouter } from "next/router";
 import {
@@ -56,6 +57,7 @@ const AdvisoryList = () => {
     advisorId: string;
     careerId: string;
   }>({ advisorId: "", careerId: "" });
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
 
@@ -99,8 +101,13 @@ const AdvisoryList = () => {
       typeof advisor.career === "string"
         ? advisor.career
         : advisor.career?._id || "";
-    setCreateTarget({ advisorId: advisor._id, careerId });
-    setCreateModalOpen(true);
+    const advisorId = advisor._id;
+    if (advisorId && careerId) {
+      setCreateTarget({ advisorId, careerId });
+      setCreateModalOpen(true);
+    } else {
+      alert("No se pudo abrir el formulario. Datos incompletos.");
+    }
   };
 
   const handleToggleStatus = async (advisor: User) => {
@@ -166,9 +173,6 @@ const AdvisoryList = () => {
     }
   };
 
-  if (loading) return <p>Cargando datos...</p>;
-  if (error) return <p>{error}</p>;
-
   return (
     <div className="p-6 bg-white shadow-lg rounded-lg">
       <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
@@ -194,132 +198,135 @@ const AdvisoryList = () => {
           value={filterCareer}
           onChange={(e) => setFilterCareer(e.target.value)}
         >
-          <SelectItem key="">Todas</SelectItem>
           <>
-            {careers.map((career) => (
-              <SelectItem key={career} data-value={career}>
-                {career}
-              </SelectItem>
-            ))}
+          <SelectItem key="">Todas</SelectItem>
+          {careers.map((career) => (
+            <SelectItem key={career} data-value={career}>
+              {career}
+            </SelectItem>
+          ))}
           </>
         </Select>
         <Button className="min-w-[120px]" color="primary" onPress={onOpen}>
           <PlusIcon /> Agregar Mentor
         </Button>
-        <Button
-          color="secondary"
-          variant="bordered"
-          className="w-full md:w-auto"
-          onClick={() => document.getElementById("csv-upload")?.click()}
-        >
-          Cargar CSV
-        </Button>
-        {/*<Input
-          id="csv-upload"
-          type="file"
-          accept=".csv, .xlsx"
-          hidden
-          onChange={handleFileUpload}
-        />*/}
       </div>
 
       <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
-        <Table isStriped aria-label="Lista de Asesores">
-          <TableHeader>
-            <TableColumn>#</TableColumn>
-            <TableColumn>Nombre</TableColumn>
-            <TableColumn>Código</TableColumn>
-            <TableColumn>Correo</TableColumn>
-            <TableColumn>Carrera</TableColumn>
-            <TableColumn>Estado</TableColumn>
-            <TableColumn>Acciones</TableColumn>
-          </TableHeader>
-          <TableBody>
-            {filteredAdvisors.map((advisor, index) => (
-              <TableRow key={advisor._id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{advisor.name}</TableCell>
-                <TableCell>{advisor.codigo}</TableCell>
-                <TableCell>{advisor.email}</TableCell>
-                <TableCell>
-                  {advisor.career &&
-                  typeof advisor.career === "object" &&
-                  "name" in advisor.career
-                    ? String(advisor.career.name)
-                    : "Desconocida"}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    color={advisor.enable ? "success" : "danger"}
-                    size="sm"
-                    variant="flat"
-                  >
-                    {advisor.enable ? "Activo" : "Inactivo"}
-                  </Chip>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2 items-center">
-                    <Tooltip content="Ver detalles">
-                      <button
-                        className="text-default-400 hover:text-primary"
-                        onClick={() => openViewModal(advisor)}
-                      >
-                        <EyeIcon />
-                      </button>
-                    </Tooltip>
-                    <Tooltip content="Editar asesor">
-                      <button
-                        className="text-default-400 hover:text-warning"
-                        onClick={() => openEditModal(advisor._id)}
-                      >
-                        <EditIcon />
-                      </button>
-                    </Tooltip>
-                    <Tooltip
-                      content={advisor.enable ? "Deshabilitar" : "Habilitar"}
+        {loading ? (
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+        ) : (
+          <Table isStriped aria-label="Lista de Asesores">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn>Nombre</TableColumn>
+              <TableColumn>Código</TableColumn>
+              <TableColumn>Correo</TableColumn>
+              <TableColumn>Carrera</TableColumn>
+              <TableColumn>Estado</TableColumn>
+              <TableColumn>Hoja de Vida</TableColumn>
+              <TableColumn>Acciones</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {filteredAdvisors.map((advisor, index) => (
+                <TableRow key={advisor._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{advisor.name}</TableCell>
+                  <TableCell>{advisor.codigo}</TableCell>
+                  <TableCell>{advisor.email}</TableCell>
+                  <TableCell>
+                    {advisor.career &&
+                    typeof advisor.career === "object" &&
+                    "name" in advisor.career
+                      ? String(advisor.career.name)
+                      : "Desconocida"}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      color={advisor.enable ? "success" : "danger"}
+                      size="sm"
+                      variant="flat"
                     >
-                      <button
-                        className={`cursor-pointer ${advisor.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
-                        onClick={() => handleToggleStatus(advisor)}
-                      >
-                        {advisor.enable ? <BlockIcon /> : <CheckIcon />}
-                      </button>
-                    </Tooltip>
-                    <Tooltip content="Eliminar asesor">
-                      <button
-                        className="cursor-pointer text-danger hover:text-red-600"
-                        onClick={() => handleDelete(advisor)}
-                      >
-                        <TrashIcon />
-                      </button>
-                    </Tooltip>
-                    <Tooltip content="Crear asesoría">
+                      {advisor.enable ? "Activo" : "Inactivo"}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {advisor.resume ? (
                       <Button
-                        isIconOnly
-                        size="sm"
-                        color="primary"
-                        isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
-                        onClick={() => openCreateModal(advisor)}
+                      color="primary"
+                      size="sm"
+                      onPress={() => window.open(`${advisor.resume}`, "_blank")}
                       >
-                        +
+                      <ClipboardIcon /> Ver Hoja de Vida
                       </Button>
-                    </Tooltip>
-                    <Tooltip content="Ver asesorías">
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        color="secondary"
-                        onClick={() => router.push(`/advisors/${advisor._id}`)}
+                    ) : (
+                      <span>No disponible</span>
+                    )}
+                    </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2 items-center">
+                      <Tooltip content="Ver detalles">
+                        <button
+                          className="text-default-400 hover:text-primary"
+                          onClick={() => openViewModal(advisor)}
+                        >
+                          <EyeIcon />
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Editar asesor">
+                        <button
+                          className="text-default-400 hover:text-warning"
+                          onClick={() => openEditModal(advisor._id)}
+                        >
+                          <EditIcon />
+                        </button>
+                      </Tooltip>
+                      <Tooltip
+                        content={advisor.enable ? "Deshabilitar" : "Habilitar"}
                       >
-                        <ClipboardIcon />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                        <button
+                          className={`cursor-pointer ${advisor.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
+                          onClick={() => handleToggleStatus(advisor)}
+                        >
+                          {advisor.enable ? <BlockIcon /> : <CheckIcon />}
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Eliminar asesor">
+                        <button
+                          className="cursor-pointer text-danger hover:text-red-600"
+                          onClick={() => handleDelete(advisor)}
+                        >
+                          <TrashIcon />
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Crear asesoría">
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          color="primary"
+                          isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
+                          onClick={() => openCreateModal(advisor)}
+                        >
+                          +
+                        </Button>
+                      </Tooltip>
+                      <Tooltip content="Ver asesorías">
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          color="secondary"
+                          onClick={() => router.push(`/advisors/${advisor._id}`)}
+                        >
+                          <ClipboardIcon />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       <AddUserModal isOpen={isOpen} onClose={onClose} />
@@ -336,13 +343,15 @@ const AdvisoryList = () => {
           onUpdateSuccess={refreshAdvisors}
         />
       )}
-      <CreateAdvisoryModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        advisorId={createTarget.advisorId}
-        careerId={createTarget.careerId}
-        onSuccess={refreshAdvisors}
-      />
+      {createTarget.advisorId && createTarget.careerId && (
+        <CreateAdvisoryModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          advisorId={createTarget.advisorId}
+          careerId={createTarget.careerId}
+          onSuccess={refreshAdvisors}
+        />
+      )}
     </div>
   );
 };

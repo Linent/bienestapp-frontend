@@ -28,6 +28,7 @@ import {
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
 import EditUserModal from "@/components/user/EditUserModal";
+import { User } from "@/types";
 
 const roleMap: Record<string, string> = {
   admin: "Administrador",
@@ -40,17 +41,8 @@ const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
   Inactivo: "danger"
 };
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  codigo: string;
-  role: keyof typeof roleMap;
-  enable: boolean;
-  career: {
-    name: string;
-  };
-}
+
+
 
 const UserTable = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -88,7 +80,7 @@ const UserTable = () => {
   }, []);
 
   const uniqueCareers = Array.from(
-    new Set(users.map((user) => user.career?.name).filter(Boolean))
+    new Set(users.map((user) => user.career && typeof user.career === "object" ? user.career.name : null).filter(Boolean))
   );
 
   const filteredUsers = users.filter((user) => {
@@ -96,7 +88,7 @@ const UserTable = () => {
       ? (user.enable ? "Activo" : "Inactivo") === filterStatus
       : true;
     const matchesCareer = filterCareer
-      ? user.career?.name === filterCareer
+      ? (user.career && typeof user.career === "object" ? user.career.name : user.career) === filterCareer
       : true;
     const matchesSearch = searchTerm
       ? user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -230,7 +222,7 @@ const UserTable = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.codigo}</TableCell>
                   <TableCell>{roleMap[user.role] ?? "Desconocido"}</TableCell>
-                  <TableCell>{user.career?.name}</TableCell>
+                  <TableCell>{user.career ? (typeof user.career === "object" ? user.career.name : user.career) : "No especificado"}</TableCell>
                   <TableCell>
                     <Chip color={statusColorMap[statusText]} size="sm" variant="flat">
                       {statusText}
