@@ -13,6 +13,23 @@ export const fetchUsers = async () => {
   return response.data;
 };
 
+export const importUsersFromFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post(
+    `${BACKEND_URL}/${UserPath}/import`, // asegúrate que la ruta es correcta
+    formData,
+    {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    }
+  );
+  console.log(response);
+  return response.data;
+};
+
 export const deleteUser = async (userId: string) => {
   const response = await api.put(`${BACKEND_URL}/${UserPath}/delete/${userId}`, {
     headers: getAuthHeaders(),

@@ -5,8 +5,8 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 
 import { fetchSchedulesByTopic } from "@/services/reportService";
@@ -19,13 +19,11 @@ const AdvisoriesByTopic = () => {
     const getData = async () => {
       try {
         const result = await fetchSchedulesByTopic();
-
         setData(
           result.slice(0, 10).map((item) => ({
-            // Tomar solo los primeros 10 registros
-            topicName: item.topic || "Desconocido", // Asegura que siempre haya un valor
+            topicName: item.topic || "Desconocido",
             count: item.count,
-          })),
+          }))
         );
       } catch (err) {
         setError("No se pudo cargar la información.");
@@ -36,20 +34,53 @@ const AdvisoriesByTopic = () => {
   }, []);
 
   return (
-    <div className="bg-white p-4 shadow-lg rounded-lg">
-      <h2 className="text-lg font-bold mb-4">Cantidad de Asesorías por Tema</h2>
+    <div className="w-full bg-white p-6 shadow-lg rounded-lg max-w-4xl mx-auto">
+      <h2 className="text-lg font-semibold text-center mb-4">
+        Asesorías por Tema (Top 10)
+      </h2>
 
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500 text-center">{error}</p>}
 
-      <ResponsiveContainer height={300} width="100%">
-        <BarChart data={data}>
-          <XAxis dataKey="topicName" />
-          <YAxis allowDecimals={false} />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="count" fill="#82ca9d" name="Cantidad de Asesorías" />
-        </BarChart>
-      </ResponsiveContainer>
+      {!error && data.length > 0 && (
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 10, bottom: 60 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="topicName"
+              angle={-25}
+              textAnchor="end"
+              interval={0}
+              height={70}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fontSize: 12 }}
+              label={{
+                value: "Cantidad",
+                angle: -90,
+                position: "insideLeft",
+                offset: 10,
+                fontSize: 12,
+              }}
+            />
+            <Tooltip
+              formatter={(value: number) => `${value} asesorías`}
+              labelStyle={{ fontWeight: 500 }}
+            />
+            <Bar
+              dataKey="count"
+              name="Asesorías"
+              fill="#6366f1" // Indigo-500 HeroUI
+              radius={[6, 6, 0, 0]}
+              barSize={40}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };

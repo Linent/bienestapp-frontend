@@ -26,7 +26,7 @@ export default function Scheduleview() {
   return (
     <DefaultLayout>
       <div className=" flex flex-col w-full items-center p-6">
-        <h1 className={title()}>Estudiantes agendados esta semana</h1>
+        <h1 className={title()}>Estudiantes agendados</h1>
         <Divider className="my-4"/>
         <WeeklySchedules/>
       </div>

@@ -4,78 +4,81 @@ import {
   Pie,
   Cell,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
+import { fetchSchedules } from "@/services/scheduleService";
+import { Schedule } from "@/types/types";
 
-import { fetchAttendancePerSchedule } from "@/services/reportService";
+// Colores más suaves y accesibles
+const COLORS = ["#4ade80", "#f87171"]; // Verde suave / Rojo claro
 
-const COLORS = ["#0088FE", "#FF8042"]; // Azul para presente, naranja para ausente
-
-const AttendancePerSchedule = () => {
-  const [data, setData] = useState<
-    { advisoryId: string; attendanceRate: number }[]
-  >([]);
+const AttendancePieChart = () => {
+  const [chartData, setChartData] = useState<{ name: string; value: number }[]>(
+    []
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getData = async () => {
+    const loadAttendance = async () => {
       try {
-        const result = await fetchAttendancePerSchedule();
-        setData(result);
+        const schedules: Schedule[] = await fetchSchedules();
+        const total = schedules.length;
+        const attended = schedules.filter((s) => s.attendance).length;
+        const notAttended = total - attended;
+
+        const data = [
+          { name: "Asistió", value: attended },
+          { name: "No asistió", value: notAttended },
+        ];
+
+        setChartData(data);
       } catch (err) {
         setError("No se pudo cargar la información.");
       }
     };
 
-    getData();
+    loadAttendance();
   }, []);
 
   return (
-    <div className="bg-white p-4 shadow-lg rounded-lg">
-      <h2 className="text-lg font-bold mb-4">
-        Porcentaje de Asistencia por Asesoría
+    <div className="w-full bg-white p-6 shadow-lg rounded-lg max-w-xl mx-auto">
+      <h2 className="text-lg font-bold mb-6 text-center">
+        Porcentaje de Asistencia General
       </h2>
-      {error && <p className="text-red-500">{error}</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {data.map((item, index) => {
-          const chartData = [
-            { name: "Asistió", value: item.attendanceRate },
-            { name: "No asistió", value: 1 - item.attendanceRate },
-          ];
+      {error && <p className="text-red-500 text-center">{error}</p>}
 
-          return (
-            <div key={item.advisoryId} className="flex flex-col items-center">
-              <ResponsiveContainer width={200} height={200}>
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {chartData.map((entry, i) => (
-                      <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <p className="mt-2 font-semibold text-sm text-gray-700">
-                ID Asesoría: {item.advisoryId}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+      {!error && chartData.length > 0 && (
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="40%"
+              cy="50%"
+              outerRadius={100}
+              innerRadius={0}
+              label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend
+              verticalAlign="middle"
+              align="right"
+              layout="vertical"
+              iconType="circle"
+              formatter={(value) => <span className="text-sm">{value}</span>}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };
 
-export default AttendancePerSchedule;
-
+export default AttendancePieChart;

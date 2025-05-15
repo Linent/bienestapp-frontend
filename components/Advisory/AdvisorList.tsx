@@ -14,14 +14,17 @@ import {
   useDisclosure,
   Tooltip,
   Skeleton,
+  Spinner,
 } from "@heroui/react";
 import { useRouter } from "next/router";
 import {
   fetchUsers,
   updateEnableUser,
   deleteUser,
+  importUsersFromFile,
 } from "@/services/userService";
 import { User } from "@/types";
+import { UploadIcon } from "@/components/icons/ActionIcons";
 import {
   EyeIcon,
   EditIcon,
@@ -42,21 +45,17 @@ const AdvisoryList = () => {
   const [advisors, setAdvisors] = useState<User[]>([]);
   const [careers, setCareers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterCareer, setFilterCareer] = useState<string>("");
   const [selectedAdvisor, setSelectedAdvisor] = useState<User | null>(null);
-  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(
-    null
-  );
+  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(null);
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [createTarget, setCreateTarget] = useState<{
-    advisorId: string;
-    careerId: string;
-  }>({ advisorId: "", careerId: "" });
+  const [createTarget, setCreateTarget] = useState<{ advisorId: string; careerId: string }>({ advisorId: "", careerId: "" });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -65,24 +64,8 @@ const AdvisoryList = () => {
     const loadData = async () => {
       try {
         const users = await fetchUsers();
-        const academicFriends = users.filter(
-          (user: User) => user.role === "academic_friend"
-        );
-
-        const uniqueCareerNames: string[] = Array.from(
-          new Set(
-            academicFriends
-              .map((user: User) =>
-                user.career &&
-                typeof user.career === "object" &&
-                "name" in user.career
-                  ? user.career.name
-                  : null
-              )
-              .filter(Boolean)
-          )
-        ) as string[];
-
+        const academicFriends = users.filter((user: User) => user.role === "academic_friend");
+        const uniqueCareerNames: string[] = Array.from(new Set(academicFriends.map((user: User) => user.career && typeof user.career === "object" && "name" in user.career ? user.career.name : null).filter(Boolean))) as string[];
         setCareers(uniqueCareerNames);
         setAdvisors(academicFriends);
       } catch (err) {
@@ -92,86 +75,121 @@ const AdvisoryList = () => {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
 
-  const openCreateModal = (advisor: User) => {
-    const careerId =
-      typeof advisor.career === "string"
-        ? advisor.career
-        : advisor.career?._id || "";
-    const advisorId = advisor._id;
-    if (advisorId && careerId) {
-      setCreateTarget({ advisorId, careerId });
-      setCreateModalOpen(true);
-    } else {
-      alert("No se pudo abrir el formulario. Datos incompletos.");
-    }
-  };
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleToggleStatus = async (advisor: User) => {
+    setImporting(true);
     try {
-      await updateEnableUser(advisor._id, !advisor.enable);
-      alert(
-        `Asesor ${!advisor.enable ? "habilitado" : "deshabilitado"} correctamente`
-      );
-      refreshAdvisors();
+      const result = await importUsersFromFile(file);
+      alert(`Usuarios creados: ${result.created}`);
+      window.location.reload();
     } catch (error) {
-      alert("No se pudo cambiar el estado del asesor.");
+      console.error("Error al importar usuarios:", error);
+      alert("Error al importar usuarios");
+    } finally {
+      setImporting(false);
     }
   };
 
-  const handleDelete = async (advisor: User) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este asesor?")) {
-      try {
-        await deleteUser(advisor._id);
-        alert("Asesor eliminado correctamente");
-        refreshAdvisors();
-      } catch (error) {
-        alert("No se pudo eliminar el asesor.");
-      }
-    }
-  };
-
+  // Filtrar asesores según los criterios de búsqueda y filtros seleccionados
   const filteredAdvisors = advisors.filter((advisor) => {
-    const matchSearch = advisor.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchStatus = filterStatus
-      ? (advisor.enable ? "Activo" : "Inactivo") === filterStatus
-      : true;
-    const matchCareer = filterCareer
-      ? advisor.career &&
+    const matchesSearch =
+      advisor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      advisor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (advisor.codigo && advisor.codigo.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesStatus =
+      !filterStatus ||
+      (filterStatus === "Activo" && advisor.enable) ||
+      (filterStatus === "Inactivo" && !advisor.enable);
+    const matchesCareer =
+      !filterCareer ||
+      (advisor.career &&
         typeof advisor.career === "object" &&
-        "name" in advisor.career
-        ? advisor.career.name === filterCareer
-        : false
-      : true;
-    return matchSearch && matchStatus && matchCareer;
+        "name" in advisor.career &&
+        advisor.career.name === filterCareer);
+    return matchesSearch && matchesStatus && matchesCareer;
   });
 
-  const openViewModal = (user: User) => {
-    setSelectedAdvisor(user);
+  function openViewModal(advisor: User): void {
+    setSelectedAdvisor(advisor);
     setViewModalOpen(true);
-  };
+  }
 
-  const openEditModal = (userId: string) => {
-    setSelectedAdvisorId(userId);
+  function openEditModal(_id: string): void {
+    setSelectedAdvisorId(_id);
     setEditModalOpen(true);
-  };
+  }
 
-  const refreshAdvisors = async () => {
+  function openCreateModal(advisor: User): void {
+    setCreateTarget({
+      advisorId: advisor._id,
+      careerId:
+        advisor.career &&
+        typeof advisor.career === "object" &&
+        "id" in advisor.career
+          ? String(advisor.career.id)
+          : "",
+    });
+    setCreateModalOpen(true);
+  }
+
+  async function handleToggleStatus(advisor: User): Promise<void> {
+    try {
+      await updateEnableUser(advisor._id, !advisor.enable);
+      setAdvisors((prev) =>
+        prev.map((a) =>
+          a._id === advisor._id ? { ...a, enable: !advisor.enable } : a
+        )
+      );
+    } catch (err) {
+      alert("No se pudo actualizar el estado del asesor.");
+      console.error(err);
+    }
+  }
+
+  async function handleDelete(advisor: User): Promise<void> {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar al asesor "${advisor.name}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+    try {
+      await deleteUser(advisor._id);
+      setAdvisors((prev) => prev.filter((a) => a._id !== advisor._id));
+      alert("Asesor eliminado correctamente.");
+    } catch (err) {
+      alert("No se pudo eliminar el asesor.");
+      console.error(err);
+    }
+  }
+
+  async function refreshAdvisors(): Promise<void> {
     setLoading(true);
     try {
-      const data = await fetchUsers();
-      setAdvisors(data.filter((user: User) => user.role === "academic_friend"));
+      const users = await fetchUsers();
+      const academicFriends = users.filter((user: User) => user.role === "academic_friend");
+      const uniqueCareerNames: string[] = Array.from(
+        new Set(
+          academicFriends
+            .map((user: User) =>
+              user.career && typeof user.career === "object" && "name" in user.career
+                ? user.career.name
+                : null
+            )
+            .filter(Boolean)
+        )
+      ) as string[];
+      setCareers(uniqueCareerNames);
+      setAdvisors(academicFriends);
     } catch (err) {
-      setError("No se pudo actualizar la lista de asesores.");
+      console.error("Error recargando los datos:", err);
+      setError("No se pudieron recargar los datos.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-lg">
@@ -199,17 +217,35 @@ const AdvisoryList = () => {
           onChange={(e) => setFilterCareer(e.target.value)}
         >
           <>
-          <SelectItem key="">Todas</SelectItem>
-          {careers.map((career) => (
-            <SelectItem key={career} data-value={career}>
-              {career}
-            </SelectItem>
-          ))}
+            <SelectItem key="">Todas</SelectItem>
+            {careers.map((career) => (
+              <SelectItem key={career} data-value={career}>
+                {career}
+              </SelectItem>
+            ))}
           </>
         </Select>
         <Button className="min-w-[120px]" color="primary" onPress={onOpen}>
           <PlusIcon /> Agregar Mentor
         </Button>
+        <div className="relative inline-block">
+          <Button
+            as="label"
+            variant="bordered"
+            startContent={<UploadIcon className="w-4 h-4" />}
+            className="text-purple-700 border-purple-500 hover:bg-purple-100 rounded-full px-4 py-2 font-medium cursor-pointer"
+            isDisabled={importing}
+          >
+            {importing ? <Spinner size="sm" /> : "Importar usuarios"}
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={handleUpload}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              disabled={importing}
+            />
+          </Button>
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
@@ -253,16 +289,18 @@ const AdvisoryList = () => {
                   <TableCell>
                     {advisor.resume ? (
                       <Button
-                      color="primary"
-                      size="sm"
-                      onPress={() => window.open(`${advisor.resume}`, "_blank")}
+                        color="primary"
+                        size="sm"
+                        onPress={() =>
+                          window.open(`${advisor.resume}`, "_blank")
+                        }
                       >
-                      <ClipboardIcon /> Ver Hoja de Vida
+                        <ClipboardIcon /> Ver Hoja de Vida
                       </Button>
                     ) : (
                       <span>No disponible</span>
                     )}
-                    </TableCell>
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2 items-center">
                       <Tooltip content="Ver detalles">
@@ -304,7 +342,9 @@ const AdvisoryList = () => {
                           isIconOnly
                           size="sm"
                           color="primary"
-                          isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
+                          isDisabled={
+                            (advisor.availableHours ?? 0) >= MAX_HOURS
+                          }
                           onClick={() => openCreateModal(advisor)}
                         >
                           +
@@ -315,7 +355,9 @@ const AdvisoryList = () => {
                           isIconOnly
                           size="sm"
                           color="secondary"
-                          onClick={() => router.push(`/advisors/${advisor._id}`)}
+                          onClick={() =>
+                            router.push(`/advisors/${advisor._id}`)
+                          }
                         >
                           <ClipboardIcon />
                         </Button>

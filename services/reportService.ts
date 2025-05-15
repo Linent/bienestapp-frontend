@@ -3,7 +3,7 @@ import { BACKEND_URL } from "@/config";
 const Advisory = "advisory";
 import { getAuthHeaders } from "@/helpers/authHelper";
 import {TopCareerReport, AdvisoryReport, MostActiveAdvisor} from "@/types/types";
-
+const dashboardPath = "schedules";
 
 export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
   try {
@@ -22,45 +22,48 @@ export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
   }
 };
 // Funciones para obtener los datos
-export const fetchAdvisoriesLast7Days = async (): Promise<AdvisoryReport[]> => {
-  const response = await api.get(
-    `${BACKEND_URL}/${Advisory}/report/last7days`,
-    { headers: getAuthHeaders() },
-  );
+// En services/reportService.ts
 
-  return response.data.map((item: any) => ({
-    date: `${item._id.year}-${String(item._id.month).padStart(2, "0")}-${String(item._id.day).padStart(2, "0")}`,
-    count: item.totalAdvisories,
-  }));
+export const fetchSchedulesByDay = async (): Promise<{ date: string; count: number }[]> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/schedules-by-day`, {
+    headers: getAuthHeaders(),
+  });
+
+  return response.data.map((item: any) => {
+    const { day, month, year, count } = item;
+    const formattedDate = `${day}/${month}/${year.toString().slice(-2)}`;
+    return { date: formattedDate, count };
+  });
 };
 
-export const fetchAdvisoriesLast30Days = async (): Promise<
-  AdvisoryReport[]
-> => {
-  const response = await api.get(
-    `${BACKEND_URL}/${Advisory}/report/last30days`,
-    { headers: getAuthHeaders() },
-  );
+// 🟡 Últimos 30 días (también agrupado por día)
+export const fetchSchedulesByMonth = async (): Promise<{ date: string; count: number }[]> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/schedules-by-month`, {
+    headers: getAuthHeaders(),
+  });
 
-  return response.data.map((item: any) => ({
-    date: `${item._id.year}-${String(item._id.month).padStart(2, "0")}-${String(item._id.day).padStart(2, "0")}`,
-    count: item.totalAdvisories,
-  }));
+  return response.data.map((item: any) => {
+    const { day, month, year, count } = item;
+    const formattedDate = `${day}/${month}/${year.toString().slice(-2)}`;
+    return { date: formattedDate, count };
+  });
 };
 
-export const fetchAdvisoriesLastYear = async (): Promise<AdvisoryReport[]> => {
-  const response = await api.get(
-    `${BACKEND_URL}/${Advisory}/report/lastyear`,
-    { headers: getAuthHeaders() },
-  );
+// 🔵 Último año (agrupado por mes)
+export const fetchSchedulesByYear = async (): Promise<{ date: string; count: number }[]> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/schedules-by-year`, {
+    headers: getAuthHeaders(),
+  });
 
-  return response.data.map((item: any) => ({
-    date: new Date(item._id.year, item._id.month - 1).toLocaleString("en-US", {
-      month: "short",
-    }), // Convierte a 'Jan', 'Feb', etc.
-    count: Math.round(item.totalAdvisories), // Asegura que sean enteros
-  }));
+  const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+  return response.data.map((item: any) => {
+    const { month, year, count } = item;
+    const formattedDate = `${meses[month - 1]} ${year}`;
+    return { date: formattedDate, count };
+  });
 };
+
 
 export const fetchMostActiveAdvisor = async (): Promise<
   MostActiveAdvisor[]
@@ -115,4 +118,32 @@ export const fetchAttendancePerSchedule = async (): Promise<
   );
 
   return response.data;
+};
+
+export const fetchTotalAdvisories = async (): Promise<number> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/total-advisories`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data.total;
+};
+
+export const fetchAttendancePercentage = async (): Promise<number> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/attendance-percentage`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data.percentage;
+};
+
+export const fetchMonthlyAdvisories = async (): Promise<number> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/monthly-advisories`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data.total;
+};
+
+export const fetchCountMostActiveAdvisor = async (): Promise<string> => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/most-active-advisor`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data.advisor.name;
 };
