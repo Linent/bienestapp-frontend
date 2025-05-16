@@ -6,7 +6,7 @@ import DefaultLayout from "@/layouts/default";
 import AdvisoriesByTopic from "@/components/reports/AdvisoriesByTopic";
 import AdvisoriesByAdvisor from "@/components/reports/AdvisoriesByAdvisor";
 import AttendancePerSchedule from "@/components/reports/AttendancePerSchedule";
-import { Divider } from "@heroui/react";
+import { Divider, Spinner } from "@heroui/react";
 import { title } from "@/components/primitives";
 import KpiCard from "@/components/reports/KpiCard";
 import {
@@ -20,7 +20,6 @@ import {
   fetchAttendancePercentage,
   fetchMonthlyAdvisories,
   fetchCountMostActiveAdvisor,
-  
 } from "@/services/reportService";
 
 const Dashboard = () => {
@@ -81,8 +80,18 @@ const Dashboard = () => {
   }, [isAuthenticated, userRole]);
 
   if (!isAuthenticated || userRole !== "admin") return null;
-  if (loading) return <p className="text-center">Cargando estadísticas...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+
+  if (loading) {
+    return (
+      <div className="w-full h-[60vh] flex items-center justify-center">
+        <Spinner color="danger" label="Cargando estadísticas..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">{error}</p>;
+  }
 
   return (
     <DefaultLayout>
@@ -90,7 +99,6 @@ const Dashboard = () => {
         <h1 className={title()}>Estadísticas de Asesorías</h1>
         <Divider className="my-4" />
 
-        {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <KpiCard
             title="Total de Asesorías"
@@ -118,7 +126,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Gráficas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <AdvisoriesByAdvisor />
           <AdvisoriesByTopic />

@@ -22,6 +22,7 @@ import { Logo } from "@/components/icons";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "../theme-switch";
 import { getTokenPayload } from "@/utils/auth"; // Asegúrate de tener esta función
+import { LogoutIcon } from "../icons/ActionIcons";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -169,12 +170,7 @@ export const Navbar = () => {
             className="mt-auto border-t pt-4 flex items-center gap-2 px-4 cursor-pointer text-danger hover:text-red-600"
             onClick={handleLogout}
           >
-            <Image
-              src={icons8CerrarSesion.src}
-              alt="Cerrar sesión"
-              className="w-5 h-5"
-              width={20}
-              height={20}
+            <LogoutIcon
             />
             <span>Cerrar sesión</span>
           </NavbarMenuItem>

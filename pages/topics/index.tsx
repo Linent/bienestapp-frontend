@@ -66,7 +66,7 @@ const TopicsPage = () => {
           <CardBody>
             {loading ? (
               <div className="flex justify-center py-12">
-                <Spinner label="Cargando temas..." color="primary" />
+                <Spinner label="Cargando temas..." color="danger" />
               </div>
             ) : topics.length === 0 ? (
               <p className="text-center text-gray-500">

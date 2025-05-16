@@ -179,6 +179,44 @@ export const DeleteIcon = (props: any) => (
   </svg>
 );
 
+export const LogoutIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    height="1em"
+    {...props}
+  >
+    {/* Flecha hacia la izquierda */}
+    <path
+      d="M8 17l-5-5 5-5"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Línea horizontal */}
+    <path
+      d="M3 12h12"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
+    {/* Puerta / caja */}
+    <rect
+      x="15"
+      y="4"
+      width="6"
+      height="16"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth={2}
+    />
+  </svg>
+);
 
 export const ClipboardIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -343,5 +381,28 @@ export const CloseIcon = (props: any) => (
   >
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+export const DownloadPdfIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    height="1.2em"
+    width="1.2em"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    {...props}
+  >
+    <path
+      d="M12 3v12m0 0l-4-4m4 4l4-4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );

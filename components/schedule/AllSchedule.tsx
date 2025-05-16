@@ -17,6 +17,7 @@ import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 import { fetchSchedules } from "@/services/scheduleService";
 import { Schedule } from "@/types/types";
+import { DownloadPdfIcon } from "../icons/ActionIcons";
 
 const WeeklySchedules = () => {
   const [allSchedules, setAllSchedules] = useState<Schedule[]>([]);
@@ -156,13 +157,13 @@ const WeeklySchedules = () => {
     <div className="w-full p-6 bg-white shadow-md rounded-lg">
       <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
         <Input
-          className="w-full md:w-1/3"
+          className="w-full sm:w-1/3 md:w-1/3"
           placeholder="Buscar por estudiante o asesor"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Select
-          className="w-full md:w-1/3"
+          className="w-full sm:w-1/3 md:w-1/3"
           label="Filtrar por carrera"
           value={filterCareer}
           onChange={(e) => setFilterCareer(e.target.value)}
@@ -179,7 +180,7 @@ const WeeklySchedules = () => {
           </>
         </Select>
         <Select
-          className="w-full md:w-1/3"
+          className="w-full sm:w-1/3 md:w-1/3"
           label="Filtrar por asistencia"
           value={filterAttendance}
           onChange={(e) => setFilterAttendance(e.target.value)}
@@ -198,7 +199,7 @@ const WeeklySchedules = () => {
 
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <DateRangePicker
-          className="max-w-md"
+          className="max-w-md w-full sm:w-auto"
           data-value={selectedDateRange}
           onChange={(value) => {
             if (
@@ -216,9 +217,9 @@ const WeeklySchedules = () => {
           }}
         />
 
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
           <Select
-            className="w-[150px]"
+            className="w-[150px] w-full sm:w-[150px]"
             label="Items por página"
             value={itemsPerPage.toString()}
             onChange={(e) => setItemsPerPage(e.target.value === "all" ? -1 : parseInt(e.target.value))}
@@ -228,7 +229,7 @@ const WeeklySchedules = () => {
             <SelectItem key="100" data-value="100">100</SelectItem>
             <SelectItem key="all" data-value="all">Todos</SelectItem>
           </Select>
-          <Button variant="bordered" className="text-sm" onClick={clearFilters}>
+          <Button variant="bordered" color="primary" className="text-sm w-full sm:w-auto" onClick={clearFilters}>
             Limpiar filtros
           </Button>
         </div>
@@ -237,7 +238,7 @@ const WeeklySchedules = () => {
       {paginatedSchedules.length > 0 ? (
         <>
           <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-            <div className="flex gap-4 text-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-start sm:space-x-6 gap-2 text-sm">
               <span>
                 <strong>Asistieron:</strong> {filteredSchedules.filter((s) => s.attendance === true).length}
               </span>
@@ -248,7 +249,7 @@ const WeeklySchedules = () => {
                 <strong>Total:</strong> {filteredSchedules.length}
               </span>
             </div>
-            <Button color="success" onClick={exportToExcel}>
+            <Button color="success" onClick={exportToExcel} startContent={<DownloadPdfIcon />}>
               Exportar a Excel
             </Button>
           </div>

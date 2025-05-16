@@ -50,32 +50,47 @@ const AttendancePieChart = () => {
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {!error && chartData.length > 0 && (
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="40%"
-              cy="50%"
-              outerRadius={100}
-              innerRadius={0}
-              label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
-            >
+        <div className="flex flex-col items-center justify-center">
+          <ResponsiveContainer width={450} height={250}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                // ❌ innerRadius={40} ← Elimina esta línea
+                label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+
+          <div className="mt-6 w-full">
+            <ul className="flex flex-col sm:flex-row sm:justify-center gap-2 text-sm">
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <li
+                  key={index}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  ></span>
+                  {entry.name}
+                </li>
               ))}
-            </Pie>
-            <Tooltip />
-            <Legend
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
-              iconType="circle"
-              formatter={(value) => <span className="text-sm">{value}</span>}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+            </ul>
+          </div>
+        </div>
       )}
     </div>
   );

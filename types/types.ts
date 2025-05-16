@@ -12,7 +12,21 @@ export interface User {
   resume?: string; // URL de la hoja de vida
   resumePublicId?: string; // ID de la hoja de vida
 }
-
+export interface MentorAttendance {
+  advisorId: string;
+  advisorName: string;
+  count: number;
+  profileImage?: string;
+}
+export type UserInfo = {
+  _id: string;
+  fullName: string;
+  documentType: string;
+  documentNumber: string;
+  ufpsCode: string;
+  beneficiaryType: string;
+  academicProgram: string;
+};
 export interface Career {
   _id: string;
   name: string;

@@ -53,18 +53,27 @@ const AdvisoryLineChart = () => {
           className="w-40"
         >
           <SelectItem key="7d" data-value="7d">7 días</SelectItem>
-          <SelectItem key="30d" data-value="30d">Últimos 30 días</SelectItem>
+          <SelectItem key="30d" data-value="30d">30 días</SelectItem>
           <SelectItem key="12m" data-value="12m">1 año</SelectItem>
         </Select>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <LineChart
+          data={data}
+          margin={{ top: 10, right: 30, left: 0, bottom: 50 }}
+        >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="date" stroke="#94a3b8" />
+          <XAxis
+            dataKey="date"
+            stroke="#94a3b8"
+            angle={-45}
+            textAnchor="end"
+            interval={0}
+          />
           <YAxis
             stroke="#94a3b8"
-            label={{ value: "Cantidad", angle: -90, position: "insideLeft", offset: 0 }}
+            label={{  angle: -90, position: "insideLeft", offset: 0 }}
           />
           <Tooltip formatter={(value: any) => `${value} asesorías`} />
           <Legend verticalAlign="top" height={36} />

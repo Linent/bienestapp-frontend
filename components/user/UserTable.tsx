@@ -69,7 +69,7 @@ const UserTable = () => {
           throw new Error("Formato de datos inválido");
         }
       } catch (err) {
-        setError("No se pudo cargar la lista de asesores.");
+        setError("No se pudo cargar la lista de mentores.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -120,13 +120,13 @@ const UserTable = () => {
       const onlyAdvisors = data.filter((user: User) => user.role === "student");
       setUsers(onlyAdvisors);
     } catch (error) {
-      setError("No se pudo actualizar la lista de asesores.");
+      setError("No se pudo actualizar la lista de Mentores.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <p>Cargando asesores...</p>;
+  if (loading) return <p>Cargando Mentores...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
@@ -178,7 +178,7 @@ const UserTable = () => {
       </div>
       
       <div className="min-w-full table-auto border-gray-300">
-        <Table isStriped aria-label="Lista de Asesores">
+        <Table isStriped aria-label="Lista de Mentores">
           <TableHeader>
             <TableColumn>#</TableColumn>
             <TableColumn>Nombre</TableColumn>

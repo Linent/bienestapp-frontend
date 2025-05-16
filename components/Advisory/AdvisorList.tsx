@@ -252,7 +252,7 @@ const AdvisoryList = () => {
         {loading ? (
           <Skeleton className="h-[300px] w-full rounded-lg" />
         ) : (
-          <Table isStriped aria-label="Lista de Asesores">
+          <Table isStriped aria-label="Lista de Mentores">
             <TableHeader>
               <TableColumn>#</TableColumn>
               <TableColumn>Nombre</TableColumn>

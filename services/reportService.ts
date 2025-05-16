@@ -92,6 +92,16 @@ export const fetchSchedulesByAdvisor = async (): Promise<
   return response.data;
 };
 
+export const fetchSchedulesByAdvisorAll = async (from: Date, to: Date) => {
+  const response = await api.get(`${BACKEND_URL}/${dashboardPath}/schedules-by-advisorAll`, {
+    params: {
+      startDate: from.toISOString(),
+      endDate: to.toISOString(),
+    },
+    headers: getAuthHeaders(),
+  });
+  return response.data;
+};
 // Obtener cantidad de asesorías por tema
 export const fetchSchedulesByTopic = async (): Promise<
   { topic: string; count: number }[]
