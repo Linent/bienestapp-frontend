@@ -5,6 +5,38 @@ import { getAuthHeaders } from "@/helpers/authHelper";
 import {TopCareerReport, AdvisoryReport, MostActiveAdvisor} from "@/types/types";
 const dashboardPath = "schedules";
 
+const USER_QUERY_PATH = "userqueries";
+
+// Obtener TODAS las consultas (para tabla)
+export const fetchAllUserQueries = async () => {
+  try {
+    const headers = getAuthHeaders();
+    const response = await api.get(
+      `${BACKEND_URL}/${USER_QUERY_PATH}/all`,
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error obteniendo consultas de usuarios:", error);
+    throw new Error("No se pudo cargar la información.");
+  }
+};
+
+// Obtener KPIs / estadísticas para dashboard y gráficas
+export const fetchUserQueryKpis = async () => {
+  try {
+    const headers = getAuthHeaders();
+    const response = await api.get(
+      `${BACKEND_URL}/${USER_QUERY_PATH}/kpis`,
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error obteniendo estadísticas de consultas:", error);
+    throw new Error("No se pudo cargar la información de KPIs.");
+  }
+};
+
 export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
   try {
     const token = localStorage.getItem("token");
