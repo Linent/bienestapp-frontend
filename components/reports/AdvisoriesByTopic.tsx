@@ -7,30 +7,49 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Cell,
 } from "recharts";
 
 import { fetchSchedulesByTopic } from "@/services/reportService";
 
+const COLORS = [
+  "#6366f1", // indigo-500
+  "#ef4444",
+  "#10b981",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+  "#3b82f6",
+  "#f97316",
+  "#14b8a6",
+  "#22c55e",
+];
+
+interface TopicData {
+  topicName: string;
+  count: number;
+}
+
 const AdvisoriesByTopic = () => {
-  const [data, setData] = useState<{ topicName: string; count: number }[]>([]);
+  const [data, setData] = useState<TopicData[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getData = async () => {
+    (async () => {
       try {
         const result = await fetchSchedulesByTopic();
-        setData(
-          result.slice(0, 10).map((item) => ({
+        const top10 = result
+          .map(item => ({
             topicName: item.topic || "Desconocido",
             count: item.count,
           }))
-        );
-      } catch (err) {
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+        setData(top10);
+      } catch {
         setError("No se pudo cargar la información.");
       }
-    };
-
-    getData();
+    })();
   }, []);
 
   return (
@@ -69,15 +88,30 @@ const AdvisoriesByTopic = () => {
             />
             <Tooltip
               formatter={(value: number) => `${value} asesorías`}
-              labelStyle={{ fontWeight: 500 }}
+              // Color de fondo, borde y texto del tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                borderColor: "#e5e7eb",
+                color: "#6366f1",
+              }}
+              // Color del título (topicName)
+              labelStyle={{ color: "#27272A", fontWeight: 500 }}
+              // Color de cada línea del payload
+              itemStyle={{ color: "#6366f1" }}
             />
             <Bar
               dataKey="count"
               name="Asesorías"
-              fill="#6366f1" // Indigo-500 HeroUI
               radius={[6, 6, 0, 0]}
               barSize={40}
-            />
+            >
+              {data.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       )}
