@@ -1,3 +1,4 @@
+// components/AdvisoryList.tsx
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -15,8 +16,10 @@ import {
   Tooltip,
   Skeleton,
   Spinner,
+  Alert,
 } from "@heroui/react";
 import { useRouter } from "next/router";
+
 import {
   fetchUsers,
   updateEnableUser,
@@ -24,7 +27,7 @@ import {
   importUsersFromFile,
 } from "@/services/userService";
 import { User } from "@/types";
-import { UploadIcon } from "@/components/icons/ActionIcons";
+import { DocumentIcon, UploadIcon } from "@/components/icons/ActionIcons";
 import {
   EyeIcon,
   EditIcon,
@@ -34,6 +37,7 @@ import {
   BlockIcon,
   CheckIcon,
 } from "@/components/icons/ActionIcons";
+
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
 import EditUserModal from "@/components/user/EditUserModal";
@@ -41,103 +45,132 @@ import CreateAdvisoryModal from "@/components/Advisory/CreateAdvisoryModal";
 
 const MAX_HOURS = 20;
 
-const AdvisoryList = () => {
+export default function AdvisoryList() {
   const [advisors, setAdvisors] = useState<User[]>([]);
   const [careers, setCareers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterCareer, setFilterCareer] = useState<string>("");
+
   const [selectedAdvisor, setSelectedAdvisor] = useState<User | null>(null);
-  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(null);
+  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(
+    null
+  );
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [createTarget, setCreateTarget] = useState<{ advisorId: string; careerId: string }>({ advisorId: "", careerId: "" });
+  const [createTarget, setCreateTarget] = useState<{
+    advisorId: string;
+    careerId: string;
+  }>({ advisorId: "", careerId: "" });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
 
+  // Estado para Alert
+  const [alertProps, setAlertProps] = useState<{
+    color:
+      | "success"
+      | "danger"
+      | "warning"
+      | "default"
+      | "primary"
+      | "secondary";
+    title: string;
+  } | null>(null);
+
+  // Limpia el alerta tras 5s
   useEffect(() => {
-    const loadData = async () => {
+    if (!alertProps) return;
+    const t = setTimeout(() => setAlertProps(null), 5000);
+    return () => clearTimeout(t);
+  }, [alertProps]);
+
+  // Carga inicial
+  useEffect(() => {
+    (async () => {
       try {
         const users = await fetchUsers();
-        const academicFriends = users.filter((user: User) => user.role === "academic_friend");
-        const uniqueCareerNames: string[] = Array.from(new Set(academicFriends.map((user: User) => user.career && typeof user.career === "object" && "name" in user.career ? user.career.name : null).filter(Boolean))) as string[];
+        const academicFriends = users.filter(
+          (u: User) => u.role === "academic_friend"
+        );
+        interface Career {
+          _id: string;
+          name: string;
+        }
+
+        interface AcademicFriend extends User {
+          career: Career | null;
+        }
+
+        const uniqueCareerNames: string[] = Array.from(
+          new Set(
+            (academicFriends as AcademicFriend[])
+              .map((u: AcademicFriend) =>
+                typeof u.career === "object" && u.career !== null
+                  ? u.career.name
+                  : null
+              )
+              .filter(Boolean)
+          )
+        ) as string[];
         setCareers(uniqueCareerNames);
         setAdvisors(academicFriends);
       } catch (err) {
-        console.error("Error cargando los datos:", err);
+        console.error(err);
         setError("No se pudieron cargar los datos.");
       } finally {
         setLoading(false);
       }
-    };
-    loadData();
+    })();
   }, []);
 
+  // Manejo de importación de archivo
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setImporting(true);
     try {
       const result = await importUsersFromFile(file);
-      alert(`Usuarios creados: ${result.created}`);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error al importar usuarios:", error);
-      alert("Error al importar usuarios");
+      setAlertProps({
+        color: "success",
+        title: `Usuarios creados: ${result.created}`,
+      });
+      // recarga
+      const refreshed = await fetchUsers();
+      setAdvisors(refreshed.filter((u: User) => u.role === "academic_friend"));
+    } catch (err) {
+      console.error(err);
+      setAlertProps({ color: "danger", title: "Error al importar usuarios" });
     } finally {
       setImporting(false);
     }
   };
 
-  // Filtrar asesores según los criterios de búsqueda y filtros seleccionados
+  // Filtrado
   const filteredAdvisors = advisors.filter((advisor) => {
     const matchesSearch =
-      advisor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      advisor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (advisor.codigo && advisor.codigo.toLowerCase().includes(searchTerm.toLowerCase()));
+      advisor.name.toLowerCase().includes(searchTerm) ||
+      advisor.email.toLowerCase().includes(searchTerm) ||
+      advisor.codigo?.toLowerCase().includes(searchTerm);
     const matchesStatus =
       !filterStatus ||
       (filterStatus === "Activo" && advisor.enable) ||
       (filterStatus === "Inactivo" && !advisor.enable);
     const matchesCareer =
       !filterCareer ||
-      (advisor.career &&
-        typeof advisor.career === "object" &&
-        "name" in advisor.career &&
+      (typeof advisor.career === "object" &&
+        advisor.career !== null &&
         advisor.career.name === filterCareer);
     return matchesSearch && matchesStatus && matchesCareer;
   });
 
-  function openViewModal(advisor: User): void {
-    setSelectedAdvisor(advisor);
-    setViewModalOpen(true);
-  }
-
-  function openEditModal(_id: string): void {
-    setSelectedAdvisorId(_id);
-    setEditModalOpen(true);
-  }
-
-  function openCreateModal(advisor: User): void {
-    setCreateTarget({
-      advisorId: advisor._id,
-      careerId:
-        advisor.career &&
-        typeof advisor.career === "object" &&
-        "id" in advisor.career
-          ? String(advisor.career.id)
-          : "",
-    });
-    setCreateModalOpen(true);
-  }
-
-  async function handleToggleStatus(advisor: User): Promise<void> {
+  // Handlers de acciones
+  const handleToggleStatus = async (advisor: User) => {
     try {
       await updateEnableUser(advisor._id, !advisor.enable);
       setAdvisors((prev) =>
@@ -145,232 +178,239 @@ const AdvisoryList = () => {
           a._id === advisor._id ? { ...a, enable: !advisor.enable } : a
         )
       );
+      setAlertProps({
+        color: "success",
+        title: advisor.enable ? "Asesor deshabilitado" : "Asesor habilitado",
+      });
     } catch (err) {
-      alert("No se pudo actualizar el estado del asesor.");
       console.error(err);
+      setAlertProps({
+        color: "warning",
+        title: "No se pudo actualizar el estado.",
+      });
     }
-  }
+  };
 
-  async function handleDelete(advisor: User): Promise<void> {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar al asesor "${advisor.name}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+  const handleDelete = async (advisor: User) => {
+    if (!confirm(`¿Eliminar a ${advisor.name}?`)) return;
     try {
       await deleteUser(advisor._id);
       setAdvisors((prev) => prev.filter((a) => a._id !== advisor._id));
-      alert("Asesor eliminado correctamente.");
+      setAlertProps({
+        color: "success",
+        title: "Asesor eliminado correctamente",
+      });
     } catch (err) {
-      alert("No se pudo eliminar el asesor.");
       console.error(err);
+      setAlertProps({
+        color: "danger",
+        title: "No se pudo eliminar el asesor.",
+      });
     }
-  }
+  };
 
-  async function refreshAdvisors(): Promise<void> {
-    setLoading(true);
-    try {
-      const users = await fetchUsers();
-      const academicFriends = users.filter((user: User) => user.role === "academic_friend");
-      const uniqueCareerNames: string[] = Array.from(
-        new Set(
-          academicFriends
-            .map((user: User) =>
-              user.career && typeof user.career === "object" && "name" in user.career
-                ? user.career.name
-                : null
-            )
-            .filter(Boolean)
-        )
-      ) as string[];
-      setCareers(uniqueCareerNames);
-      setAdvisors(academicFriends);
-    } catch (err) {
-      console.error("Error recargando los datos:", err);
-      setError("No se pudieron recargar los datos.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  if (loading) return <Skeleton className="h-64 w-full" />;
+  if (error) return <Alert color="danger" title={error} />;
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-lg">
-      <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
+      {/* Alert superior */}
+      {alertProps && (
+        <Alert
+          color={alertProps.color}
+          title={alertProps.title}
+          className="mb-4"
+        />
+      )}
+
+      {/* Controles */}
+      <div className="flex flex-wrap md:flex-nowrap gap-4 mb-4">
         <Input
-          className="flex-1 min-w-[180px]"
+          className="flex-1"
           placeholder="Buscar por nombre..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Select
-          className="flex-1 min-w-[180px]"
+          className="flex-1"
           label="Filtrar por estado"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <SelectItem key="">Todos</SelectItem>
-          <SelectItem key="Activo">Activo</SelectItem>
-          <SelectItem key="Inactivo">Inactivo</SelectItem>
+          <SelectItem data-value="">Todos</SelectItem>
+          <SelectItem data-value="Activo">Activo</SelectItem>
+          <SelectItem data-value="Inactivo">Inactivo</SelectItem>
         </Select>
         <Select
-          className="flex-1 min-w-[180px]"
+          className="flex-1"
           label="Filtrar por carrera"
           value={filterCareer}
           onChange={(e) => setFilterCareer(e.target.value)}
         >
-          <>
-            <SelectItem key="">Todas</SelectItem>
-            {careers.map((career) => (
-              <SelectItem key={career} data-value={career}>
-                {career}
+          {[
+            <SelectItem data-value="" key="">
+              Todas
+            </SelectItem>,
+            ...careers.map((c) => (
+              <SelectItem key={c} data-value={c}>
+                {c}
               </SelectItem>
-            ))}
-          </>
+            )),
+          ]}
         </Select>
-        <Button className="min-w-[120px]" color="primary" onPress={onOpen}>
+
+        <Button color="primary" onPress={onOpen}>
           <PlusIcon /> Agregar Mentor
         </Button>
-        <div className="relative inline-block">
+
+        <label className="relative inline-block group">
           <Button
-            as="label"
+            color="success"
+            as="span"
             variant="bordered"
-            startContent={<UploadIcon className="w-4 h-4" />}
-            className="text-purple-700 border-purple-500 hover:bg-purple-100 rounded-full px-4 py-2 font-medium cursor-pointer"
+            startContent={<UploadIcon />}
             isDisabled={importing}
+            className="
+      transform 
+      transition-transform 
+      duration-200 
+      ease-in-out 
+      group-hover:scale-105 
+      active:scale-95
+    "
           >
             {importing ? <Spinner size="sm" /> : "Importar usuarios"}
-            <input
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              onChange={handleUpload}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-              disabled={importing}
-            />
           </Button>
-        </div>
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            disabled={importing}
+            onChange={handleUpload}
+          />
+        </label>
       </div>
 
-      <div className="w-full overflow-x-auto px-2 sm:rounded-lg">
-        {loading ? (
-          <Skeleton className="h-[300px] w-full rounded-lg" />
-        ) : (
-          <Table isStriped aria-label="Lista de Mentores">
-            <TableHeader>
-              <TableColumn>#</TableColumn>
-              <TableColumn>Nombre</TableColumn>
-              <TableColumn>Código</TableColumn>
-              <TableColumn>Correo</TableColumn>
-              <TableColumn>Carrera</TableColumn>
-              <TableColumn>Estado</TableColumn>
-              <TableColumn>Hoja de Vida</TableColumn>
-              <TableColumn>Acciones</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {filteredAdvisors.map((advisor, index) => (
-                <TableRow key={advisor._id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{advisor.name}</TableCell>
-                  <TableCell>{advisor.codigo}</TableCell>
-                  <TableCell>{advisor.email}</TableCell>
-                  <TableCell>
-                    {advisor.career &&
-                    typeof advisor.career === "object" &&
-                    "name" in advisor.career
-                      ? String(advisor.career.name)
-                      : "Desconocida"}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      color={advisor.enable ? "success" : "danger"}
+      {/* Tabla */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Table isStriped>
+          <TableHeader>
+            <TableColumn>#</TableColumn>
+            <TableColumn>Nombre</TableColumn>
+            <TableColumn>Código</TableColumn>
+            <TableColumn>Correo</TableColumn>
+            <TableColumn>Carrera</TableColumn>
+            <TableColumn>Estado</TableColumn>
+            <TableColumn>Hoja de Vida</TableColumn>
+            <TableColumn>Acciones</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {filteredAdvisors.map((advisor, i) => (
+              <TableRow key={advisor._id}>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{advisor.name}</TableCell>
+                <TableCell>{advisor.codigo}</TableCell>
+                <TableCell>{advisor.email}</TableCell>
+                <TableCell>
+                  {typeof advisor.career === "object" && advisor.career !== null
+                    ? advisor.career.name
+                    : "—"}
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    color={advisor.enable ? "success" : "danger"}
+                    size="sm"
+                    variant="flat"
+                  >
+                    {advisor.enable ? "Activo" : "Inactivo"}
+                  </Chip>
+                </TableCell>
+                <TableCell>
+                  {advisor.resume ? (
+                    <Button
+                      color="primary"
                       size="sm"
-                      variant="flat"
+                      onPress={() => window.open(advisor.resume, "_blank")}
                     >
-                      {advisor.enable ? "Activo" : "Inactivo"}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    {advisor.resume ? (
-                      <Button
-                        color="primary"
-                        size="sm"
-                        onPress={() =>
-                          window.open(`${advisor.resume}`, "_blank")
-                        }
-                      >
-                        <ClipboardIcon /> Ver Hoja de Vida
-                      </Button>
-                    ) : (
-                      <span>No disponible</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 items-center">
-                      <Tooltip content="Ver detalles">
-                        <button
-                          className="text-default-400 hover:text-primary"
-                          onClick={() => openViewModal(advisor)}
-                        >
-                          <EyeIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Editar asesor">
-                        <button
-                          className="text-default-400 hover:text-warning"
-                          onClick={() => openEditModal(advisor._id)}
-                        >
-                          <EditIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip
-                        content={advisor.enable ? "Deshabilitar" : "Habilitar"}
-                      >
-                        <button
-                          className={`cursor-pointer ${advisor.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
-                          onClick={() => handleToggleStatus(advisor)}
-                        >
-                          {advisor.enable ? <BlockIcon /> : <CheckIcon />}
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Eliminar asesor">
-                        <button
-                          className="cursor-pointer text-danger hover:text-red-600"
-                          onClick={() => handleDelete(advisor)}
-                        >
-                          <TrashIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Crear asesoría">
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          color="primary"
-                          isDisabled={
-                            (advisor.availableHours ?? 0) >= MAX_HOURS
-                          }
-                          onClick={() => openCreateModal(advisor)}
-                        >
-                          +
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Ver asesorías">
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          color="secondary"
-                          onClick={() =>
-                            router.push(`/advisors/${advisor._id}`)
-                          }
-                        >
-                          <ClipboardIcon />
-                        </Button>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+                      <DocumentIcon /> Ver
+                    </Button>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  <Tooltip content="Ver detalles">
+                    <button
+                    className="hover:text-blue-400"
+                      onClick={() => {
+                        setSelectedAdvisor(advisor);
+                        setViewModalOpen(true);
+                      }}
+                    >
+                      <EyeIcon />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Editar">
+                    <button
+                    className="hover:text-yellow-400"
+                      onClick={() => {
+                        setSelectedAdvisorId(advisor._id);
+                        setEditModalOpen(true);
+                      }}
+                    >
+                      <EditIcon  />
+                    </button>
+                  </Tooltip>
+                  <Tooltip
+                    content={advisor.enable ? "Deshabilitar" : "Habilitar"}
+                  >
+                    <button onClick={() => handleToggleStatus(advisor)}>
+                      {advisor.enable ? <BlockIcon color="red" /> : <CheckIcon color="green" />}
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Eliminar">
+                    <button onClick={() => handleDelete(advisor)}>
+                      <TrashIcon />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Crear asesoría">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      color="primary"
+                      isDisabled={(advisor.availableHours ?? 0) >= MAX_HOURS}
+                      onPress={() => {
+                        setCreateTarget({
+                          advisorId: advisor._id,
+                          careerId:
+                            typeof advisor.career === "object"
+                              ? String(advisor.career && advisor.career._id)
+                              : "",
+                        });
+                        setCreateModalOpen(true);
+                      }}
+                    >
+                      +
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content="Ver asesorías">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      color="secondary"
+                      onPress={() => router.push(`/advisors/${advisor._id}`)}
+                    >
+                      <ClipboardIcon />
+                    </Button>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
+      {/* Modales */}
       <AddUserModal isOpen={isOpen} onClose={onClose} />
       <ViewUserModal
         isOpen={isViewModalOpen}
@@ -382,20 +422,24 @@ const AdvisoryList = () => {
           isOpen={isEditModalOpen}
           userId={selectedAdvisorId}
           onClose={() => setEditModalOpen(false)}
-          onUpdateSuccess={refreshAdvisors}
+          onUpdateSuccess={() => {
+            setEditModalOpen(false);
+            // opcional: recargar lista
+          }}
         />
       )}
-      {createTarget.advisorId && createTarget.careerId && (
+      {isCreateModalOpen && createTarget.advisorId && createTarget.careerId && (
         <CreateAdvisoryModal
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}
           advisorId={createTarget.advisorId}
           careerId={createTarget.careerId}
-          onSuccess={refreshAdvisors}
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            // opcional: recargar lista
+          }}
         />
       )}
     </div>
   );
-};
-
-export default AdvisoryList;
+}

@@ -29,7 +29,18 @@ export const fetchAdvisoriesByAdvisor = async (advisorId: string) => {
   const response = await api.get(`${BACKEND_URL}/${advisory}/${advisor}/${advisorId}`);
   return response.data;
 };
-
+export const fetchAdvisorById = async (advisorId: string) => {
+  const res = await api.get(
+    `${BACKEND_URL}/${advisory}/${advisorId}`,
+    { headers: getAuthHeaders() }
+  );
+  // res.data === { _id, name, career: { _id, name } }
+  const raw = res.data as { name: string; career: { _id: string; name: string } };
+  return {
+    name: raw.name,
+    career: raw.career?.name ?? ""
+  };
+};
 export const updateAdvisoryStatus = async (advisoryId: string, advisoryData: AdvisoryData) => {
   const response = await api.put(`${BACKEND_URL}/${advisory}/updateStatus/${advisoryId}`, advisoryData,
     {

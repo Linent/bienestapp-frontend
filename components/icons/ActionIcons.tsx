@@ -115,6 +115,54 @@ export const TwitterIcon = (props: any) => (
     <path d="M3 3h3.6L12 10.2 17.4 3H21l-7.2 9.6L21 21h-3.6L12 13.8 6.6 21H3l7.2-9.6L3 3z" />
   </svg>
 );
+export const DocumentIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    {/* Contorno del documento */}
+    <path
+      d="M6 2H14L20 8V22H6V2Z"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Pestaña doblada */}
+    <polyline
+      points="14 2 14 8 20 8"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Líneas de texto */}
+    <line
+      x1="8"
+      y1="12"
+      x2="16"
+      y2="12"
+      stroke="currentColor"
+      strokeWidth={1}
+      strokeLinecap="round"
+    />
+    <line
+      x1="8"
+      y1="16"
+      x2="16"
+      y2="16"
+      stroke="currentColor"
+      strokeWidth={1}
+      strokeLinecap="round"
+    />
+  </svg>
+);
 export const CameraIcon = (props: any) => (
   <svg
     aria-hidden="true"

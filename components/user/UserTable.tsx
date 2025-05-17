@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// components/UserTable.tsx
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -11,11 +12,16 @@ import {
   Select,
   SelectItem,
   Button,
+  Input,
+  Alert,
   useDisclosure,
-  Input
 } from "@heroui/react";
 
-import { fetchUsers, updateEnableUser, deleteUser } from "@/services/userService";
+import {
+  fetchUsers,
+  updateEnableUser,
+  deleteUser,
+} from "@/services/userService";
 import {
   EyeIcon,
   EditIcon,
@@ -23,7 +29,7 @@ import {
   ClipboardIcon,
   TrashIcon,
   BlockIcon,
-  CheckIcon
+  CheckIcon,
 } from "@/components/icons/ActionIcons";
 import AddUserModal from "@/components/user/AddUserModal";
 import ViewUserModal from "@/components/user/ViewUserModal";
@@ -33,110 +39,148 @@ import { User } from "@/types";
 const roleMap: Record<string, string> = {
   admin: "Administrador",
   academic_friend: "Amigo Académico",
-  student: "Estudiante"
+  student: "Estudiante",
 };
 
 const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
   Activo: "success",
-  Inactivo: "danger"
+  Inactivo: "danger",
 };
 
-
-
-
-const UserTable = () => {
+export default function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterCareer, setFilterCareer] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Estado para el Alert
+  const [alertProps, setAlertProps] = useState<{
+    color: "success" | "danger";
+    title: string;
+  } | null>(null);
+
+  // Carga inicial de usuarios
   useEffect(() => {
-    const getUsers = async () => {
+    const load = async () => {
       try {
         const data = await fetchUsers();
-        if (Array.isArray(data)) {
-          const onlyAdvisors = data.filter((user: User) => user.role === "student");
-          setUsers(onlyAdvisors);
-        } else {
-          throw new Error("Formato de datos inválido");
-        }
+        // solo estudiantes para este ejemplo
+        setUsers(data.filter((u: User) => u.role === "student"));
       } catch (err) {
         setError("No se pudo cargar la lista de mentores.");
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
-    getUsers();
+    load();
   }, []);
 
+  // Oculta el alert tras 5s
+  useEffect(() => {
+    if (!alertProps) return;
+    const t = setTimeout(() => setAlertProps(null), 5000);
+    return () => clearTimeout(t);
+  }, [alertProps]);
+
   const uniqueCareers = Array.from(
-    new Set(users.map((user) => user.career && typeof user.career === "object" ? user.career.name : null).filter(Boolean))
-  );
+    new Set(
+      users
+        .map((u) =>
+          typeof u.career === "object" && u.career?.name
+            ? u.career.name
+            : (u.career as string)
+        )
+        .filter(Boolean)
+    )
+  ) as string[];
 
-  const filteredUsers = users.filter((user) => {
-    const matchesStatus = filterStatus
-      ? (user.enable ? "Activo" : "Inactivo") === filterStatus
-      : true;
-    const matchesCareer = filterCareer
-      ? (user.career && typeof user.career === "object" ? user.career.name : user.career) === filterCareer
-      : true;
-    const matchesSearch = searchTerm
-      ? user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-
-    return matchesStatus && matchesCareer && matchesSearch;
+  // Filtrado
+  const filteredUsers = users.filter((u) => {
+    const status = u.enable ? "Activo" : "Inactivo";
+    return (
+      (filterStatus ? status === filterStatus : true) &&
+      (filterCareer
+        ? (typeof u.career === "object"
+            ? u.career && u.career.name
+            : u.career) === filterCareer
+        : true) &&
+      (searchTerm
+        ? u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          u.email.toLowerCase().includes(searchTerm.toLowerCase())
+        : true)
+    );
   });
-
-  const openViewModal = (user: User) => {
-    setSelectedUser(user);
-    setIsViewModalOpen(true);
-  };
-
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-    setSelectedUser(null);
-  };
-
-  const openEditModal = (userId: string) => {
-    setSelectedUserId(userId);
-    setEditModalOpen(true);
-  };
 
   const refreshUsers = async () => {
     setLoading(true);
     try {
       const data = await fetchUsers();
-      const onlyAdvisors = data.filter((user: User) => user.role === "student");
-      setUsers(onlyAdvisors);
-    } catch (error) {
-      setError("No se pudo actualizar la lista de Mentores.");
+      setUsers(data.filter((u: User) => u.role === "student"));
+    } catch {
+      setAlertProps({ color: "danger", title: "Error actualizando la lista." });
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <p>Cargando Mentores...</p>;
+  // Handlers que disparan el Alert
+  const handleToggleStatus = async (user: User) => {
+    try {
+      await updateEnableUser(user._id, !user.enable);
+      setAlertProps({
+        color: !user.enable ? "success" : "danger",
+        title: `Asesor ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`,
+      });
+      await refreshUsers();
+    } catch {
+      setAlertProps({
+        color: "danger",
+        title: "No se pudo cambiar el estado del asesor.",
+      });
+    }
+  };
+
+  const handleDelete = async (user: User) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este asesor?")) return;
+    try {
+      await deleteUser(user._id);
+      setAlertProps({ color: "success", title: "Asesor eliminado correctamente" });
+      await refreshUsers();
+    } catch {
+      setAlertProps({
+        color: "danger",
+        title: "No se pudo eliminar el asesor.",
+      });
+    }
+  };
+
+  if (loading) return <p>Cargando mentores...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-lg">
+      {/* Alert */}
+      {alertProps && (
+        <Alert
+          color={alertProps.color}
+          title={alertProps.title}
+          className="mb-4"
+        />
+      )}
+
+      {/* Filtros y acciones */}
       <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
         <div className="flex flex-col sm:flex-row gap-2 w-full md:max-w-2xl">
           <Input
-            className="p-2 rounded w-full"
             placeholder="Buscar asesor..."
-            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -146,38 +190,33 @@ const UserTable = () => {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
-            <SelectItem key="" data-value="">Todos</SelectItem>
-            <SelectItem key="Activo" data-value="Activo">Activo</SelectItem>
-            <SelectItem key="Inactivo" data-value="Inactivo">Inactivo</SelectItem>
+            <SelectItem data-value="">Todos</SelectItem>
+            <SelectItem data-value="Activo">Activo</SelectItem>
+            <SelectItem data-value="Inactivo">Inactivo</SelectItem>
           </Select>
-
           <Select
             className="w-full"
             label="Filtrar por carrera"
             value={filterCareer}
             onChange={(e) => setFilterCareer(e.target.value)}
           >
-            <SelectItem key="" data-value="">Todas las carreras</SelectItem>
-            <>
-              {uniqueCareers.map((careerName) => (
-                <SelectItem key={careerName} data-value={careerName}>
-                  {careerName}
+            {[
+              <SelectItem key="" data-value="">Todas las carreras</SelectItem>,
+              ...uniqueCareers.map((c) => (
+                <SelectItem key={c} data-value={c}>
+                  {c}
                 </SelectItem>
-              ))}
-            </>
+              ))
+            ]}
           </Select>
         </div>
-
-        <Button
-          color="primary"
-          className="w-full md:w-auto"
-          onPress={onOpen}
-        >
+        <Button color="primary" onPress={onOpen}>
           <PlusIcon /> Agregar Estudiante
         </Button>
       </div>
-      
-      <div className="min-w-full table-auto border-gray-300">
+
+      {/* Tabla */}
+      <div className="overflow-x-auto border border-gray-200 rounded">
         <Table isStriped aria-label="Lista de Mentores">
           <TableHeader>
             <TableColumn>#</TableColumn>
@@ -190,79 +229,50 @@ const UserTable = () => {
             <TableColumn>Acciones</TableColumn>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user, index) => {
-              const statusText: "Activo" | "Inactivo" = user.enable ? "Activo" : "Inactivo";
-
-              const handleToggleStatus = async () => {
-                try {
-                  await updateEnableUser(user._id, !user.enable);
-                  alert(`Asesor ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`);
-                  refreshUsers();
-                } catch (error) {
-                  alert("No se pudo cambiar el estado del asesor.");
-                }
-              };
-
-              const handleDelete = async () => {
-                if (confirm("¿Estás seguro de que deseas eliminar este asesor?")) {
-                  try {
-                    await deleteUser(user._id);
-                    alert("Asesor eliminado correctamente");
-                    refreshUsers();
-                  } catch (error) {
-                    alert("No se pudo eliminar el asesor.");
-                  }
-                }
-              };
-
+            {filteredUsers.map((user, idx) => {
+              const statusText: "Activo" | "Inactivo" = user.enable
+                ? "Activo"
+                : "Inactivo";
               return (
-                <TableRow key={user._id || index}>
-                  <TableCell>{index + 1}</TableCell>
+                <TableRow key={user._id}>
+                  <TableCell>{idx + 1}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.codigo}</TableCell>
                   <TableCell>{roleMap[user.role] ?? "Desconocido"}</TableCell>
-                  <TableCell>{user.career ? (typeof user.career === "object" ? user.career.name : user.career) : "No especificado"}</TableCell>
                   <TableCell>
-                    <Chip color={statusColorMap[statusText]} size="sm" variant="flat">
+                    {typeof user.career === "object"
+                      ? user.career?.name ?? "—"
+                      : user.career ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      color={statusColorMap[statusText]}
+                      size="sm"
+                      variant="flat"
+                    >
                       {statusText}
                     </Chip>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Tooltip content="Ver detalles">
-                        <button
-                          aria-label="Ver detalles"
-                          className="cursor-pointer text-default-400 hover:text-primary"
-                          onClick={() => openViewModal(user)}
-                        >
+                        <button className="hover:text-blue-400" onClick={() => { setSelectedUser(user); setIsViewModalOpen(true); }}>
                           <EyeIcon />
                         </button>
                       </Tooltip>
                       <Tooltip content="Editar asesor">
-                        <button
-                          aria-label="Editar asesor"
-                          className="cursor-pointer text-default-400 hover:text-warning"
-                          onClick={() => openEditModal(user._id)}
-                        >
+                        <button className="hover:text-yellow-400" onClick={() => { setSelectedUserId(user._id); setEditModalOpen(true); }}>
                           <EditIcon />
                         </button>
                       </Tooltip>
                       <Tooltip content={user.enable ? "Deshabilitar" : "Habilitar"}>
-                        <button
-                          aria-label="Cambiar estado"
-                          className={`cursor-pointer ${user.enable ? "text-danger hover:text-red-600" : "text-success hover:text-green-600"}`}
-                          onClick={handleToggleStatus}
-                        >
-                          {user.enable ? <BlockIcon/> : <CheckIcon/>}
+                        <button  onClick={() => handleToggleStatus(user)}>
+                          {user.enable ? <BlockIcon color="red" /> : <CheckIcon color="green" />}
                         </button>
                       </Tooltip>
                       <Tooltip content="Eliminar asesor">
-                        <button
-                          aria-label="Eliminar asesor"
-                          className="cursor-pointer text-danger hover:text-red-600"
-                          onClick={handleDelete}
-                        >
+                        <button onClick={() => handleDelete(user)}>
                           <TrashIcon />
                         </button>
                       </Tooltip>
@@ -275,8 +285,13 @@ const UserTable = () => {
         </Table>
       </div>
 
+      {/* Modales */}
       <AddUserModal isOpen={isOpen} onClose={onClose} />
-      <ViewUserModal isOpen={isViewModalOpen} user={selectedUser} onClose={closeViewModal} />
+      <ViewUserModal
+        isOpen={isViewModalOpen}
+        user={selectedUser}
+        onClose={() => setIsViewModalOpen(false)}
+      />
       {isEditModalOpen && selectedUserId && (
         <EditUserModal
           isOpen={isEditModalOpen}
@@ -287,6 +302,4 @@ const UserTable = () => {
       )}
     </div>
   );
-};
-
-export default UserTable;
+}
