@@ -32,17 +32,10 @@ export default function DefaultLayout({
         {children}
       </main>
       <footer className="w-full flex flex-col sm:flex-row items-center justify-center gap-1 px-4 py-3 text-center text-sm">
-        <Link
-          isExternal
-          href="#"
-          title="Bienestapp"
-          className="flex flex-col sm:flex-row items-center gap-1 text-current"
-        >
           <span className="text-default-600">
             Desarrollada por estudiantes de Ingeniería de Sistemas
           </span>
           <p className="text-primary font-semibold">Bienestapp</p>
-        </Link>
       </footer>
     </div>
   );

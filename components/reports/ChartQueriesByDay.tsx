@@ -1,11 +1,10 @@
-// components/queries/ChartQueriesByDay.tsx
 import { useEffect, useState } from "react";
 import { fetchQueriesByDay } from "@/services/reportService";
 import { Spinner, Select, SelectItem } from "@heroui/react";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -60,13 +59,20 @@ export default function ChartQueriesByDay({ height = 320 }: { height?: number })
         </Select>
       </div>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart data={data}>
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="fecha" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="total" fill="#7c3aed" radius={[4, 4, 0, 0]} />
-        </BarChart>
+          <Line
+            type="monotone"
+            dataKey="total"
+            stroke="#7c3aed"
+            strokeWidth={3}
+            dot={{ r: 5 }}
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

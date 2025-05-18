@@ -35,7 +35,12 @@ const UserQueryDashboard: React.FC = () => {
     const dias = kpis.last7days.slice(-2);
     change =
       dias[1].count !== 0
-        ? ((dias[1].count - dias[0].count) / Math.max(dias[0].count, 1)) * 100
+        ? Number(
+            (
+              ((dias[1].count - dias[0].count) / Math.max(dias[0].count, 1)) *
+              100
+            ).toFixed(1)
+          )
         : undefined;
   }
 
