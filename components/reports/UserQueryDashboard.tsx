@@ -7,7 +7,7 @@ import { Users, MessageSquare, TrendingUp, UserCheck } from "lucide-react";
 type UserQueryKpi = {
   totalQueries: number;
   last7days: { _id: string; count: number }[];
-  topTopics: { _id: string; count: number }[];
+  topTopics: { topicId: string; topicName: string; count: number }[]; // <-- CAMBIO AQUÍ
   totalUniqueUsers: number;
 };
 
@@ -24,8 +24,10 @@ const UserQueryDashboard: React.FC = () => {
       .catch((): void => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-6 text-center">Cargando estadísticas...</div>;
-  if (!kpis) return <div className="p-6 text-center">No hay datos de consultas.</div>;
+  if (loading)
+    return <div className="p-6 text-center">Cargando estadísticas...</div>;
+  if (!kpis)
+    return <div className="p-6 text-center">No hay datos de consultas.</div>;
 
   // Ejemplo de cálculo de cambio: comparación entre ayer y anteayer
   let change = undefined;
@@ -56,7 +58,7 @@ const UserQueryDashboard: React.FC = () => {
         title="Tema + consultado"
         value={
           kpis.topTopics.length > 0
-            ? `${kpis.topTopics[0]._id} (${kpis.topTopics[0].count})`
+            ? `${kpis.topTopics[0].topicName} (${kpis.topTopics[0].count})`
             : "Sin datos"
         }
         icon={<TrendingUp />}

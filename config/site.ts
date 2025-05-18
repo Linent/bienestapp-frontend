@@ -33,7 +33,8 @@ export const siteConfig = {
       roles: ["admin"],
       subItems: [
         { label: "Reporte de mentores", href: "/dashboard/reportTable" },
-        { label: "Lista de consultores", href: "/dashboard/registerUserInfo"}
+        { label: "Lista de consultores", href: "/dashboard/registerUserInfo"},
+        { label: "Estadísticas de consultores", href:"/dashboard/query" }
       ]
     },
     {

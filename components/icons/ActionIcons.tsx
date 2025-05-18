@@ -28,6 +28,132 @@ export const EyeIcon = (props: any) => (
     />
   </svg>
 );
+export const ActivityIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="30px"
+    width="30px"
+    role="presentation"
+    viewBox="0 0 20 20"
+    {...props}
+  >
+    <path
+      d="M3.5 11L7 11L9 5L11 15L13 11L16.5 11"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+export const BookTextIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="30px"
+    width="30px"
+    role="presentation"
+    viewBox="0 0 20 20"
+    {...props}
+  >
+    <rect
+      x="3"
+      y="4"
+      width="14"
+      height="12"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    />
+    <path
+      d="M7 7H13"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    />
+    <path
+      d="M7 10H13"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    />
+    <path
+      d="M7 13H10"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    />
+  </svg>
+);
+export const UsersIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="30px"
+    width="30px"
+    role="presentation"
+    viewBox="0 0 20 20"
+    {...props}
+  >
+    <circle
+      cx="7"
+      cy="8"
+      r="3"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    />
+    <circle
+      cx="14"
+      cy="10"
+      r="3"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    />
+    <path
+      d="M3.5 16C3.5 13.5147 8.5 13.5147 8.5 16"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    />
+    <path
+      d="M11.5 16C11.5 13.5147 16.5 13.5147 16.5 16"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    />
+  </svg>
+);
+export const AwardIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="30px"
+    width="30px"
+    role="presentation"
+    viewBox="0 0 20 20"
+    {...props}
+  >
+    <circle
+      cx="10"
+      cy="8"
+      r="4"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    />
+    <path
+      d="M6.5 13.5L5 18L10 15.5L15 18L13.5 13.5"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const FacebookIcon = (props: any) => (
   <svg viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" {...props}>
     <path d="M22 12a10 10 0 10-11.6 9.9v-7H8v-2.9h2.4V9.4c0-2.4 1.4-3.8 3.5-3.8.7 0 1.4.1 2.1.2v2.3h-1.2c-1.2 0-1.6.8-1.6 1.6v1.9H17l-.4 2.9h-2.2v7A10 10 0 0022 12z" />

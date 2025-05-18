@@ -6,7 +6,26 @@ import {TopCareerReport, AdvisoryReport, MostActiveAdvisor} from "@/types/types"
 const dashboardPath = "schedules";
 
 const USER_QUERY_PATH = "userqueries";
-
+// Gráficas
+export const fetchQueriesByDay = async (days = 30) => {
+  const res = await api.get(
+    `${BACKEND_URL}/${USER_QUERY_PATH}/by-day?days=${days}`,
+    { headers: getAuthHeaders() }
+  );
+  return res.data;
+};
+export const fetchTopTopics = async () => {
+  const res = await api.get(`${BACKEND_URL}/${USER_QUERY_PATH}/top-topics`, { headers: getAuthHeaders() });
+  return res.data;
+};
+export const fetchByBeneficiary = async () => {
+  const res = await api.get(`${BACKEND_URL}/${USER_QUERY_PATH}/by-beneficiary`, { headers: getAuthHeaders() });
+  return res.data;
+};
+export const fetchByProgram = async () => {
+  const res = await api.get(`${BACKEND_URL}/${USER_QUERY_PATH}/by-program`, { headers: getAuthHeaders() });
+  return res.data;
+};
 // Obtener TODAS las consultas (para tabla)
 export const fetchAllUserQueries = async () => {
   try {
