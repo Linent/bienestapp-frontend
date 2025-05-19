@@ -10,10 +10,11 @@ import {
   CardHeader,
   Textarea,
   Button,
-  Select,
-  SelectItem,
   Spinner,
+  Skeleton,
+  Alert,
 } from "@heroui/react";
+import ReactStars from "react-rating-stars-component";
 import { ValidationResult } from "@/types";
 
 export default function CalificarAsesoriaPage() {
@@ -37,23 +38,44 @@ export default function CalificarAsesoriaPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-60">
-        <Spinner color="primary" size="lg" />
+      <div className="flex justify-center mt-12">
+        <Card className="w-full max-w-lg space-y-5 p-6" radius="lg">
+          <Skeleton className="rounded-lg">
+            <div className="h-8 w-2/3 bg-default-200" />
+          </Skeleton>
+          <div className="space-y-3">
+            <Skeleton className="w-4/5 rounded-lg">
+              <div className="h-4 w-4/5 rounded-lg bg-default-200" />
+            </Skeleton>
+            <Skeleton className="w-3/5 rounded-lg">
+              <div className="h-4 w-3/5 rounded-lg bg-default-300" />
+            </Skeleton>
+            <Skeleton className="w-2/5 rounded-lg">
+              <div className="h-4 w-2/5 rounded-lg bg-default-200" />
+            </Skeleton>
+          </div>
+          <Skeleton className="w-full h-12 rounded-lg" />
+        </Card>
       </div>
     );
+  }
   if (error)
-    return <div className="p-10 text-center text-red-500">{error}</div>;
+    return (
+      <div className="flex justify-center items-center mt-20">
+        <Alert color="danger" title={error} />
+      </div>
+    );
   if (!data) return null;
 
   if (data.rated)
     return (
-      <div className="p-10 text-center">
-        <h2 className="text-xl font-bold mb-2">
-          ¡Ya calificaste esta asesoría!
-        </h2>
-        <p>Gracias por tu participación.</p>
+      <div className="flex justify-center items-center mt-20">
+        <Alert
+          color="primary"
+          title="¡Ya calificaste esta asesoría! Gracias por tu participación."
+        />
       </div>
     );
 
@@ -85,10 +107,10 @@ export default function CalificarAsesoriaPage() {
   );
 }
 
-// Formulario HeroUI
+// Formulario HeroUI con calificación por estrellas
 function CalificacionForm({ scheduleId }: { scheduleId: string }) {
   const [feedback, setFeedback] = useState("");
-  const [rating, setRating] = useState<number | "">("");
+  const [rating, setRating] = useState<number>(0);
   const [success, setSuccess] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,13 +118,15 @@ function CalificacionForm({ scheduleId }: { scheduleId: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
     if (!rating) {
       setError("Selecciona una calificación.");
       return;
     }
+
     setSending(true);
     try {
-      await submitFeedback(scheduleId, feedback, Number(rating));
+      await submitFeedback(scheduleId, feedback, rating);
       setSuccess(true);
     } catch {
       setError("Error al enviar la calificación. Intenta de nuevo.");
@@ -112,30 +136,31 @@ function CalificacionForm({ scheduleId }: { scheduleId: string }) {
 
   if (success) {
     return (
-      <div className="mt-6 text-green-700 font-bold">
-        ¡Gracias por calificar tu asesoría!
-      </div>
+      <Alert
+        color="success"
+        title="¡Gracias por tu opinión!"
+        description="Tu calificación fue enviada correctamente. ¡Apreciamos tu participación!"
+        className="my-6"
+      />
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-3">
-      <Select
-        label="Calificación"
-        selectedKeys={new Set([rating === "" ? "" : String(rating)])}
-        onSelectionChange={(keys) => {
-          const val = Array.from(keys)[0];
-          setRating(val ? Number(val) : "");
-        }}
-        isRequired
-        className="w-full"
-      >
-        {["", 5, 4, 3, 2, 1].map((n) => (
-          <SelectItem key={String(n)}>
-            {n === "" ? "Selecciona..." : `${n} ⭐`}
-          </SelectItem>
-        ))}
-      </Select>
+      {error && <Alert color="danger" title={error} className="mb-2" />}
+      <div>
+        <label className="block font-bold mb-1">Calificación:</label>
+        <ReactStars
+          count={5}
+          value={rating}
+          onChange={setRating}
+          size={40}
+          isHalf={false}
+          activeColor="#00c9a7" // Color tipo HeroUI
+          color="#cfd8dc" // Gris claro para estrellas vacías
+          a11y={true}
+        />
+      </div>
       <Textarea
         label="Comentarios (opcional)"
         value={feedback}
@@ -143,7 +168,6 @@ function CalificacionForm({ scheduleId }: { scheduleId: string }) {
         placeholder="Comparte tus observaciones..."
         rows={3}
       />
-      {error && <div className="text-red-500 mb-3">{error}</div>}
       <Button
         type="submit"
         color="primary"

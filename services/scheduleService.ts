@@ -55,7 +55,7 @@ export const updateAttendance = async (
 
 export const validateFeedbackToken = async (token: string) => {
   const res = await api.get(`${BACKEND_URL}/${schedulePath}/feedback/validate/${token}`);
-  return res.data; // <--- esto es lo importante
+  return res.data;
 };
 
 // Guardar calificación y feedback
