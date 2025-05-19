@@ -53,11 +53,16 @@ export const updateAttendance = async (
   return res.data;
 };
 
-export const updateFeedback = async (scheduleId: string, feedback: string) => {
-  const response = await api.put(
-    `${BACKEND_URL}/schedules/${scheduleId}`,
-    { feedback },
-    { headers: getAuthHeaders() }
+export const validateFeedbackToken = async (token: string) => {
+  const res = await api.get(`${BACKEND_URL}/${schedulePath}/feedback/validate/${token}`);
+  return res.data; // <--- esto es lo importante
+};
+
+// Guardar calificación y feedback
+export const submitFeedback = async (scheduleId: string, feedback: string, rating: number) => {
+  const res = await api.put(
+    `${BACKEND_URL}/${schedulePath}/feedback/${scheduleId}`,
+    { feedback, rating }
   );
-  return response.data;
+  return res.data; // <--- esto también
 };

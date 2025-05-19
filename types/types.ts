@@ -12,6 +12,14 @@ export interface User {
   resume?: string; // URL de la hoja de vida
   resumePublicId?: string; // ID de la hoja de vida
 }
+export interface ValidationResult {
+  scheduleId: string;
+  studentName: string;
+  advisorName: string;
+  date: string;
+  topic: string;
+  rated: boolean;
+};
 export interface MentorAttendance {
   advisorId: string;
   advisorName: string;
