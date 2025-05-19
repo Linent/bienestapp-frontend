@@ -47,12 +47,12 @@ const StudentsByAdvisory = () => {
   const [viewingObservation, setViewingObservation] = useState<string | null>(null);
 
   const canEditAttendance = (start: Date) => {
-    const now = new Date();
-    return (
-      start.getTime() - now.getTime() <= 1000 * 60 * 60 * 3 &&
-      start.getTime() > now.getTime()
-    );
-  };
+  const now = new Date();
+  const startWindow = new Date(start.getTime() - 10 * 60 * 1000); // 10 min antes
+  const endWindow = new Date(start.getTime() + (2 * 60 + 30) * 60 * 1000); // 2 horas 30 min después
+
+  return now >= startWindow && now <= endWindow;
+};
 
   useEffect(() => {
     const loadStudents = async () => {

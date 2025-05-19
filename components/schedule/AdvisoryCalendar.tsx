@@ -32,32 +32,87 @@ const AdvisoryCalendar = () => {
   const [userRole, setUserRole] = useState<string>("");
 
   useEffect(() => {
-    const today = moment();
-    const [minDate, maxDate] = getNextWeekdaysRange();
-    const payload = getTokenPayload() as { id: string; role?: string };
-    setUserRole(payload.role || "");
-    const getAdvisories = async () => {
-      try {
-        const data = await fetchAdvisories();
-        const formattedEvents: AdvisoryEvent[] = [];
+  const today = moment();
+  const [minDate, maxDate] = getNextWeekdaysRange();
+  const payload = getTokenPayload() as { id: string; role?: string };
+  setUserRole(payload.role || "");
+  const getAdvisories = async () => {
+    try {
+      const data = await fetchAdvisories();
+      const formattedEvents: AdvisoryEvent[] = [];
 
-        data.forEach((advisory: Advisory) => {
-          const start = moment(advisory.dateStart);
-          const end = moment(advisory.dateEnd);
+      data.forEach((advisory: Advisory) => {
+        const start = moment(advisory.dateStart);
+        const end = moment(advisory.dateEnd);
 
-          if (!advisory.recurring) {
-            if (
-              start.isBetween(
-                moment(minDate).startOf("day"),
-                moment(maxDate).endOf("day"),
-                undefined,
-                "[]"
-              ) &&
-              ![0, 6].includes(start.day()) &&
-              start.isAfter(today)
-            ) {
+        // Cálculo de la ventana de visualización
+        const now = moment();
+        const startWindow = start.clone().subtract(30, "minutes");
+        const endWindow = end.clone().add(30, "minutes");
+
+        const isInDisplayWindow =
+          now.isBetween(startWindow, endWindow, undefined, "[]") ||
+          now.isBefore(startWindow);
+
+        // Solo filtra por rango de próximos 7 días hábiles
+        const isInRange = start.isBetween(
+          moment(minDate).startOf("day"),
+          moment(maxDate).endOf("day"),
+          undefined,
+          "[]"
+        );
+        const isWeekday = ![0, 6].includes(start.day());
+
+        if (!advisory.recurring) {
+          if (isInRange && isWeekday && isInDisplayWindow) {
+            formattedEvents.push({
+              id: advisory._id,
+              title:
+                typeof advisory.advisorId === "object" &&
+                advisory.advisorId?.name
+                  ? advisory.advisorId.name
+                  : "Sin nombre",
+              advisorName:
+                typeof advisory.advisorId === "object" &&
+                advisory.advisorId?.name
+                  ? advisory.advisorId.name
+                  : "Sin nombre",
+              career:
+                typeof advisory.careerId === "object" &&
+                advisory.careerId?.name
+                  ? advisory.careerId.name
+                  : "Sin carrera",
+              time: start.format("LLLL"),
+              start: start.toDate(),
+              end: end.toDate(),
+              status: advisory.status,
+              dateStart: start.toDate(),
+            });
+          }
+        } else {
+          for (let i = 0; i < 8; i++) {
+            const newStart = start.clone().add(i, "weeks");
+            const newEnd = end.clone().add(i, "weeks");
+
+            // Cálculo de la ventana de visualización para la asesoría recurrente
+            const recStartWindow = newStart.clone().subtract(30, "minutes");
+            const recEndWindow = newEnd.clone().add(30, "minutes");
+
+            const recIsInDisplayWindow =
+              now.isBetween(recStartWindow, recEndWindow, undefined, "[]") ||
+              now.isBefore(recStartWindow);
+
+            const recIsInRange = newStart.isBetween(
+              moment(minDate).startOf("day"),
+              moment(maxDate).endOf("day"),
+              undefined,
+              "[]"
+            );
+            const recIsWeekday = ![0, 6].includes(newStart.day());
+
+            if (recIsInRange && recIsWeekday && recIsInDisplayWindow) {
               formattedEvents.push({
-                id: advisory._id,
+                id: `${advisory._id}-${i}`,
                 title:
                   typeof advisory.advisorId === "object" &&
                   advisory.advisorId?.name
@@ -73,64 +128,25 @@ const AdvisoryCalendar = () => {
                   advisory.careerId?.name
                     ? advisory.careerId.name
                     : "Sin carrera",
-                time: start.format("LLLL"),
-                start: start.toDate(),
-                end: end.toDate(),
+                time: newStart.format("LLLL"),
+                start: newStart.toDate(),
+                end: newEnd.toDate(),
                 status: advisory.status,
-                dateStart: start.toDate(),
+                dateStart: newStart.toDate(),
               });
             }
-          } else {
-            for (let i = 0; i < 8; i++) {
-              const newStart = start.clone().add(i, "weeks");
-              const newEnd = end.clone().add(i, "weeks");
-
-              if (
-                newStart.isBetween(
-                  moment(minDate).startOf("day"),
-                  moment(maxDate).endOf("day"),
-                  undefined,
-                  "[]"
-                ) &&
-                ![0, 6].includes(newStart.day()) &&
-                newStart.isAfter(today)
-              ) {
-                formattedEvents.push({
-                  id: `${advisory._id}-${i}`,
-                  title:
-                    typeof advisory.advisorId === "object" &&
-                    advisory.advisorId?.name
-                      ? advisory.advisorId.name
-                      : "Sin nombre",
-                  advisorName:
-                    typeof advisory.advisorId === "object" &&
-                    advisory.advisorId?.name
-                      ? advisory.advisorId.name
-                      : "Sin nombre",
-                  career:
-                    typeof advisory.careerId === "object" &&
-                    advisory.careerId?.name
-                      ? advisory.careerId.name
-                      : "Sin carrera",
-                  time: newStart.format("LLLL"),
-                  start: newStart.toDate(),
-                  end: newEnd.toDate(),
-                  status: advisory.status,
-                  dateStart: newStart.toDate(),
-                });
-              }
-            }
           }
-        });
+        }
+      });
 
-        setEvents(formattedEvents);
-      } catch (error) {
-        console.error("Error cargando asesorías:", error);
-      }
-    };
+      setEvents(formattedEvents);
+    } catch (error) {
+      console.error("Error cargando asesorías:", error);
+    }
+  };
 
-    getAdvisories();
-  }, []);
+  getAdvisories();
+}, []);
 
   const handleEventClick = (event: AdvisoryEvent): void => {
     setSelectedAdvisory(event);
