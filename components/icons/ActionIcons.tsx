@@ -127,6 +127,38 @@ export const UsersIcon = (props: any) => (
     />
   </svg>
 );
+// components/icons/CustomStar.tsx
+export function CustomStar({ filled = false, size = 36, ...props }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 52 52"
+      fill="none"
+      {...props}
+    >
+      <path
+        d="M26 7
+          L32.6 20.4
+          L47 22.1
+          L36 32.7
+          L38.5 47
+          L26 39.5
+          L13.5 47
+          L16 32.7
+          L5 22.1
+          L19.4 20.4
+          Z"
+        stroke="#FFD600"   // Amarillo brillante
+        strokeWidth="3"
+        fill={filled ? "#FFD600" : "none"}
+        strokeLinejoin="round"
+        style={{ filter: filled ? "drop-shadow(0 0 1px #FFD600)" : "" }}
+      />
+    </svg>
+  );
+}
+
 export const AwardIcon = (props: any) => (
   <svg
     aria-hidden="true"

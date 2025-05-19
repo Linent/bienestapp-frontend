@@ -73,6 +73,39 @@ export const GithubIcon: React.FC<IconSvgProps> = ({
     </svg>
   );
 };
+import { useState } from "react";
+import { CustomStar } from "./icons/ActionIcons";
+
+
+interface StarsProps {
+  value: number;
+  onChange: (val: number) => void;
+}
+
+export function StarsRating({ value, onChange }: StarsProps) {
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  return (
+    <div className="flex items-center space-x-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <span
+          key={i}
+          onMouseEnter={() => setHovered(i)}
+          onMouseLeave={() => setHovered(null)}
+          onClick={() => onChange(i)}
+          style={{ cursor: "pointer" }}
+        >
+          <CustomStar
+            filled={hovered !== null ? i <= hovered : i <= value}
+            size={40}
+            color="#FFD600"
+            fillColor="#FFF9C4"
+          />
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export const MoonFilledIcon = ({
   size = 24,

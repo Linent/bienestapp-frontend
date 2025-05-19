@@ -14,8 +14,25 @@ import {
   Skeleton,
   Alert,
 } from "@heroui/react";
-import ReactStars from "react-rating-stars-component";
+import { StarsRating } from "@/components/icons";
 import { ValidationResult } from "@/types";
+
+// Componente de agradecimiento visual tipo "Successfully Booked"
+function SuccessFeedback() {
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <div className="rounded-full bg-green-100 flex items-center justify-center mb-5 shadow-lg"
+        style={{ width: 94, height: 94 }}>
+        <svg width={52} height={52} viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="26" fill="#22C55E" />
+          <path d="M36 20L23.5 32.5L16 25" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      <div className="text-xl font-bold text-gray-700 mb-1">¡Gracias por tu opinión!</div>
+      <div className="text-gray-500 text-base text-center mb-3">Tu calificación fue enviada correctamente.<br />Apreciamos tu participación.</div>
+    </div>
+  );
+}
 
 export default function CalificarAsesoriaPage() {
   const router = useRouter();
@@ -39,6 +56,7 @@ export default function CalificarAsesoriaPage() {
   }, [token]);
 
   if (loading) {
+    // Skeleton de HeroUI
     return (
       <div className="flex justify-center mt-12">
         <Card className="w-full max-w-lg space-y-5 p-6" radius="lg">
@@ -107,7 +125,7 @@ export default function CalificarAsesoriaPage() {
   );
 }
 
-// Formulario HeroUI con calificación por estrellas
+// Formulario con estrellas custom y HeroUI
 function CalificacionForm({ scheduleId }: { scheduleId: string }) {
   const [feedback, setFeedback] = useState("");
   const [rating, setRating] = useState<number>(0);
@@ -134,32 +152,14 @@ function CalificacionForm({ scheduleId }: { scheduleId: string }) {
     setSending(false);
   };
 
-  if (success) {
-    return (
-      <Alert
-        color="success"
-        title="¡Gracias por tu opinión!"
-        description="Tu calificación fue enviada correctamente. ¡Apreciamos tu participación!"
-        className="my-6"
-      />
-    );
-  }
+  if (success) return <SuccessFeedback />;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-3">
       {error && <Alert color="danger" title={error} className="mb-2" />}
       <div>
         <label className="block font-bold mb-1">Calificación:</label>
-        <ReactStars
-          count={5}
-          value={rating}
-          onChange={setRating}
-          size={40}
-          isHalf={false}
-          activeColor="#00c9a7" // Color tipo HeroUI
-          color="#cfd8dc" // Gris claro para estrellas vacías
-          a11y={true}
-        />
+        <StarsRating value={rating} onChange={setRating} />
       </div>
       <Textarea
         label="Comentarios (opcional)"
