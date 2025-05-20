@@ -118,6 +118,7 @@ export interface Schedule {
   career: string;
   dateStart: string; // ISO date string
   attendance: boolean;
+  status:string;
 }
 export interface Props {
   topic: {

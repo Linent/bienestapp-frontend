@@ -146,6 +146,12 @@ const WeeklySchedules = () => {
     filterCareer,
     filterAttendance
   ]);
+const statusLabels: Record<string, string> = {
+  approved: "Aprobado",
+  pending: "Pendiente",
+  completed: "Completado",
+  canceled: "Cancelado",
+};
 
   const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(filteredSchedules.length / itemsPerPage);
   const paginatedSchedules =
@@ -262,6 +268,7 @@ const WeeklySchedules = () => {
                 <TableColumn>Tema</TableColumn>
                 <TableColumn>Carrera</TableColumn>
                 <TableColumn>Fecha</TableColumn>
+                <TableColumn>Estado</TableColumn>
                 <TableColumn>Asistencia</TableColumn>
               </TableHeader>
               <TableBody>
@@ -272,6 +279,7 @@ const WeeklySchedules = () => {
                     <TableCell>{schedule.topic}</TableCell>
                     <TableCell>{schedule.AdvisoryId.careerId?.name ?? "Sin carrera"}</TableCell>
                     <TableCell>{new Date(schedule.dateStart).toLocaleString("es-CO")}</TableCell>
+                    <TableCell>{statusLabels[schedule.status] ?? schedule.status}</TableCell>
                     <TableCell>
                       <Chip
                         color={schedule.attendance ? "success" : "danger"}
