@@ -32,10 +32,17 @@ export default function DefaultLayout({
         {children}
       </main>
       <footer className="w-full flex flex-col sm:flex-row items-center justify-center gap-1 px-4 py-3 text-center text-sm">
-          <span className="text-default-600">
-            Desarrollada por estudiantes de Ingeniería de Sistemas
-          </span>
-          <p className="text-primary font-semibold">Bienestapp</p>
+        <span className="text-default-600">
+          Desarrollada por estudiantes de Ingeniería de Sistemas
+        </span>
+        <p className="text-primary font-semibold">Bienestapp</p>
+        <span className="mx-2 text-default-400">|</span>
+        <Link
+          href="/privacyPolicyPage"
+          className="text-default-500 hover:text-primary underline transition-colors"
+        >
+          Política de Privacidad
+        </Link>
       </footer>
     </div>
   );

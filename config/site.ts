@@ -48,12 +48,7 @@ export const siteConfig = {
       roles: ["academic_friend"],
       subItems: [
         { label: "Mis asesorías", href: "/advisors/:advisorId", roles: ["academic_friend"] },
-        ]
-    },
-    {
-      label: "Perfil",
-      href: "/user/profile",
-      roles: ["admin", "student", "academic_friend"],
+      ]
     },
     {
       label: "Documentos",

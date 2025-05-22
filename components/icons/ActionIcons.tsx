@@ -217,6 +217,54 @@ export const CalendarIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <line x1="3" y1="10" x2="21" y2="10" />
   </svg>
 );
+export const HomeIcon = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M3 10L12 3L21 10"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 10V19C5 19.5523 5.44772 20 6 20H18C18.5523 20 19 19.5523 19 19V10"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+export const UsersIcons = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth={1.7}/>
+    <circle cx="16" cy="13" r="3" stroke="currentColor" strokeWidth={1.7}/>
+    <path d="M2 21c0-3.3137 6-5 10-5s10 1.6863 10 5" stroke="currentColor" strokeWidth={1.7}/>
+  </svg>
+);
+export const StatsIcon = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect x="4" y="13" width="3" height="7" rx="1.5" stroke="currentColor" strokeWidth={1.7}/>
+    <rect x="10.5" y="7" width="3" height="13" rx="1.5" stroke="currentColor" strokeWidth={1.7}/>
+    <rect x="17" y="3" width="3" height="17" rx="1.5" stroke="currentColor" strokeWidth={1.7}/>
+  </svg>
+);
+export const CareerIcon = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth={1.7}/>
+    <path d="M3 7l7.5-5h3L21 7" stroke="currentColor" strokeWidth={1.7} strokeLinejoin="round"/>
+  </svg>
+);
+export const MyCalendarIcon = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth={1.7}/>
+    <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth={1.7}/>
+    <path d="M12 13V11" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"/>
+    <path d="M12 13h2" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"/>
+    <path d="M16 3v4M8 3v4" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"/>
+    <path d="M3 9h18" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"/>
+  </svg>
+);
 export const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
@@ -236,7 +284,12 @@ export const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-
+export const StudentIcon = (props: any) => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
+    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth={1.7}/>
+    <path d="M6 21v-2c0-2.209 3.134-4 7-4s7 1.791 7 4v2" stroke="currentColor" strokeWidth={1.7}/>
+  </svg>
+);
 export const UploadIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,
@@ -384,45 +437,42 @@ export const DeleteIcon = (props: any) => (
     <path d="M 24 4 C 20.491685 4 17.570396 6.6214322 17.080078 10 L 10.238281 10 A 1.50015 1.50015 0 0 0 9.9804688 9.9785156 A 1.50015 1.50015 0 0 0 9.7578125 10 L 6.5 10 A 1.50015 1.50015 0 1 0 6.5 13 L 8.6386719 13 L 11.15625 39.029297 C 11.427329 41.835926 13.811782 44 16.630859 44 L 31.367188 44 C 34.186411 44 36.570826 41.836168 36.841797 39.029297 L 39.361328 13 L 41.5 13 A 1.50015 1.50015 0 1 0 41.5 10 L 38.244141 10 A 1.50015 1.50015 0 0 0 37.763672 10 L 30.919922 10 C 30.429604 6.6214322 27.508315 4 24 4 z M 24 7 C 25.879156 7 27.420767 8.2681608 27.861328 10 L 20.138672 10 C 20.579233 8.2681608 22.120844 7 24 7 z M 11.650391 13 L 36.347656 13 L 33.855469 38.740234 C 33.730439 40.035363 32.667963 41 31.367188 41 L 16.630859 41 C 15.331937 41 14.267499 40.033606 14.142578 38.740234 L 11.650391 13 z M 20.476562 17.978516 A 1.50015 1.50015 0 0 0 19 19.5 L 19 34.5 A 1.50015 1.50015 0 1 0 22 34.5 L 22 19.5 A 1.50015 1.50015 0 0 0 20.476562 17.978516 z M 27.476562 17.978516 A 1.50015 1.50015 0 0 0 26 19.5 L 26 34.5 A 1.50015 1.50015 0 1 0 29 34.5 L 29 19.5 A 1.50015 1.50015 0 0 0 27.476562 17.978516 z" />
   </svg>
 );
-
-export const LogoutIcon = (props: any) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    role="presentation"
-    viewBox="0 0 24 24"
-    width="1em"
-    height="1em"
-    {...props}
-  >
-    {/* Flecha hacia la izquierda */}
+export const CalendarIcons = (props: any) => (
+  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth={1.5} />
+    <path d="M16 3v4M8 3v4M3 9h18" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+  </svg>
+);
+export const ProfileIcon = (props: any) => (
+  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" {...props}>
+    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth={1.5} />
     <path
-      d="M8 17l-5-5 5-5"
+      d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={1.5}
       strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    {/* Línea horizontal */}
-    <path
-      d="M3 12h12"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-    />
-    {/* Puerta / caja */}
-    <rect
-      x="15"
-      y="4"
-      width="6"
-      height="16"
-      rx="2"
-      stroke="currentColor"
-      strokeWidth={2}
     />
   </svg>
 );
+export const LogoutIcon = (props: any) => (
+  <svg
+    width={20} // un poquito más grande para mejor presencia
+    height={20}
+    viewBox="0 0 24 24"
+    fill="none"
+    style={{ display: "block" }}
+    {...props}
+  >
+    <path
+      d="M16 17L21 12M21 12L16 7M21 12H9M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 
 export const ClipboardIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg

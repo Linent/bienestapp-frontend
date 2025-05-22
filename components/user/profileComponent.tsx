@@ -13,7 +13,7 @@ import { fetchUserById, uploadUserFiles } from "@/services/userService";
 import { getTokenPayload } from "@/utils/auth";
 import { User } from "@/types/types";
 import toast from "react-hot-toast";
-import { CameraIcon } from "../icons/ActionIcons";
+import { CameraIcon, EditIcon } from "../icons/ActionIcons";
 import ResumeCard from "./ResumeCard";
 
 const ProfileCard = () => {
@@ -157,6 +157,7 @@ const ProfileCard = () => {
             variant="solid"
             onPress={() => setIsEditOpen(true)}
           >
+            <EditIcon/>
             Editar perfil
           </Button>
           {user?.role === "academic_friend" && (

@@ -12,41 +12,41 @@ import { getTokenPayload } from "@/utils/auth";
 moment.locale("es");
 const localizer = momentLocalizer(moment);
 
-const diasMap: Record<string, number> = {
-  lunes: 1,
-  martes: 2,
-  miércoles: 3,
-  jueves: 4,
-  viernes: 5,
-};
+// --- Helper: obtener lunes actual y domingo de la siguiente semana ---
+function getWeekRange() {
+  const today = moment();
+  const mondayThisWeek = today.clone().startOf("week").add(1, "day"); // lunes
+  const sundayNextWeek = mondayThisWeek.clone().add(13, "days"); // domingo de la próxima semana
+  return [mondayThisWeek.startOf("day"), sundayNextWeek.endOf("day")];
+}
 
-const convertToEvent = (advisory: Advisory): AdvisoryEvent => {
-  const dateStart = new Date(advisory.dateStart);
+const convertToEvent = (advisory: Advisory, customDateStart?: Date, customDateEnd?: Date): AdvisoryEvent => {
+  const dateStart = customDateStart ? new Date(customDateStart) : new Date(advisory.dateStart);
+  const dateEnd = customDateEnd ? new Date(customDateEnd) : new Date(advisory.dateEnd);
 
   return {
-    id: advisory._id,
+    id: advisory._id + "-" + dateStart.getTime(),
     title: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
     advisorName: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
     career: typeof advisory.careerId === "object" && advisory.careerId?.name ? advisory.careerId.name : "Sin carrera",
-    time: moment(advisory.dateStart).format("dddd HH:mm"),
-    start: new Date(advisory.dateStart),
-    end: new Date(advisory.dateEnd),
+    time: moment(dateStart).format("dddd HH:mm"),
+    start: dateStart,
+    end: dateEnd,
     status: advisory.status,
-    dateStart: new Date(advisory.dateStart),
+    dateStart: dateStart,
     fullDateString: dateStart.toLocaleDateString("es-ES", {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
-    }), // Fecha completa para uso interno
+    }),
   };
 };
 
 const AdvisoryCalendar = () => {
   const [events, setEvents] = useState<AdvisoryEvent[]>([]);
   const [userRole, setUserRole] = useState<string>("");
-  const [selectedAdvisory, setSelectedAdvisory] =
-    useState<AdvisoryEvent | null>(null);
+  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryEvent | null>(null);
 
   useEffect(() => {
     const loadAdvisories = async () => {
@@ -56,52 +56,37 @@ const AdvisoryCalendar = () => {
         const advisorId = payload?.id;
         if (!advisorId) return;
 
+        const [minDate, maxDate] = getWeekRange();
         const data = await fetchAdvisoriesByAdvisor(advisorId);
         const formattedEvents: AdvisoryEvent[] = [];
+
         data.forEach((advisory: Advisory) => {
-          const start = moment(advisory.dateStart);
-          const end = moment(advisory.dateEnd);
+          const originalStart = moment(advisory.dateStart);
+          const originalEnd = moment(advisory.dateEnd);
 
+          // Si no es recurrente, solo agrega si cae en el rango
           if (!advisory.recurring) {
-            formattedEvents.push(convertToEvent(advisory));
+            if (originalStart.isBetween(minDate, maxDate, undefined, "[]")) {
+              formattedEvents.push(convertToEvent(advisory));
+            }
           } else {
-            for (let i = 0; i < 2; i++) {
-              const newStart = start.clone().add(i, "weeks");
-              const newEnd = end.clone().add(i, "weeks");
+            // Repite la asesoría en cada semana SIEMPRE que esté en el rango
+            let i = 0;
+            while (true) {
+              const newStart = originalStart.clone().add(i, "weeks");
+              const newEnd = originalEnd.clone().add(i, "weeks");
+              if (newStart.isAfter(maxDate)) break; // No seguir si ya pasó el rango
 
-              formattedEvents.push({
-                id: `${advisory._id}-${i}`,
-                title: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
-                advisorName: typeof advisory.advisorId === "object" && advisory.advisorId?.name ? advisory.advisorId.name : "Sin nombre",
-                career: typeof advisory.careerId === "object" && advisory.careerId?.name ? advisory.careerId.name : "Sin carrera",
-                time: newStart.format("dddd HH:mm"),
-                start: newStart.toDate(),
-                end: newEnd.toDate(),
-                status: advisory.status,
-                dateStart: newStart.toDate(),
-                fullDateString: newStart.toDate().toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }),
-              });
+              if (newStart.isBetween(minDate, maxDate, undefined, "[]")) {
+                formattedEvents.push(
+                  convertToEvent(advisory, newStart.toDate(), newEnd.toDate())
+                );
+              }
+              i++;
             }
           }
-        }); /////////////////////////
+        });
 
-        // // Filtrar asesorías del mes actual
-        // const now = moment();
-        // const currentMonth = now.month(); // Enero = 0
-        // const currentYear = now.year();
-
-        // const currentMonthAdvisories = formattedEvents.filter((event) => {
-        //   const eventDate = moment(event.dateStart);
-        //   return (
-        //     eventDate.month() === currentMonth &&
-        //     eventDate.year() === currentYear
-        //   );
-        // });
         setEvents(formattedEvents);
       } catch (error) {
         console.error("Error cargando asesorías:", error);

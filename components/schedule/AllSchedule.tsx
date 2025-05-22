@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { fetchSchedules } from "@/services/scheduleService";
 import { Schedule } from "@/types/types";
 import { DownloadPdfIcon } from "../icons/ActionIcons";
+import advisoryStatusLabels from "@/utils/advisoryStatusLabels";
 
 const WeeklySchedules = () => {
   const [allSchedules, setAllSchedules] = useState<Schedule[]>([]);
@@ -146,12 +147,7 @@ const WeeklySchedules = () => {
     filterCareer,
     filterAttendance
   ]);
-const statusLabels: Record<string, string> = {
-  approved: "Aprobado",
-  pending: "Pendiente",
-  completed: "Completado",
-  canceled: "Cancelado",
-};
+
 
   const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(filteredSchedules.length / itemsPerPage);
   const paginatedSchedules =
@@ -279,7 +275,7 @@ const statusLabels: Record<string, string> = {
                     <TableCell>{schedule.topic}</TableCell>
                     <TableCell>{schedule.AdvisoryId.careerId?.name ?? "Sin carrera"}</TableCell>
                     <TableCell>{new Date(schedule.dateStart).toLocaleString("es-CO")}</TableCell>
-                    <TableCell>{statusLabels[schedule.status] ?? schedule.status}</TableCell>
+                    <TableCell>{advisoryStatusLabels[schedule.status] ?? schedule.status}</TableCell>
                     <TableCell>
                       <Chip
                         color={schedule.attendance ? "success" : "danger"}

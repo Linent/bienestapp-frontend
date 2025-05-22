@@ -12,17 +12,19 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Image,
+  Avatar,
 } from "@heroui/react";
 import { Button } from "@heroui/button";
 import NextLink from "next/link";
-import icons8CerrarSesion from "@/public/icons8-cerrar-sesión-100-(1).png";
-import icon8CerrarSesion from "@/public/icons8-logout-96.png";
 import { Logo } from "@/components/icons";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "../theme-switch";
-import { getTokenPayload } from "@/utils/auth"; // Asegúrate de tener esta función
+import { getTokenPayload } from "@/utils/auth";
+import { fetchUserById } from "@/services/userService";
+import { UserProfileDropdown } from "@/components/user/UserProfileDropdown";
 import { LogoutIcon } from "../icons/ActionIcons";
+
+const DEFAULT_AVATAR = "https://res.cloudinary.com/dhaxrwwio/image/upload/v1747070979/Captura-de-pantalla-2025-05-12-122646_zrk4ft.webp";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,14 +32,29 @@ export const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [advisorId, setAdvisorId] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const [user, setUser] = useState<{ name?: string; profileImage?: string }>({});
+  const [loadingUser, setLoadingUser] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
     const tokenData = getTokenPayload();
-    if (tokenData) {
+    if (tokenData && tokenData.id) {
       setIsAuthenticated(true);
       setUserRole(tokenData.role);
       setAdvisorId(tokenData.id);
+
+      setLoadingUser(true);
+      fetchUserById(tokenData.id)
+        .then((userData) => {
+          setUser({
+            name: userData.name,
+            profileImage: userData.profileImage,
+          });
+        })
+        .catch(() => setUser({}))
+        .finally(() => setLoadingUser(false));
     }
   }, []);
 
@@ -69,6 +86,7 @@ export const Navbar = () => {
         </NavbarBrand>
       </NavbarContent>
 
+      {/* Menú principal Desktop */}
       {isAuthenticated && (
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           {siteConfig.navItems
@@ -85,17 +103,19 @@ export const Navbar = () => {
                       variant="light"
                       onMouseEnter={() => setOpenDropdown(item.href)}
                       onPointerDown={() => router.push(resolveHref(item.href))}
+                      className="flex items-center gap-2"
                     >
                       {item.label}
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
+                    className="hover:text-primary"
                     aria-label={`Submenú de ${item.label}`}
                     onMouseLeave={() => setOpenDropdown(null)}
                   >
                     {item.subItems.map((subItem) => (
                       <DropdownItem key={subItem.href}>
-                        <NextLink className="w-full block" href={resolveHref(subItem.href)}>
+                        <NextLink className="w-full block hover:text-primary" href={resolveHref(subItem.href)}>
                           {subItem.label}
                         </NextLink>
                       </DropdownItem>
@@ -113,19 +133,11 @@ export const Navbar = () => {
         </NavbarContent>
       )}
 
+      {/* Perfil Desktop */}
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
           {isAuthenticated ? (
-            <Button variant="flat" onClick={handleLogout}>
-              <Image
-                src={icon8CerrarSesion.src}
-                alt="Cerrar sesión"
-                className="w-5 h-5 mr-2"
-                width={20}
-                height={20}
-              />
-              Cerrar sesión
-            </Button>
+            <UserProfileDropdown user={user} onLogout={handleLogout} loading={loadingUser} />
           ) : (
             <Button as={NextLink} href="/login" variant="flat">
               Iniciar sesión
@@ -134,23 +146,45 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
+      {/* Menú móvil */}
       <NavbarMenu>
         {isAuthenticated ? (
-          siteConfig.navItems
-            .filter((item) => !userRole || item.roles.includes(userRole))
-            .map((item) => (
-              <NavbarMenuItem key={item.href}>
-                <NextLink className="block px-4 py-2" href={resolveHref(item.href)}>
-                  {item.label}
-                </NextLink>
-                {item.subItems &&
-                  item.subItems.map((subItem) => (
-                    <NavbarMenuItem key={subItem.href} className="pl-6 text-sm">
-                      <NextLink href={resolveHref(subItem.href)}>{subItem.label}</NextLink>
-                    </NavbarMenuItem>
-                  ))}
-              </NavbarMenuItem>
-            ))
+          <>
+            {/* Navegación principal móvil */}
+            {siteConfig.navItems
+              .filter((item) => !userRole || item.roles.includes(userRole))
+              .map((item) => (
+                <NavbarMenuItem key={item.href}>
+                  <NextLink className="block px-4 py-2" href={resolveHref(item.href)}>
+                    {item.label}
+                  </NextLink>
+                  {item.subItems &&
+                    item.subItems.map((subItem) => (
+                      <NavbarMenuItem key={subItem.href} className="pl-10 text-sm">
+                        <NextLink href={resolveHref(subItem.href)}>{subItem.label}</NextLink>
+                      </NavbarMenuItem>
+                    ))}
+                </NavbarMenuItem>
+              ))}
+
+            {/* Separador y opciones usuario */}
+            <div className="border-t my-4" />
+
+            <NavbarMenuItem
+              onClick={() => router.push("/user/profile")}
+              className="flex items-center gap-2 px-4 cursor-pointer"
+            >
+              <Avatar src={user?.profileImage || DEFAULT_AVATAR} size="sm" />
+              <span>{user?.name || "Mi perfil"}</span>
+            </NavbarMenuItem>
+            <NavbarMenuItem
+              className="flex items-center gap-2 px-4 cursor-pointer text-danger hover:text-red-600"
+              onClick={handleLogout}
+            >
+              <LogoutIcon />
+              <span>Cerrar sesión</span>
+            </NavbarMenuItem>
+          </>
         ) : (
           <>
             <NavbarMenuItem key="/">
@@ -164,16 +198,6 @@ export const Navbar = () => {
               </NextLink>
             </NavbarMenuItem>
           </>
-        )}
-        {isAuthenticated && (
-          <NavbarMenuItem
-            className="mt-auto border-t pt-4 flex items-center gap-2 px-4 cursor-pointer text-danger hover:text-red-600"
-            onClick={handleLogout}
-          >
-            <LogoutIcon
-            />
-            <span>Cerrar sesión</span>
-          </NavbarMenuItem>
         )}
         <ThemeSwitch />
       </NavbarMenu>
