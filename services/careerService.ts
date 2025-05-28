@@ -13,7 +13,18 @@ export const fetchCareers = async (): Promise<Career[]> => {
 
   return response.data;
 };
-
+export const fetchCareerByCode = async (code: string): Promise<Career | null> => {
+  try {
+    const response = await api.get(`${BACKEND_URL}/${carreraPath}/code/${code}`,
+      {
+    headers: getAuthHeaders(),
+  }
+    );
+    return response.data;
+  } catch {
+    return null;
+  }
+};
 // Obtener una carrera por ID
 export const fetchCareerById = async (id: string): Promise<Career> => {
   const response = await api.get(`${BACKEND_URL}/${carreraPath}/${id}`, {

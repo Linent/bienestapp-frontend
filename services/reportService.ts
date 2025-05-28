@@ -72,8 +72,7 @@ export const fetchTopCareers = async (): Promise<TopCareerReport[]> => {
     throw new Error("No se pudo cargar la información.");
   }
 };
-// Funciones para obtener los datos
-// En services/reportService.ts
+
 
 export const fetchSchedulesByDay = async (): Promise<{ date: string; count: number }[]> => {
   const response = await api.get(`${BACKEND_URL}/${dashboardPath}/schedules-by-day`, {

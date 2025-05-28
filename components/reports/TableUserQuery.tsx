@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { fetchAllUserQueries } from "@/services/reportService";
+import { fetchCareerByCode } from "@/services/careerService";
 import { Download, FileDown, X } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-  Select, SelectItem, Badge, Spinner, Button, DateRangePicker
+  Select, SelectItem, Spinner, Button, DateRangePicker
 } from "@heroui/react";
 import { parseDate, today } from "@internationalized/date";
+
 
 const COLUMNS = [
   { key: "fullName", label: "Nombre completo" },
@@ -23,20 +25,21 @@ const COLUMNS = [
 ];
 
 const PAGE_SIZE_OPTIONS = [
+  { key: "10", label: "10" },
   { key: "25", label: "25" },
   { key: "50", label: "50" },
   { key: "100", label: "100" },
   { key: "Todos", label: "Todos" },
 ];
 
-const DEFAULT_PAGE_SIZE = "25";
+const DEFAULT_PAGE_SIZE = "10";
 const DEFAULT_BENEFICIARY = "Todos";
+const DEFAULT_CAREER = "Todas";
 const DEFAULT_RANGE = {
   start: today("UTC").subtract({ days: 30 }),
   end: today("UTC")
 };
 
-// Helper para estructurar los datos planos para la tabla dinámica
 type UserQuery = {
   _id: string;
   userId?: {
@@ -85,8 +88,13 @@ export default function TableUserQuery() {
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState(DEFAULT_RANGE);
 
+  // Estado para el filtro de carreras dinámicas
+  const [careerFilter, setCareerFilter] = useState(DEFAULT_CAREER);
+  const [careerOptions, setCareerOptions] = useState<{ code: string, name: string }[]>([]);
+
   // Fetch Data
   useEffect(() => {
+    setLoading(true);
     fetchAllUserQueries()
       .then((data) => setQueries(flattenQueries(data)))
       .finally(() => setLoading(false));
@@ -98,14 +106,12 @@ export default function TableUserQuery() {
     [queries]
   );
 
-  // **Filtro de fechas**
+  // Filtro de fechas
   const filteredByDate = useMemo(() => {
     if (!dateRange?.start || !dateRange?.end) return queries;
     return queries.filter((q) => {
       if (!q.createdAt) return false;
-      // createdAt formato: "2024-05-22"
       const qDate = parseDate(q.createdAt);
-      // Incluye fechas entre start y end, ambos inclusive
       return (
         (qDate.compare(dateRange.start) > 0 || qDate.compare(dateRange.start) === 0) &&
         (qDate.compare(dateRange.end) < 0 || qDate.compare(dateRange.end) === 0)
@@ -113,7 +119,7 @@ export default function TableUserQuery() {
     });
   }, [queries, dateRange]);
 
-  // **Filtro por beneficiario**
+  // Filtro por beneficiario
   const filtered = useMemo(
     () =>
       beneficiary === DEFAULT_BENEFICIARY
@@ -122,26 +128,75 @@ export default function TableUserQuery() {
     [filteredByDate, beneficiary]
   );
 
+  // Obtén los códigos únicos de 3 dígitos de los registros filtrados
+  const codesSet = useMemo(() => {
+    const set = new Set<string>();
+    filtered.forEach(q => {
+      if (q.ufpsCode && q.ufpsCode.length === 7) {
+        set.add(q.ufpsCode.substring(0, 3));
+      }
+    });
+    return Array.from(set);
+  }, [filtered]);
+
+  // Busca las carreras existentes para esos códigos (solo una vez por código)
+  useEffect(() => {
+    let isMounted = true;
+    if (codesSet.length === 0) {
+      setCareerOptions([]);
+      return;
+    }
+    Promise.all(
+      codesSet.map(async code => {
+        const career = await fetchCareerByCode(code);
+        return career ? { code: career.code, name: career.name } : null;
+      })
+    ).then(results => {
+      if (!isMounted) return;
+      const carrerasFiltradas = results.filter(Boolean) as { code: string, name: string }[];
+      // Sin repeticiones
+      const sinRepetir = Array.from(
+        new Map(carrerasFiltradas.map(c => [c.code, c])).values()
+      );
+      setCareerOptions(sinRepetir);
+    });
+    return () => { isMounted = false };
+  }, [codesSet]);
+
+  // Filtro por carrera seleccionada
+  const filteredByCareer = useMemo(() => {
+    if (careerFilter === DEFAULT_CAREER) return filtered;
+    return filtered.filter(q => q.ufpsCode && q.ufpsCode.length === 7 && q.ufpsCode.substring(0, 3) === careerFilter);
+  }, [filtered, careerFilter]);
+
   // Paginación
   const numericPageSize =
-    pageSize === "Todos" ? filtered.length : parseInt(pageSize, 10) || 25;
-  const pageCount = Math.ceil(filtered.length / numericPageSize) || 1;
+    pageSize === "Todos" ? filteredByCareer.length : parseInt(pageSize, 10) || 25;
+  const pageCount = Math.ceil(filteredByCareer.length / numericPageSize) || 1;
   const pageData =
     pageSize === "Todos"
-      ? filtered
-      : filtered.slice((page - 1) * numericPageSize, page * numericPageSize);
+      ? filteredByCareer
+      : filteredByCareer.slice((page - 1) * numericPageSize, page * numericPageSize);
 
   // Limpiar filtros
   const handleResetFilters = () => {
     setBeneficiary(DEFAULT_BENEFICIARY);
+    setCareerFilter(DEFAULT_CAREER);
     setPageSize(DEFAULT_PAGE_SIZE);
     setDateRange(DEFAULT_RANGE);
     setPage(1);
   };
 
+  // Solo exportar las columnas definidas en COLUMNS (sin 'key')
+  const exportRows = pageData.map(row => {
+    const filtered: Record<string, any> = {};
+    COLUMNS.forEach(col => { filtered[col.key] = row[col.key]; });
+    return filtered;
+  });
+
   // Exportar a Excel
   const handleExportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(pageData);
+    const ws = XLSX.utils.json_to_sheet(exportRows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Consultas");
     XLSX.writeFile(wb, "consultas_chatbot.xlsx");
@@ -152,14 +207,14 @@ export default function TableUserQuery() {
     const doc = new jsPDF();
     autoTable(doc, {
       head: [COLUMNS.map((c) => c.label)],
-      body: pageData.map((row) => COLUMNS.map((col) => row[col.key] ?? "")),
+      body: exportRows.map(row => COLUMNS.map(col => row[col.key] ?? "")),
       styles: { fontSize: 8 },
     });
     doc.save("consultas_chatbot.pdf");
   };
 
   // Reset page cuando cambia filtro/pageSize
-  useEffect(() => setPage(1), [beneficiary, pageSize, dateRange]);
+  useEffect(() => setPage(1), [beneficiary, careerFilter, pageSize, dateRange]);
 
   return (
     <div className="bg-white rounded-2xl p-6 border shadow-sm">
@@ -177,17 +232,34 @@ export default function TableUserQuery() {
           {/* Filtro beneficiario */}
           <Select
             label="Filtrar por beneficiario"
-            className="w-full sm:w-60"
+            className="w-full sm:w-52"
             selectedKeys={new Set([beneficiary])}
             onSelectionChange={(keys) =>
               setBeneficiary(String(Array.from(keys)[0] ?? DEFAULT_BENEFICIARY))
             }
+            items={beneficiaryTypes.map((t) => ({
+              key: t,
+              label: t,
+            }))}
+          >
+            {(item) => (
+              <SelectItem key={item.key} data-value={item.key}>
+                {item.label}
+              </SelectItem>
+            )}
+          </Select>
+
+          {/* Filtro carrera dinámico */}
+          <Select
+            label="Filtrar por carrera"
+            className="w-full sm:w-56"
+            selectedKeys={new Set([careerFilter])}
+            onSelectionChange={(keys) =>
+              setCareerFilter(String(Array.from(keys)[0] ?? DEFAULT_CAREER))
+            }
             items={[
-              { key: DEFAULT_BENEFICIARY, label: "Todos" },
-              ...getBeneficiaryTypes(queries).map((t) => ({
-                key: t,
-                label: t,
-              })),
+              { key: DEFAULT_CAREER, label: "Todas las carreras" },
+              ...careerOptions.map(c => ({ key: c.code, label: c.name }))
             ]}
           >
             {(item) => (
@@ -234,7 +306,7 @@ export default function TableUserQuery() {
             onClick={handleExportExcel}
             startContent={<Download size={18} />}
           >
-            Exportar CSV
+            Exportar Excel
           </Button>
         </div>
       </div>
@@ -287,11 +359,8 @@ export default function TableUserQuery() {
                 <TableRow key={row.key}>
                   {COLUMNS.map((col) => (
                     <TableCell key={col.key}>
-                      {["ufpsCode", "beneficiaryType", "topicKey"].includes(
-                        col.key
-                      )
-                        ? row[col.key] ||
-                          (col.key === "topicKey" ? "Sin tema" : "-")
+                      {["beneficiaryType", "topicKey"].includes(col.key)
+                        ? row[col.key] || (col.key === "topicKey" ? "Sin tema" : "-")
                         : row[col.key] || "-"}
                     </TableCell>
                   ))}
