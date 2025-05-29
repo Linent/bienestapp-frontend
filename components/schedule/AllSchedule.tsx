@@ -10,7 +10,7 @@ import {
   Select,
   SelectItem,
   Chip,
-  Button
+  Button,
 } from "@heroui/react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -52,7 +52,7 @@ const WeeklySchedules = () => {
       Tema: s.topic,
       Carrera: s.AdvisoryId.careerId?.name ?? "No especificada",
       Fecha: new Date(s.dateStart).toLocaleString("es-CO"),
-      Asistencia: s.attendance ? "Asistió" : "No asistió"
+      Asistencia: s.attendance ? "Asistió" : "No asistió",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -61,11 +61,11 @@ const WeeklySchedules = () => {
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",
-      type: "array"
+      type: "array",
     });
 
     const fileData = new Blob([excelBuffer], {
-      type: "application/octet-stream"
+      type: "application/octet-stream",
     });
     saveAs(fileData, `agendamientos_${Date.now()}.xlsx`);
   };
@@ -119,8 +119,8 @@ const WeeklySchedules = () => {
           filterAttendance === "asistio"
             ? schedule.attendance === true
             : filterAttendance === "no_asistio"
-            ? schedule.attendance === false
-            : true;
+              ? schedule.attendance === false
+              : true;
 
         const matchesSearch = searchTerm
           ? schedule.studentId.name
@@ -145,15 +145,20 @@ const WeeklySchedules = () => {
     selectedDateRange,
     searchTerm,
     filterCareer,
-    filterAttendance
+    filterAttendance,
   ]);
 
-
-  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(filteredSchedules.length / itemsPerPage);
+  const totalPages =
+    itemsPerPage === -1
+      ? 1
+      : Math.ceil(filteredSchedules.length / itemsPerPage);
   const paginatedSchedules =
     itemsPerPage === -1
       ? filteredSchedules
-      : filteredSchedules.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+      : filteredSchedules.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        );
 
   return (
     <div className="w-full p-6 bg-white shadow-md rounded-lg">
@@ -213,7 +218,7 @@ const WeeklySchedules = () => {
             ) {
               setSelectedDateRange({
                 from: value.start.toDate("UTC"),
-                to: value.end.toDate("UTC")
+                to: value.end.toDate("UTC"),
               });
             }
           }}
@@ -224,14 +229,31 @@ const WeeklySchedules = () => {
             className="w-[150px] w-full sm:w-[150px]"
             label="Items por página"
             value={itemsPerPage.toString()}
-            onChange={(e) => setItemsPerPage(e.target.value === "all" ? -1 : parseInt(e.target.value))}
+            onChange={(e) =>
+              setItemsPerPage(
+                e.target.value === "all" ? -1 : parseInt(e.target.value)
+              )
+            }
           >
-            <SelectItem key="25" data-value="25">25</SelectItem>
-            <SelectItem key="50" data-value="50">50</SelectItem>
-            <SelectItem key="100" data-value="100">100</SelectItem>
-            <SelectItem key="all" data-value="all">Todos</SelectItem>
+            <SelectItem key="25" data-value="25">
+              25
+            </SelectItem>
+            <SelectItem key="50" data-value="50">
+              50
+            </SelectItem>
+            <SelectItem key="100" data-value="100">
+              100
+            </SelectItem>
+            <SelectItem key="all" data-value="all">
+              Todos
+            </SelectItem>
           </Select>
-          <Button variant="bordered" color="primary" className="text-sm w-full sm:w-auto" onClick={clearFilters}>
+          <Button
+            variant="bordered"
+            color="primary"
+            className="text-sm w-full sm:w-auto"
+            onClick={clearFilters}
+          >
             Limpiar filtros
           </Button>
         </div>
@@ -242,16 +264,22 @@ const WeeklySchedules = () => {
           <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
             <div className="flex flex-col sm:flex-row sm:justify-start sm:space-x-6 gap-2 text-sm">
               <span>
-                <strong>Asistieron:</strong> {filteredSchedules.filter((s) => s.attendance === true).length}
+                <strong>Asistieron:</strong>{" "}
+                {filteredSchedules.filter((s) => s.attendance === true).length}
               </span>
               <span>
-                <strong>No asistieron:</strong> {filteredSchedules.filter((s) => s.attendance === false).length}
+                <strong>No asistieron:</strong>{" "}
+                {filteredSchedules.filter((s) => s.attendance === false).length}
               </span>
               <span>
                 <strong>Total:</strong> {filteredSchedules.length}
               </span>
             </div>
-            <Button color="success" onClick={exportToExcel} startContent={<DownloadPdfIcon />}>
+            <Button
+              color="success"
+              onClick={exportToExcel}
+              startContent={<DownloadPdfIcon />}
+            >
               Exportar a Excel
             </Button>
           </div>
@@ -273,9 +301,15 @@ const WeeklySchedules = () => {
                     <TableCell>{schedule.studentId.name}</TableCell>
                     <TableCell>{schedule.AdvisoryId.advisorId.name}</TableCell>
                     <TableCell>{schedule.topic}</TableCell>
-                    <TableCell>{schedule.AdvisoryId.careerId?.name ?? "Sin carrera"}</TableCell>
-                    <TableCell>{new Date(schedule.dateStart).toLocaleString("es-CO")}</TableCell>
-                    <TableCell>{advisoryStatusLabels[schedule.status] ?? schedule.status}</TableCell>
+                    <TableCell>
+                      {schedule.AdvisoryId.careerId?.name ?? "Sin carrera"}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(schedule.dateStart).toLocaleString("es-CO")}
+                    </TableCell>
+                    <TableCell>
+                      {advisoryStatusLabels[schedule.status] ?? schedule.status}
+                    </TableCell>
                     <TableCell>
                       <Chip
                         color={schedule.attendance ? "success" : "danger"}

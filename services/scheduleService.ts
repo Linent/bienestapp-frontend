@@ -66,3 +66,15 @@ export const submitFeedback = async (scheduleId: string, feedback: string, ratin
   );
   return res.data; // <--- esto también
 };
+
+export const fetchScheduleCountByAdvisory = async (
+  advisoryId: string,
+  dateStart: string
+): Promise<number> => {
+  const res = await api.get(
+    `${BACKEND_URL}/${schedulePath}/count-by-advisory`,
+    { params: { advisoryId, dateStart } }
+  );
+  // La API responde { count: <número> }
+  return res.data.count;
+};
