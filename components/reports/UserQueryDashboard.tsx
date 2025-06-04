@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import KpiCard from "./KpiCard";
 import { fetchUserQueryKpis } from "@/services/reportService";
 import { Users, MessageSquare, TrendingUp, UserCheck } from "lucide-react";
+import { Spinner } from "@heroui/react";
 
 type UserQueryKpi = {
   totalQueries: number;
@@ -25,7 +26,7 @@ const UserQueryDashboard: React.FC = () => {
   }, []);
 
   if (loading)
-    return <div className="p-6 text-center">Cargando estadísticas...</div>;
+    return <Spinner color="danger"/>;
   if (!kpis)
     return <div className="p-6 text-center">No hay datos de consultas.</div>;
 

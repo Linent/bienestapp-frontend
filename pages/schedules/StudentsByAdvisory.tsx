@@ -11,6 +11,7 @@ import {
   TableColumn,
   Divider,
   Tooltip,
+  Spinner,
 } from "@heroui/react";
 
 import {
@@ -119,7 +120,7 @@ const StudentsByAdvisory = () => {
         <Divider className="my-4" />
 
         {loading ? (
-          <p>Cargando estudiantes...</p>
+          <Spinner color="danger" label="Cargando estudiantes..." />
         ) : error ? (
           <div className="text-center text-gray-600 border rounded-lg py-6">
             <p>{error}</p>

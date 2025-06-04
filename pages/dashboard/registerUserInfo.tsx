@@ -36,7 +36,7 @@ const RegistroPage = () => {
   if (loading)
     return (
       <div className="py-20 text-center">
-        <Spinner color="primary" />
+        <Spinner color="danger" label="cargando..." />
       </div>
     );
 

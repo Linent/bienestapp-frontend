@@ -152,7 +152,7 @@ const MentorAttendanceTable: React.FC = () => {
       {/* -- Tabla -- */}
       {loading ? (
         <div className="text-center py-10">
-          <Spinner color="primary" />
+          <Spinner color="danger" label="cargando datos..."/>
         </div>
       ) : (
         <div className="overflow-x-auto">

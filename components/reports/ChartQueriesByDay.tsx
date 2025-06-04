@@ -33,7 +33,7 @@ export default function ChartQueriesByDay({ height = 320 }: { height?: number })
   if (loading)
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <Spinner color="primary" />
+        <Spinner color="danger" />
       </div>
     );
   if (!data.length)

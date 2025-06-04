@@ -14,7 +14,7 @@ export default function ChartByBeneficiary() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner color="primary" className="my-10" />;
+  if (loading) return <Spinner color="danger" className="my-10" />;
   if (!data.length) return <div>No hay datos para mostrar.</div>;
 
   return (

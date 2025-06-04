@@ -88,6 +88,44 @@ export const BookTextIcon = (props: any) => (
     />
   </svg>
 );
+export const FeedbackIcon = (props: any) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    width="1em"
+    viewBox="0 0 20 20"
+    role="presentation"
+    {...props}
+  >
+    <path
+      d="M3.333 14.166v2.501a.833.833 0 0 0 1.178.753l3.236-1.544a1.667 1.667 0 0 1 .722-.162h5.498A2.333 2.333 0 0 0 17 13.382V6.618A2.333 2.333 0 0 0 15 4.166H5A2.333 2.333 0 0 0 3.333 6.618v7.548Z"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx={7}
+      cy={10}
+      r={0.8}
+      fill="currentColor"
+    />
+    <circle
+      cx={10}
+      cy={10}
+      r={0.8}
+      fill="currentColor"
+    />
+    <circle
+      cx={13}
+      cy={10}
+      r={0.8}
+      fill="currentColor"
+    />
+  </svg>
+);
 export const UsersIcon = (props: any) => (
   <svg
     aria-hidden="true"

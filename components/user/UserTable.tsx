@@ -15,6 +15,7 @@ import {
   Input,
   Alert,
   useDisclosure,
+  Spinner,
 } from "@heroui/react";
 
 import {
@@ -162,7 +163,7 @@ export default function UserTable() {
     }
   };
 
-  if (loading) return <p>Cargando mentores...</p>;
+  if (loading) return <Spinner color="danger" label="cargando carreras"/>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

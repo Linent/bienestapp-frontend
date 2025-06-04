@@ -53,16 +53,15 @@ export const createCareer = async (
 // Actualizar una carrera
 export const updateCareer = async (
   id: string,
-  careerData: Partial<Career>,
-): Promise<Career> => {
+  careerData: Partial<Career>
+): Promise<{ success: boolean; data?: Career; message?: string }> => {
   const response = await api.put(
     `${BACKEND_URL}/${carreraPath}/${id}`,
     careerData,
     {
       headers: getAuthHeaders(),
-    },
+    }
   );
-
   return response.data;
 };
 
@@ -70,14 +69,11 @@ export const updateCareer = async (
 export const toggleCareerStatus = async (
   id: string,
   enable: boolean,
-): Promise<Career> => {
+): Promise<{ success: boolean; data: Career }> => {
   const response = await api.post(
     `${BACKEND_URL}/${carreraPath}/enable/${id}`,
     { enable },
-    {
-      headers: getAuthHeaders(),
-    },
+    { headers: getAuthHeaders() },
   );
-
   return response.data;
 };

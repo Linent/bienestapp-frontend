@@ -15,7 +15,15 @@ export const fetchStudentsByAdvisory = async (advisoryId: string, day: string, d
     return response.data;
   
 };
+export const fetchAllFeedbacks = async () => {
+  const res = await api.get(`${BACKEND_URL}/${schedulePath}/feedbacks`);
+  return res.data;
+};
 
+export const fetchFeedbacksByMentor = async (mentorId: string) => {
+  const res = await api.get(`${BACKEND_URL}/${schedulePath}/feedbacks/${mentorId}`);
+  return res.data;
+};
 export const fetchSchedules = async () => {
   const res = await api.get(`${BACKEND_URL}/${schedulePath}`, {
     headers: getAuthHeaders(),

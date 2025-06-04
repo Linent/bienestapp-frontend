@@ -161,7 +161,7 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="font-medium">Agendados:</span>
                     {loadingCount ? (
-                      <Spinner size="sm" color="primary" />
+                      <Spinner size="sm" color="danger" />
                     ) : (
                       <Badge className="bg-primary text-white px-2 py-1 rounded">
                         {scheduleCount !== null
@@ -232,7 +232,7 @@ const AdvisoryList: React.FC<AdvisoryListProps> = ({
                 <Users className="w-5 h-5 text-primary" />
                 <span className="font-medium">Agendados: </span>
                 {loadingCount ? (
-                  <Spinner size="sm" color="primary" />
+                  <Spinner size="sm" color="danger" />
                 ) : (
                   <Chip
                     color={

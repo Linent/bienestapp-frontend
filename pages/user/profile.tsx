@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import ProfileComponent from "@/components/user/profileComponent";
 import { getTokenPayload } from "@/utils/auth"; // función para obtener el token y decodificarlo
 import DefaultLayout from "@/layouts/default"; //  Importa el layout
-import { Divider } from "@heroui/react";
+import { Divider, Spinner } from "@heroui/react";
 import { title } from "@/components/primitives";
 
 export default function ProfilePage() {
@@ -28,7 +28,7 @@ export default function ProfilePage() {
     return null; // No renderiza la página mientras redirige
   }
   if (!user) {
-    return <div>Cargando...</div>; // Mientras se carga el perfil
+    return <Spinner color="danger" label="cargando perfil..."/>; // Mientras se carga el perfil
   }
 
   return (

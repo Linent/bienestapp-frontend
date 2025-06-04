@@ -13,12 +13,21 @@ import {
   Chip,
   useDisclosure,
   Input,
+  Spinner,
+  Alert,
 } from "@heroui/react";
-
-import { fetchCareers } from "@/services/careerService";
-import { EyeIcon, EditIcon, DeleteIcon } from "@/components/icons/ActionIcons";
+import { toggleCareerStatus, fetchCareers } from "@/services/careerService";
+import {
+  EyeIcon,
+  EditIcon,
+  DeleteIcon,
+  BlockIcon,
+  CheckIcon,
+} from "@/components/icons/ActionIcons";
 import AddCareerModal from "@/components/career/AddCareerModal";
 import ViewCareerModal from "@/components/career/viewCareerModal";
+import EditCareerModal from "@/components/career/EditCareerModal";
+
 import { Career } from "@/types";
 
 const statusColorMap: Record<"Activo" | "Inactivo", "success" | "danger"> = {
@@ -33,8 +42,16 @@ const CareerTable = () => {
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const [selectedCareer, setSelectedCareer] = useState<Career | null>(null);
+  const [loadingToggle, setLoadingToggle] = useState<string | null>(null);
+  const [editCareerId, setEditCareerId] = useState<string | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  // ALERT
+  const [alert, setAlert] = useState<{
+    color: "success" | "danger";
+    message: string;
+  } | null>(null);
+
   const {
     isOpen: isViewOpen,
     onOpen: onViewOpen,
@@ -42,23 +59,48 @@ const CareerTable = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    const getCareers = async () => {
-      try {
-        const data = await fetchCareers();
-        if (Array.isArray(data)) {
-          setCareers(data as Career[]);
-        } else {
-          throw new Error("Formato de datos inválido");
-        }
-      } catch (err) {
-        setError("No se pudo cargar la lista de carreras.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     getCareers();
   }, []);
+
+  const getCareers = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchCareers();
+      if (Array.isArray(data)) {
+        setCareers(data as Career[]);
+      } else {
+        throw new Error("Formato de datos inválido");
+      }
+    } catch (err) {
+      setError("No se pudo cargar la lista de carreras.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ACCIÓN HABILITAR/DESHABILITAR usando recarga de la lista y ALERT
+  const handleToggleCareerStatus = async (career: Career) => {
+    setLoadingToggle(career._id);
+    try {
+      const result = await toggleCareerStatus(career._id, !career.enable);
+      await getCareers();
+      setAlert({
+        color: "success",
+        message: !career.enable
+          ? "¡Carrera habilitada correctamente!"
+          : "¡Carrera deshabilitada correctamente!",
+      });
+    } catch (err) {
+      setAlert({
+        color: "danger",
+        message: "No se pudo cambiar el estado de la carrera.",
+      });
+    } finally {
+      setLoadingToggle(null);
+      setTimeout(() => setAlert(null), 3000);
+    }
+  };
 
   const handleViewCareer = (career: Career) => {
     setSelectedCareer(career);
@@ -73,15 +115,21 @@ const CareerTable = () => {
       ? career.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         career.code.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-
     return matchesStatus && matchesSearch;
   });
 
-  if (loading) return <p>Cargando carreras...</p>;
+  if (loading) return <Spinner color="danger" />;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="m-4">
+      {alert && (
+        <Alert color={alert.color} className="mb-4">
+          {alert.message}
+        </Alert>
+      )}
+
+      {/* Filtros y buscador */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <Input
           className="p-2 rounded w-full sm:w-1/3"
@@ -113,7 +161,11 @@ const CareerTable = () => {
 
       {/* Tabla responsiva con scroll horizontal */}
       <div className="overflow-x-auto rounded-lg shadow">
-        <Table isStriped aria-label="Lista de Carreras" className="min-w-[700px]">
+        <Table
+          isStriped
+          aria-label="Lista de Carreras"
+          className="min-w-[700px]"
+        >
           <TableHeader>
             <TableColumn>#</TableColumn>
             <TableColumn>Código</TableColumn>
@@ -126,20 +178,23 @@ const CareerTable = () => {
               const statusText: "Activo" | "Inactivo" = career.enable
                 ? "Activo"
                 : "Inactivo";
-
               return (
                 <TableRow key={career._id || index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{career.code}</TableCell>
                   <TableCell>{career.name}</TableCell>
                   <TableCell>
-                    <Chip
-                      color={statusColorMap[statusText]}
-                      size="sm"
-                      variant="flat"
-                    >
-                      {statusText}
-                    </Chip>
+                    <div className="flex items-center gap-2">
+                      <Chip
+                        color={statusColorMap[statusText]}
+                        size="sm"
+                        variant="flat"
+                      >
+                        {statusText}
+                      </Chip>
+                      {/* Botón con Tooltip e ícono */}
+                      {loadingToggle === career._id && <Spinner size="sm" />}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap items-center gap-2">
@@ -156,8 +211,27 @@ const CareerTable = () => {
                         <button
                           aria-label="Editar carrera"
                           className="cursor-pointer text-default-400 hover:text-warning"
+                          onClick={() => { setEditCareerId(career._id); setIsEditOpen(true); }}
                         >
                           <EditIcon />
+                        </button>
+                      </Tooltip>
+                      <Tooltip
+                        content={career.enable ? "Deshabilitar" : "Habilitar"}
+                      >
+                        <button
+                          aria-label={
+                            career.enable ? "Deshabilitar" : "Habilitar"
+                          }
+                          onClick={() => handleToggleCareerStatus(career)}
+                          disabled={loadingToggle === career._id}
+                          className="focus:outline-none"
+                        >
+                          {career.enable ? (
+                            <BlockIcon color="red" />
+                          ) : (
+                            <CheckIcon color="green" />
+                          )}
                         </button>
                       </Tooltip>
                       <Tooltip content="Eliminar carrera">
@@ -181,26 +255,21 @@ const CareerTable = () => {
       <AddCareerModal
         isOpen={isOpen}
         onClose={onClose}
-        onSuccess={() => {
-          setLoading(true);
-          fetchCareers()
-            .then((data) => {
-              if (Array.isArray(data)) {
-                setCareers(data as Career[]);
-              }
-              setLoading(false);
-            })
-            .catch(() => {
-              setError("No se pudo actualizar la lista de carreras.");
-              setLoading(false);
-            });
-        }}
+        onSuccess={getCareers}
       />
       <ViewCareerModal
         career={selectedCareer}
         isOpen={isViewOpen}
         onClose={onViewClose}
       />
+      {isEditOpen && editCareerId && (
+  <EditCareerModal
+    isOpen={isEditOpen}
+    onClose={() => setIsEditOpen(false)}
+    careerId={editCareerId}
+    onUpdateSuccess={getCareers} // o la función que recargue tu lista
+  />
+)}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import DefaultLayout from "@/layouts/default";
-import { Divider } from "@heroui/react";
+import { Divider, Spinner } from "@heroui/react";
 import { title } from "@/components/primitives";
 import MentorAttendanceTable from "@/components/reports/MentorAttendanceTable";
 
@@ -39,7 +39,7 @@ const ReportTable = () => {
   }, [isAuthenticated, userRole]);
 
   if (!isAuthenticated || userRole !== "admin") return null;
-  if (loading) return <p className="text-center">Cargando reporte...</p>;
+  if (loading) return <Spinner color="danger" label="Cargando reporte..."/>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (

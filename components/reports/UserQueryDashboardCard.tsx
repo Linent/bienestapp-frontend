@@ -88,19 +88,27 @@ const UserQueryDashboard: React.FC = () => {
 
       {/* Consultas por Programa Académico */}
       <CardDashboard
-        title="Consultas por Programa Académico"
-        icon={<AwardIcon className="text-warning" style={{ fontSize: 32 }} />}
-      >
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-          <BarChart data={byProgram}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="academicProgram" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="total" fill="#FBBF24" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardDashboard>
+  title="Consultas por Carrera"
+  icon={<AwardIcon className="text-warning" style={{ fontSize: 32 }} />}
+>
+  <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+    <BarChart data={byProgram}>
+      <CartesianGrid strokeDasharray="3 3" />
+      {/* Aquí cambiamos la key */}
+      <XAxis dataKey="careerName" />
+      <YAxis />
+      <Tooltip 
+        formatter={(value, name, props) =>
+          [`${value} consultas`, "Total"]
+        }
+        labelFormatter={(label, props) =>
+          `Carrera: ${label}`
+        }
+      />
+      <Bar dataKey="total" fill="#FBBF24" radius={[4, 4, 0, 0]} />
+    </BarChart>
+  </ResponsiveContainer>
+</CardDashboard>
     </div>
   );
 };

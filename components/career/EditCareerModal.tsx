@@ -36,7 +36,6 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
         setLoading(true);
         try {
           const careerData = await fetchCareerById(careerId);
-
           setCareer(careerData);
         } catch (error) {
           console.error("Error al obtener datos de la carrera:", error);
@@ -45,7 +44,6 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
           setLoading(false);
         }
       };
-
       fetchData();
     }
   }, [isOpen, careerId]);
@@ -56,14 +54,17 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
     try {
       const updatedCareer = Object.keys(career).reduce((acc, key) => {
         if (career[key] !== "") acc[key] = career[key];
-
         return acc;
       }, {} as any);
 
-      await updateCareer(careerId, updatedCareer);
-      toast.success("Carrera actualizada correctamente");
-      onUpdateSuccess();
-      onClose();
+      const result = await updateCareer(careerId, updatedCareer);
+      if (result.success) {
+        toast.success("Carrera actualizada correctamente");
+        onUpdateSuccess();
+        onClose();
+      } else {
+        toast.error(result.message || "No se pudo actualizar la carrera");
+      }
     } catch (error) {
       console.error("Error al actualizar carrera:", error);
       toast.error("Hubo un error al actualizar la carrera");
@@ -82,15 +83,25 @@ const EditCareerModal: React.FC<EditCareerModalProps> = ({
           ) : (
             <>
               <Input
-                label="Nombre de la Carrera"
+                label="Carrera"
+                placeholder="Ingrese el nombre de la carrera"
                 value={career?.name || ""}
                 onChange={(e) => setCareer({ ...career, name: e.target.value })}
               />
+              
+              <Input
+                label="Código"
+                placeholder="Ingrese el código de la Carrera"
+                value={career?.code || ""}
+                onChange={(e) => setCareer({ ...career, code: e.target.value })}
+                className="mt-4"
+              />
+              
             </>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
+          <Button color="danger" variant="flat" onPress={onClose}>
             Cancelar
           </Button>
           <Button color="primary" isLoading={updating} onPress={handleUpdate}>

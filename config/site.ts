@@ -14,7 +14,7 @@ export const siteConfig = {
       href: "/schedules",
       roles: ["admin"],
       subItems: [
-        { label: "Historial reciente de asesorías", href: "/schedules/view"}
+        { label: "Historial reciente de asesorías", href: "/schedules/view" },
       ],
     },
     {
@@ -33,9 +33,9 @@ export const siteConfig = {
       roles: ["admin"],
       subItems: [
         { label: "Reporte de mentores", href: "/dashboard/reportTable" },
-        { label: "Lista de consultores", href: "/dashboard/registerUserInfo"},
-        { label: "Estadísticas de consultores", href:"/dashboard/query" }
-      ]
+        { label: "Lista de consultores", href: "/dashboard/registerUserInfo" },
+        { label: "Estadísticas de consultores", href: "/dashboard/query" },
+      ],
     },
     {
       label: "Carreras",
@@ -47,14 +47,28 @@ export const siteConfig = {
       href: "/advisor/calendar",
       roles: ["academic_friend"],
       subItems: [
-        { label: "Mis asesorías", href: "/advisors/:advisorId", roles: ["academic_friend"] },
-      ]
+        {
+          label: "Mis asesorías",
+          href: "/advisors/:advisorId",
+          roles: ["academic_friend"],
+        },
+      ],
     },
     {
       label: "Documentos",
       href: "/topics",
       roles: ["admin"],
-    }
+    },
+    {
+      label: "Testimonios",
+      href: "/feedback/my",
+      roles: ["academic_friend"],
+    },
+    {
+      label: "Testimonios",
+      href: "/feedback",
+      roles: ["admin"],
+    },
   ],
   navMenuItems: [
     {

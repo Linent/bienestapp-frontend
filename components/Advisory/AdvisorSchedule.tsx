@@ -7,6 +7,7 @@ import {
   TableRow,
   TableCell,
   Chip,
+  Spinner,
 } from "@heroui/react";
 import { fetchAdvisoriesByAdvisor } from "@/services/advisoryService";
 
@@ -53,7 +54,7 @@ const AdvisorSchedule = ({ advisorId }: { advisorId: string }) => {
     if (advisorId) loadAdvisories();
   }, [advisorId]);
 
-  if (loading) return <p>Cargando asesorías...</p>;
+  if (loading) return <Spinner color="danger" label="Cargando asesorías registradas..."/>;
 
   return (
     <div className="bg-white p-4 shadow rounded">

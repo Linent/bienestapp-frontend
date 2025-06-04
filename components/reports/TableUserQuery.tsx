@@ -335,7 +335,7 @@ export default function TableUserQuery() {
       {/* Tabla */}
       {loading ? (
         <div className="py-12 flex justify-center items-center">
-          <Spinner color="primary" size="lg" />
+          <Spinner color="danger" size="lg" />
         </div>
       ) : (
         <Table aria-label="Consultas de usuarios">

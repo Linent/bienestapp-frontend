@@ -4,52 +4,50 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
-import { fetchSchedules } from "@/services/scheduleService";
-import { Schedule } from "@/types/types";
+import { fetchAttendancePercentage } from "@/services/reportService";
+import { Spinner } from "@heroui/react";
 
-// Colores más suaves y accesibles
-const COLORS = ["#4ade80", "#f87171"]; // Verde suave / Rojo claro
+// Colores accesibles
+const COLORS = ["#4ade80", "#f87171"]; // verde / rojo
 
 const AttendancePieChart = () => {
-  const [chartData, setChartData] = useState<{ name: string; value: number }[]>(
-    []
-  );
-  const [error, setError] = useState<string | null>(null);
+  const [percentage, setPercentage] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadAttendance = async () => {
+    const loadPercentage = async () => {
+      setLoading(true);
       try {
-        const schedules: Schedule[] = await fetchSchedules();
-        const total = schedules.length;
-        const attended = schedules.filter((s) => s.attendance).length;
-        const notAttended = total - attended;
-
-        const data = [
-          { name: "Asistió", value: attended },
-          { name: "No asistió", value: notAttended },
-        ];
-
-        setChartData(data);
-      } catch (err) {
-        setError("No se pudo cargar la información.");
+        const value = await fetchAttendancePercentage();
+        setPercentage(Number(value));
+      } catch {
+        setPercentage(null);
+      } finally {
+        setLoading(false);
       }
     };
-
-    loadAttendance();
+    loadPercentage();
   }, []);
+
+  const chartData = [
+    { name: "Asistió", value: percentage ?? 0 },
+    { name: "No asistió", value: percentage !== null ? 100 - percentage : 0 },
+  ];
 
   return (
     <div className="w-full bg-white p-6 shadow-lg rounded-lg max-w-xl mx-auto">
       <h2 className="text-lg font-bold mb-6 text-center">
         Porcentaje de Asistencia General
       </h2>
-
-      {error && <p className="text-red-500 text-center">{error}</p>}
-
-      {!error && chartData.length > 0 && (
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Spinner color="success" size="lg" />
+        </div>
+      ) : percentage === null ? (
+        <p className="text-red-500 text-center">No se pudo cargar la información.</p>
+      ) : (
         <div className="flex flex-col items-center justify-center">
           <ResponsiveContainer width={450} height={250}>
             <PieChart>
@@ -60,32 +58,26 @@ const AttendancePieChart = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius={80}
-                // ❌ innerRadius={40} ← Elimina esta línea
-                label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+                label={({ percent, name }) =>
+                  name === "Asistió" ? `${percent ? (percent * 100).toFixed(1) : 0}%` : ""
+                }
               >
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                {chartData.map((entry, idx) => (
+                  <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} />
             </PieChart>
           </ResponsiveContainer>
-
           <div className="mt-6 w-full">
             <ul className="flex flex-col sm:flex-row sm:justify-center gap-2 text-sm">
-              {chartData.map((entry, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-center gap-2"
-                >
+              {chartData.map((entry, idx) => (
+                <li key={idx} className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    style={{ backgroundColor: COLORS[idx % COLORS.length] }}
                   ></span>
-                  {entry.name}
+                  {entry.name}: <b>{entry.value.toFixed(1)}%</b>
                 </li>
               ))}
             </ul>

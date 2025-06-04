@@ -36,7 +36,7 @@ export default function ChartTopTopics({ height = 250 }) {
     tema: limpiarTema(item.tema),
   }));
 
-  if (loading) return <div className="flex justify-center items-center h-[180px]"><Spinner color="primary" /></div>;
+  if (loading) return <div className="flex justify-center items-center h-[180px]"><Spinner color="danger" label="cargando datos..."/></div>;
   if (!cleanedData.length) return <div className="text-center py-6">No hay datos para mostrar.</div>;
 
   return (

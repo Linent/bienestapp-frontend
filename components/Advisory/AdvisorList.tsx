@@ -27,7 +27,7 @@ import {
   importUsersFromFile,
 } from "@/services/userService";
 import { User } from "@/types";
-import { DocumentIcon, UploadIcon } from "@/components/icons/ActionIcons";
+import { DocumentIcon, FeedbackIcon, UploadIcon } from "@/components/icons/ActionIcons";
 import {
   EyeIcon,
   EditIcon,
@@ -279,7 +279,7 @@ export default function AdvisoryList() {
       active:scale-95
     "
           >
-            {importing ? <Spinner size="sm" /> : "Importar usuarios"}
+            {importing ? <Spinner color="danger" size="sm" /> : "Importar usuarios"}
           </Button>
           <input
             type="file"
@@ -341,7 +341,7 @@ export default function AdvisoryList() {
                 <TableCell className="flex gap-2">
                   <Tooltip content="Ver detalles">
                     <button
-                    className="hover:text-blue-400"
+                      className="hover:text-blue-400"
                       onClick={() => {
                         setSelectedAdvisor(advisor);
                         setViewModalOpen(true);
@@ -352,26 +352,40 @@ export default function AdvisoryList() {
                   </Tooltip>
                   <Tooltip content="Editar">
                     <button
-                    className="hover:text-yellow-400"
+                      className="hover:text-yellow-400"
                       onClick={() => {
                         setSelectedAdvisorId(advisor._id);
                         setEditModalOpen(true);
                       }}
                     >
-                      <EditIcon  />
+                      <EditIcon />
                     </button>
                   </Tooltip>
                   <Tooltip
                     content={advisor.enable ? "Deshabilitar" : "Habilitar"}
                   >
                     <button onClick={() => handleToggleStatus(advisor)}>
-                      {advisor.enable ? <BlockIcon color="red" /> : <CheckIcon color="green" />}
+                      {advisor.enable ? (
+                        <BlockIcon color="red" />
+                      ) : (
+                        <CheckIcon color="green" />
+                      )}
                     </button>
                   </Tooltip>
                   <Tooltip content="Eliminar">
                     <button onClick={() => handleDelete(advisor)}>
                       <TrashIcon />
                     </button>
+                  </Tooltip>
+                  <Tooltip content="Ver feedback">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      color="warning"
+                      onPress={() => router.push(`/feedback/${advisor._id}`)}
+                    >
+                      <FeedbackIcon />
+                    </Button>
                   </Tooltip>
                   <Tooltip content="Crear asesoría">
                     <Button

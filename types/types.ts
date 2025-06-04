@@ -41,7 +41,18 @@ export interface Career {
   code: string;
   enable: boolean;
 }
-
+export interface FeedbackListProps {
+  mentorId?: string; // Ahora acepta undefined y string
+}
+export interface Feedback {
+  _id: string;
+  topic: string;
+  feedback: string;
+  rating: number;
+  studentId: { name: string; email: string };
+  AdvisoryId: { advisorId: { name: string; email: string } };
+  dateStart: string;
+}
 export interface AdvisoryData {
   advisorId: string;
   careerId: string;

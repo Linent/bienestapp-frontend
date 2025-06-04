@@ -1,23 +1,22 @@
+// pages/feedbacks.tsx
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+
 import DefaultLayout from "@/layouts/default";
-import { Accordion, AccordionItem, Divider, Spinner } from "@heroui/react";
+import { Divider, Spinner } from "@heroui/react";
 import { title } from "@/components/primitives";
-import UserQueryDashboard from "@/components/reports/UserQueryDashboard";
-import TableUserQuery from "@/components/reports/TableUserQuery";
-import UserQueryDashboardCard from "@/components/reports/UserQueryDashboardCard";
+import TableAllFeedbacks from "@/components/schedule/FeedBack"; // <- Crea este componente
 
-
-const ConsultasPage = () => {
+const FeedbacksPage = () => {
   const [isAuth, setIsAuth] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole]   = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token"),
-        role = localStorage.getItem("role");
+            role  = localStorage.getItem("role");
       if (!token) {
         router.replace("/login");
         return;
@@ -37,26 +36,19 @@ const ConsultasPage = () => {
   if (loading)
     return (
       <div className="py-20 text-center">
-        <Spinner color="danger" label="cargando consultas..." />
+        <Spinner color="primary" label="cargando testimonios ..." />
       </div>
     );
 
   return (
     <DefaultLayout>
       <div className="w-full p-6">
-        <h1 className={title()}>Consultas por WhatsApp</h1>
+        <h1 className={title()}>Feedback y Calificaciones de Mentores</h1>
         <Divider className="my-4" />
-                <UserQueryDashboard />
-        <Accordion>
-            <AccordionItem aria-label="Estadisticas" title="Estadisticas">
-                <UserQueryDashboardCard/>
-            </AccordionItem> 
-        </Accordion>
-        <Divider className="my-4" />
-        <TableUserQuery />
+        <TableAllFeedbacks />
       </div>
     </DefaultLayout>
   );
 };
 
-export default ConsultasPage;
+export default FeedbacksPage;
