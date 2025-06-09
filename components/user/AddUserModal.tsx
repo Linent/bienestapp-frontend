@@ -31,6 +31,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
   const [codigo, setCode] = useState<string>("");
   const [role, setRole] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [dni, setDni] = useState<string>(""); // Estado para la cédula
   const [loading, setLoading] = useState<boolean>(false); // Estado para mostrar el Skeleton
   const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
@@ -56,7 +57,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
 
   const handleSave = async () => {
     // Verificar si todos los campos obligatorios están completos
-    if (!name || !email || !codigo || !role || !password || !selectedCareer) {
+    if (!name || !email || !codigo || !role || !password || !selectedCareer|| !dni) {
       setError("Por favor, complete todos los campos.");
 
       return;
@@ -72,6 +73,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
       role,
       password,
       career: selectedCareer,
+      dni
     };
 
     try {
@@ -176,7 +178,15 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                   placeholder="Ingrese el código"
                   value={codigo}
                   variant="bordered"
-                  onChange={(e) => setCode(e.target.value)}
+                />
+                <Input
+                  isRequired
+                  errorMessage="Por favor, ingrese una cédula"
+                  label="Cédula"
+                  placeholder="Ingrese la cédula"
+                  value={dni}
+                  variant="bordered"
+                  onChange={(e) => setDni(e.target.value)}
                 />
                 <Select
                   isRequired

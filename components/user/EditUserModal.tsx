@@ -112,7 +112,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         <ModalHeader>
           <div>
             <h1>Editar Usuario</h1>
-            <i>Edita los campos que quieras modificar</i>
+            <p>Edita solo los campos que quieras modificar</p>
           </div>
         </ModalHeader>
         <ModalBody>

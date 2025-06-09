@@ -19,6 +19,7 @@ import {
   CloseIcon,
   EditIcon,
   EyeIcon,
+  BackArrowIcon,
 } from "@/components/icons/ActionIcons";
 
 import EditObservationModal from "@/components/schedule/EditObservationModal";
@@ -106,7 +107,7 @@ const StudentsByAdvisory = () => {
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className={title()}>Estudiantes Agendados</h2>
-          <Button color="primary" onPress={() => router.back()}>
+          <Button color="primary" onPress={() => router.back()} startContent={<BackArrowIcon />}>
             Volver
           </Button>
         </div>
