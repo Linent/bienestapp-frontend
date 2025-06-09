@@ -124,7 +124,7 @@ const LoginPage = () => {
               </div>
 
               <div className="flex justify-center">
-                <Button fullWidth className="py-3 text-lg" color="primary" type="submit">
+                <Button fullWidth color="primary" type="submit">
                   Iniciar sesión
                 </Button>
               </div>

@@ -12,6 +12,8 @@ import {
   Spinner,
   Button,
 } from "@heroui/react";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { fetchAllUserInfo } from "@/services/userInfoService";
@@ -112,26 +114,62 @@ export default function TableUserInfo() {
 
   // Export CSV
   const exportToExcel = () => {
-    const header = columnas.map((c) => c.label).join(",");
-    const rows = filteredData.map((item) =>
-      [
-        `"${capitalize(item.fullName)}"`,
-        `"${item.documentType}"`,
-        `"${item.documentNumber}"`,
-        `"${item.ufpsCode}"`,
-        `"${item.beneficiaryType}"`,
-        `"${item.academicProgram}"`,
-      ].join(",")
-    );
-    const csvContent = [header, ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "registros_bienestar.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  // Procesar los datos: cortar el nombre en 4 columnas
+  const excelData = filteredData.map((item) => {
+    const nameParts = (item.fullName || "").split(" ").slice(0, 4);
+    while (nameParts.length < 4) nameParts.push("");
+    return [
+      nameParts[0], // Nombre 1
+      nameParts[1], // Nombre 2
+      nameParts[2], // Nombre 3
+      nameParts[3], // Nombre 4
+      item.documentType,
+      item.documentNumber,
+      item.ufpsCode,
+      item.beneficiaryType,
+      item.academicProgram,
+    ];
+  });
+
+  // Cabeceras para el Excel
+  const headers = [
+    "Nombre 1",
+    "Nombre 2",
+    "Nombre 1",
+    "Nombre 4",
+    "Tipo de documento",
+    "Nro. documento",
+    "Código UFPS",
+    "Tipo de beneficiario",
+    "Programa / Dependencia",
+  ];
+
+  // (Opcional) Agregar una fila fusionada como título general
+  const aoa = [
+    ["NOMBRE COMPLETO", "", "", "", ...headers.slice(4)], // Fila 1, fusiona las 4 primeras celdas
+    headers,                                               // Fila 2, cabeceras reales
+    ...excelData,                                          // Fila 3 en adelante, los datos
+  ];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+  // Fusionar A1:D1 para el título "NOMBRE COMPLETO"
+  worksheet["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // A1:D1
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Registros");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+  const blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "registros_bienestar.xlsx");
+};
 
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 space-y-4">

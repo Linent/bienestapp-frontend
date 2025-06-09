@@ -224,6 +224,7 @@ export default function UserTable() {
             <TableColumn>Nombre</TableColumn>
             <TableColumn>Email</TableColumn>
             <TableColumn>Código</TableColumn>
+            <TableColumn>Cédula</TableColumn>
             <TableColumn>Rol</TableColumn>
             <TableColumn>Carrera</TableColumn>
             <TableColumn>Estado</TableColumn>
@@ -240,6 +241,7 @@ export default function UserTable() {
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.codigo}</TableCell>
+                  <TableCell>{user.dni}</TableCell>
                   <TableCell>{roleMap[user.role] ?? "Desconocido"}</TableCell>
                   <TableCell>
                     {typeof user.career === "object"

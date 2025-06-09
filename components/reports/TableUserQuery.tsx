@@ -6,11 +6,19 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-  Select, SelectItem, Spinner, Button, DateRangePicker
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Select,
+  SelectItem,
+  Spinner,
+  Button,
+  DateRangePicker,
 } from "@heroui/react";
 import { parseDate, today } from "@internationalized/date";
-
 
 const COLUMNS = [
   { key: "fullName", label: "Nombre completo" },
@@ -37,7 +45,7 @@ const DEFAULT_BENEFICIARY = "Todos";
 const DEFAULT_CAREER = "Todas";
 const DEFAULT_RANGE = {
   start: today("UTC").subtract({ days: 30 }),
-  end: today("UTC")
+  end: today("UTC"),
 };
 
 type UserQuery = {
@@ -90,7 +98,9 @@ export default function TableUserQuery() {
 
   // Estado para el filtro de carreras dinámicas
   const [careerFilter, setCareerFilter] = useState(DEFAULT_CAREER);
-  const [careerOptions, setCareerOptions] = useState<{ code: string, name: string }[]>([]);
+  const [careerOptions, setCareerOptions] = useState<
+    { code: string; name: string }[]
+  >([]);
 
   // Fetch Data
   useEffect(() => {
@@ -113,7 +123,8 @@ export default function TableUserQuery() {
       if (!q.createdAt) return false;
       const qDate = parseDate(q.createdAt);
       return (
-        (qDate.compare(dateRange.start) > 0 || qDate.compare(dateRange.start) === 0) &&
+        (qDate.compare(dateRange.start) > 0 ||
+          qDate.compare(dateRange.start) === 0) &&
         (qDate.compare(dateRange.end) < 0 || qDate.compare(dateRange.end) === 0)
       );
     });
@@ -131,7 +142,7 @@ export default function TableUserQuery() {
   // Obtén los códigos únicos de 3 dígitos de los registros filtrados
   const codesSet = useMemo(() => {
     const set = new Set<string>();
-    filtered.forEach(q => {
+    filtered.forEach((q) => {
       if (q.ufpsCode && q.ufpsCode.length === 7) {
         set.add(q.ufpsCode.substring(0, 3));
       }
@@ -147,36 +158,51 @@ export default function TableUserQuery() {
       return;
     }
     Promise.all(
-      codesSet.map(async code => {
+      codesSet.map(async (code) => {
         const career = await fetchCareerByCode(code);
         return career ? { code: career.code, name: career.name } : null;
       })
-    ).then(results => {
+    ).then((results) => {
       if (!isMounted) return;
-      const carrerasFiltradas = results.filter(Boolean) as { code: string, name: string }[];
+      const carrerasFiltradas = results.filter(Boolean) as {
+        code: string;
+        name: string;
+      }[];
       // Sin repeticiones
       const sinRepetir = Array.from(
-        new Map(carrerasFiltradas.map(c => [c.code, c])).values()
+        new Map(carrerasFiltradas.map((c) => [c.code, c])).values()
       );
       setCareerOptions(sinRepetir);
     });
-    return () => { isMounted = false };
+    return () => {
+      isMounted = false;
+    };
   }, [codesSet]);
 
   // Filtro por carrera seleccionada
   const filteredByCareer = useMemo(() => {
     if (careerFilter === DEFAULT_CAREER) return filtered;
-    return filtered.filter(q => q.ufpsCode && q.ufpsCode.length === 7 && q.ufpsCode.substring(0, 3) === careerFilter);
+    return filtered.filter(
+      (q) =>
+        q.ufpsCode &&
+        q.ufpsCode.length === 7 &&
+        q.ufpsCode.substring(0, 3) === careerFilter
+    );
   }, [filtered, careerFilter]);
 
   // Paginación
   const numericPageSize =
-    pageSize === "Todos" ? filteredByCareer.length : parseInt(pageSize, 10) || 25;
+    pageSize === "Todos"
+      ? filteredByCareer.length
+      : parseInt(pageSize, 10) || 25;
   const pageCount = Math.ceil(filteredByCareer.length / numericPageSize) || 1;
   const pageData =
     pageSize === "Todos"
       ? filteredByCareer
-      : filteredByCareer.slice((page - 1) * numericPageSize, page * numericPageSize);
+      : filteredByCareer.slice(
+          (page - 1) * numericPageSize,
+          page * numericPageSize
+        );
 
   // Limpiar filtros
   const handleResetFilters = () => {
@@ -188,26 +214,72 @@ export default function TableUserQuery() {
   };
 
   // Solo exportar las columnas definidas en COLUMNS (sin 'key')
-  const exportRows = pageData.map(row => {
+  const exportRows = pageData.map((row) => {
     const filtered: Record<string, any> = {};
-    COLUMNS.forEach(col => { filtered[col.key] = row[col.key]; });
+    COLUMNS.forEach((col) => {
+      filtered[col.key] = row[col.key];
+    });
     return filtered;
   });
 
   // Exportar a Excel
   const handleExportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(exportRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Consultas");
-    XLSX.writeFile(wb, "consultas_chatbot.xlsx");
-  };
+  // 1. Prepara los datos
+  const excelRows = pageData.map(row => {
+    const nameParts = (row.fullName || "").split(" ").slice(0, 4);
+    while (nameParts.length < 4) nameParts.push("");
+    return [
+      nameParts[0],
+      nameParts[1],
+      nameParts[2],
+      nameParts[3],
+      row.documentType || "",
+      row.documentNumber || "",
+      row.ufpsCode || "",
+      row.beneficiaryType || "",
+      row.academicProgram || "",
+      row.rawQuery || "",
+      row.topicKey || "",
+      row.createdAt || "",
+    ];
+  });
+
+  const headers = [
+    "Nombre 1",
+    "Nombre 2",
+    "Nombre 3",
+    "Nombre 4",
+    "Tipo de documento",
+    "Nro. documento",
+    "Código UFPS",
+    "Tipo de beneficiario",
+    "Programa / Dependencia",
+    "Pregunta",
+    "Tema detectado",
+    "Fecha",
+  ];
+
+  // 2. Solo una fila de encabezado (como en la segunda imagen)
+  const aoa = [
+    headers,
+    ...excelRows,
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  // NO agregues fusión de celdas, ni más filas de encabezado
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Consultas");
+  XLSX.writeFile(wb, "consultas_chatbot.xlsx");
+};
 
   // Exportar a PDF
   const handleExportPDF = () => {
     const doc = new jsPDF();
     autoTable(doc, {
       head: [COLUMNS.map((c) => c.label)],
-      body: exportRows.map(row => COLUMNS.map(col => row[col.key] ?? "")),
+      body: exportRows.map((row) => COLUMNS.map((col) => row[col.key] ?? "")),
       styles: { fontSize: 8 },
     });
     doc.save("consultas_chatbot.pdf");
@@ -259,7 +331,7 @@ export default function TableUserQuery() {
             }
             items={[
               { key: DEFAULT_CAREER, label: "Todas las carreras" },
-              ...careerOptions.map(c => ({ key: c.code, label: c.name }))
+              ...careerOptions.map((c) => ({ key: c.code, label: c.name })),
             ]}
           >
             {(item) => (
@@ -360,7 +432,8 @@ export default function TableUserQuery() {
                   {COLUMNS.map((col) => (
                     <TableCell key={col.key}>
                       {["beneficiaryType", "topicKey"].includes(col.key)
-                        ? row[col.key] || (col.key === "topicKey" ? "Sin tema" : "-")
+                        ? row[col.key] ||
+                          (col.key === "topicKey" ? "Sin tema" : "-")
                         : row[col.key] || "-"}
                     </TableCell>
                   ))}

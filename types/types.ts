@@ -4,6 +4,7 @@ export interface User {
   email: string;
   career?: string | { _id: string, name: string; } | null;
   codigo: string;
+  dni: string;
   role: "admin" | "student" | "academic_friend";
   enable: boolean;
   profileImage?: string;

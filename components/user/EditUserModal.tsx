@@ -109,7 +109,12 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   return (
     <Modal className="w-full max-w-lg" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader>Editar Usuario</ModalHeader>
+        <ModalHeader>
+          <div>
+            <h1>Editar Usuario</h1>
+            <i>Edita los campos que quieras modificar</i>
+          </div>
+        </ModalHeader>
         <ModalBody>
           {loading ? (
             <Skeleton className="h-10 w-full mb-3" />
@@ -128,12 +133,21 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     label="Email"
                     type="email"
                     value={user?.email || ""}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
+                    onChange={(e) =>
+                      setUser({ ...user, email: e.target.value })
+                    }
                   />
                   <Input
                     label="Código"
                     value={user?.codigo || ""}
-                    onChange={(e) => setUser({ ...user, codigo: e.target.value })}
+                    onChange={(e) =>
+                      setUser({ ...user, codigo: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Cédula"
+                    value={user?.dni || ""}
+                    onChange={(e) => setUser({ ...user, dni: e.target.value })}
                   />
                   <Select
                     label="Rol"
@@ -175,7 +189,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
+          <Button color="danger" variant="flat" onPress={onClose}>
             Cancelar
           </Button>
           <Button color="primary" isLoading={updating} onPress={handleUpdate}>

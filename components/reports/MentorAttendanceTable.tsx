@@ -18,6 +18,8 @@ import {
 } from "@heroui/react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { fetchSchedulesByAdvisorAll } from "@/services/reportService";
 import { DownloadPdfIcon } from "../icons/ActionIcons";
 import { fromDate } from "@internationalized/date";
@@ -67,6 +69,7 @@ const MentorAttendanceTable: React.FC = () => {
     order === "asc" ? a.count - b.count : b.count - a.count
   );
 
+  // Exportar a PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
     const start = dateRange.from.toLocaleDateString("es-CO");
@@ -87,6 +90,38 @@ const MentorAttendanceTable: React.FC = () => {
     doc.save("reporte_mentores.pdf");
   };
 
+  // Exportar a Excel
+  const exportToExcel = () => {
+  const excelData = sortedData.map((mentor) => {
+    // Divide el nombre por espacios y toma hasta 4 partes
+    const nameParts = (mentor.advisorName || "").split(" ").slice(0, 4);
+    // Rellena hasta 4 columnas, en blanco si faltan partes
+    while (nameParts.length < 4) nameParts.push("");
+
+    return {
+      "Nombre 1": nameParts[0],
+      "Nombre 2": nameParts[1],
+      "Apellido 1": nameParts[2],
+      "Apellido 2": nameParts[3],
+      "Asesorías atendidas": mentor.count,
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(excelData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+  const blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "reporte_mentores.xlsx");
+};
+
+
   const clearFilters = () => {
     setDateRange(getDefaultDateRange());
   };
@@ -98,8 +133,8 @@ const MentorAttendanceTable: React.FC = () => {
         {/* Date Range + Clear */}
         <div className="flex flex-col sm:flex-row items-start sm:w-64 sm:items-center gap-2 w-full lg:w-auto break-words">
           <DateRangePicker
-            granularity="day" // 1) mostrar sólo fechas
-            className="w-full sm:w-64" // 2) ancho 100% en móvil, 16rem en >sm
+            granularity="day"
+            className="w-full sm:w-64"
             value={{
               start: fromDate(dateRange.from, "UTC"),
               end: fromDate(dateRange.to, "UTC"),
@@ -138,6 +173,14 @@ const MentorAttendanceTable: React.FC = () => {
               Descendente
             </SelectItem>
           </Select>
+          <Button
+            color="success"
+            onPress={exportToExcel}
+            className="w-full sm:w-auto"
+            startContent={<DownloadPdfIcon />}
+          >
+            Exportar Excel
+          </Button>
           <Button
             color="danger"
             onPress={exportToPDF}
