@@ -138,27 +138,27 @@ export default function UserTable() {
       await updateEnableUser(user._id, !user.enable);
       setAlertProps({
         color: !user.enable ? "success" : "danger",
-        title: `Asesor ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`,
+        title: `Estudiante ${!user.enable ? "habilitado" : "deshabilitado"} correctamente`,
       });
       await refreshUsers();
     } catch {
       setAlertProps({
         color: "danger",
-        title: "No se pudo cambiar el estado del asesor.",
+        title: "No se pudo cambiar el estado del Estudiante.",
       });
     }
   };
 
   const handleDelete = async (user: User) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este asesor?")) return;
+    if (!confirm("¿Estás seguro de que deseas eliminar este Estudiante?")) return;
     try {
       await deleteUser(user._id);
-      setAlertProps({ color: "success", title: "Asesor eliminado correctamente" });
+      setAlertProps({ color: "success", title: "Estudiante eliminado correctamente" });
       await refreshUsers();
     } catch {
       setAlertProps({
         color: "danger",
-        title: "No se pudo eliminar el asesor.",
+        title: "No se pudo eliminar el Estudiante.",
       });
     }
   };
@@ -181,7 +181,7 @@ export default function UserTable() {
       <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-4">
         <div className="flex flex-col sm:flex-row gap-2 w-full md:max-w-2xl">
           <Input
-            placeholder="Buscar asesor..."
+            placeholder="Buscar Estudiante..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -264,7 +264,7 @@ export default function UserTable() {
                           <EyeIcon />
                         </button>
                       </Tooltip>
-                      <Tooltip content="Editar asesor">
+                      <Tooltip content="Editar Estudiante">
                         <button className="hover:text-yellow-400" onClick={() => { setSelectedUserId(user._id); setEditModalOpen(true); }}>
                           <EditIcon />
                         </button>
@@ -274,7 +274,7 @@ export default function UserTable() {
                           {user.enable ? <BlockIcon color="red" /> : <CheckIcon color="green" />}
                         </button>
                       </Tooltip>
-                      <Tooltip content="Eliminar asesor">
+                      <Tooltip content="Eliminar Estudiante">
                         <button onClick={() => handleDelete(user)}>
                           <TrashIcon />
                         </button>
