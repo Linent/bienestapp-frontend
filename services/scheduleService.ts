@@ -83,6 +83,7 @@ export const fetchScheduleCountByAdvisory = async (
     `${BACKEND_URL}/${schedulePath}/count-by-advisory`,
     { params: { advisoryId, dateStart } }
   );
+  console.log(res.data);
   // La API responde { count: <número> }
   return res.data.count;
 };

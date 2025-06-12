@@ -11,7 +11,6 @@ export const fetchAdvisories = async () => {
     const response = await api.get(`${BACKEND_URL}/${advisory}`, {
       headers: getAuthHeaders(),
     });
-
     return response.data; // Debe devolver un array de asesorías
   
 };
