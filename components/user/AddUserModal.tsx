@@ -173,6 +173,8 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                 />
                 <Input
                   isRequired
+                  type="number"
+                  minLength={6}
                   errorMessage="Por favor, ingrese un código"
                   label="Código"
                   placeholder="Ingrese el código"
@@ -182,6 +184,8 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                 />
                 <Input
                   isRequired
+                  type="number"
+                  minLength={10}
                   errorMessage="Por favor, ingrese una cédula"
                   label="Cédula"
                   placeholder="Ingrese la cédula"
