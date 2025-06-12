@@ -46,7 +46,7 @@ export default function IndexPage() {
         </div>
 
         {/* Contenedor de las tarjetas con separación */}
-        <div className="flex flex-wrap items-center justify-center gap-1">
+        <div className="flex flex-wrap items-center justify-center gap-6">
           {cardsData.map((card, index) => (
             <a
               key={index}
@@ -54,21 +54,22 @@ export default function IndexPage() {
               rel="noreferrer noopener"
               target="_blank"
             >
-              <Card className="py-4 w-5/6 h-85 mt-2">
-                <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+              <Card className="w-[350px] h-[350px] mt-2 flex flex-col overflow-hidden">
+                <CardHeader className="pb-0 pt-2 px-4 flex-col items-start bg-white z-10 mb-2">
                   <p className="text-tiny uppercase font-bold">
                     {card.subtitle}
                   </p>
                   <h4 className="font-bold text-large">{card.title}</h4>
                   <small className="text-default-500">{card.description}</small>
                 </CardHeader>
-                <CardBody className="overflow-visible py-2">
+                <CardBody className="p-0 flex-1">
                   <Image
                     isZoomed
                     alt={card.title}
-                    className="object-cover items-center rounded-xl"
                     src={card.imageUrl}
+                    className="object-cover w-full h-full"
                     width={350}
+                    height={250}
                   />
                 </CardBody>
               </Card>
