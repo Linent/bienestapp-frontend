@@ -178,6 +178,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose }) => {
                   placeholder="Ingrese el código"
                   value={codigo}
                   variant="bordered"
+                  onChange={(e) => setCode(e.target.value)}
                 />
                 <Input
                   isRequired
