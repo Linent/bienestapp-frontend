@@ -62,9 +62,9 @@ export default function AdvisoryCardsPage() {
     .then(({ name, career }) => {
       console.log("Respuesta del backend:", { name, career });
       setAdvisorName(name);
-      if (career && typeof career === "object") {
-        setCareerName(career.name ?? "");
-        setCareerId(career._id ?? "");
+      if (career && typeof career === "object" && 'name' in career && ' _id' in career) {
+        setCareerName((career as { name?: string }).name ?? "");
+        setCareerId((career as { _id?: string })._id ?? "");
       } else {
         setCareerName("");
         setCareerId("");
