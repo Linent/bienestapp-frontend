@@ -31,9 +31,11 @@ const MAX_HOURS = 20;
 export default function AdvisoryCardsPage() {
   const router = useRouter();
   const { advisorId } = router.query;
+
   const [advisories, setAdvisories] = useState<Advisory[]>([]);
   const [advisorName, setAdvisorName] = useState("");
   const [careerName, setCareerName] = useState("");
+  const [careerId, setCareerId] = useState("");
   const [availableHours, setAvailableHours] = useState(0);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [editAdvisory, setEditAdvisory] = useState<Advisory | null>(null);
@@ -53,14 +55,22 @@ export default function AdvisoryCardsPage() {
       .catch(console.error);
   }, [advisorId]);
 
+  // Cargar info del asesor, nombre, carrera y careerId
   useEffect(() => {
     if (typeof advisorId !== "string") return;
-    fetchAdvisorById(advisorId)
-      .then(({ name, career }) => {
-        setAdvisorName(name);
-        setCareerName(career);
-      })
-      .catch(console.error);
+      fetchAdvisorById(advisorId)
+    .then(({ name, career }) => {
+      console.log("Respuesta del backend:", { name, career });
+      setAdvisorName(name);
+      if (career && typeof career === "object") {
+        setCareerName(career.name ?? "");
+        setCareerId(career._id ?? "");
+      } else {
+        setCareerName("");
+        setCareerId("");
+      }
+    })
+    .catch(console.error);
   }, [advisorId]);
 
   useEffect(() => {
@@ -101,7 +111,10 @@ export default function AdvisoryCardsPage() {
             <p className="text-gray-600">Carrera: {careerName}</p>
           </div>
           {availableHours < MAX_HOURS && (
-            <Button color="primary" onPress={() => setCreateModalOpen(true)}>
+            <Button
+              color="primary"
+              onPress={() => setCreateModalOpen(true)}
+            >
               Agregar Asesoría
             </Button>
           )}
@@ -179,7 +192,7 @@ export default function AdvisoryCardsPage() {
                                     className="mt-1"
                                     onPress={() => setEditAdvisory(adv)}
                                   >
-                                    <EditIcon/> Editar
+                                    <EditIcon /> Editar
                                   </Button>
                                 )}
                               </CardBody>
@@ -203,7 +216,7 @@ export default function AdvisoryCardsPage() {
             isOpen={isCreateModalOpen}
             onClose={() => setCreateModalOpen(false)}
             advisorId={advisorId as string}
-            careerId={careerName}
+            careerId={careerId}
             onSuccess={() => {
               loadAdvisories();
               setCreateModalOpen(false);

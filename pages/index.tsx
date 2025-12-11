@@ -28,7 +28,7 @@ export default function IndexPage() {
       subtitle: "Estamos contigo en casa",
       description: "Vuelve la Oficina Virtual de Bienestar Universitario UFPS",
       imageUrl:
-        "https://scontent.fbga2-1.fna.fbcdn.net/v/t1.6435-9/174627494_3709278305865154_4523148945106296178_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGWGS_v5Xe4qpB2Jp8yVJs_7TreAsdix6btOt4Cx2LHphuFQKUBWsW247CAjhV2A5o&_nc_ohc=8QPiUPDl1QAQ7kNvwHJJut4&_nc_oc=AdmpXwnM48nUZjfoPqL1SjC6JPOJGiOhpi7aMkc4ejr4oSVIED2h5rEZLHp6X0cRYiYrlsStpIkFA7GCXC9XYCk8&_nc_zt=23&_nc_ht=scontent.fbga2-1.fna&_nc_gid=h1axsWGo1vp8C3tQDkUFgA&oh=00_AfJmhbNrtwhTo8Vc95iX3FiCdn1tBP95d3Qs-k0DROaO4A&oe=684A3CE5",
+        "https://ww2.ufps.edu.co/public/imagenes/noticia/5be7e3b209524e9d9c68fc5f8322e198.jpg",
       href: "https://docs.google.com/forms/d/e/1FAIpQLSdKak7SIRrRkJpY6qGZifM4N3M4MQZDxvsUfAB7NFqqo6EMhA/viewform?fbclid=IwY2xjawJWx2xleHRuA2FlbQIxMAABHaQGDS6nXnCB52cbwJco3mp9WBmooacWSIKq-BN3GjMLzN1VTz2mLLllzg_aem__WChdfqJofJEOc1QqaYIsQ",
     },
   ];
